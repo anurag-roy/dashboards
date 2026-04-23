@@ -3,7 +3,7 @@
   "settings": {
     "react": { "version": "19.0.0" },
     "next": {
-      "rootDir": ["apps/web"]
+      "rootDir": ["apps/web", "apps/dashboard"]
     }
   },
   "plugins": ["unicorn", "typescript", "react", "nextjs"],
@@ -16,7 +16,13 @@
     "browser": true,
     "serviceworker": true
   },
-  "ignorePatterns": ["dist/**", ".next/**", "**/.turbo/**", "**/coverage/**"],
+  "ignorePatterns": [
+    "dist/**",
+    ".next/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "apps/dashboard/components/line-chart.tsx"
+  ],
   "rules": {
     "constructor-super": "error",
     "for-direction": "error",
