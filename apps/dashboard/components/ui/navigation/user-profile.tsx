@@ -22,9 +22,9 @@ export function UserProfileDesktop() {
             className='flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs text-muted-foreground'
             aria-hidden='true'
           >
-            ES
+            AR
           </span>
-          <span>Emma Stone</span>
+          <span>Anurag Roy</span>
         </span>
         <MoreHorizontal
           className='size-4 shrink-0 text-muted-foreground group-hover:text-foreground'
@@ -47,7 +47,7 @@ export function UserProfileMobile() {
           className='flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs text-muted-foreground'
           aria-hidden='true'
         >
-          ES
+          AR
         </span>
       </Button>
     </DropdownUserProfile>

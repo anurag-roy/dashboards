@@ -32,9 +32,9 @@ const TabNavigationLink = React.forwardRef<HTMLAnchorElement, TabNavigationLinkP
           ref={ref}
           data-active={active ? '' : undefined}
           className={cn(
-            '-mb-px flex items-center rounded-t-2xl border-b-2 border-transparent px-4 pt-1 pb-2.5 text-sm font-medium text-muted-foreground transition-all',
+            '-mb-px flex items-center rounded-t-2xl border-b-2 border-transparent px-4 pt-1 pb-2.5 text-sm font-medium text-muted-foreground transition-[color,border-color,background-color] duration-150 ease-out',
             'hover:border-border hover:text-foreground',
-            'data-[active]:border-primary data-[active]:text-primary',
+            'data-active:border-primary data-active:text-primary',
             focusRing,
             className
           )}

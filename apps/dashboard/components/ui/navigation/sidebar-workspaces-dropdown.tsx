@@ -16,9 +16,9 @@ import * as React from 'react';
 
 const workspaces = [
   {
-    value: 'retail-analytics',
-    name: 'Retail analytics',
-    initials: 'RA',
+    value: 'pulse-analytics',
+    name: 'Pulse analytics',
+    initials: 'PA',
     role: 'Member',
     color: 'bg-primary',
   },
@@ -53,11 +53,11 @@ export function WorkspacesDropdownDesktop() {
               className='flex aspect-square size-8 items-center justify-center rounded-2xl bg-primary p-2 text-xs font-medium text-primary-foreground'
               aria-hidden='true'
             >
-              RA
+              PA
             </span>
             <div className='flex w-full items-center justify-between gap-x-4 truncate'>
               <div className='truncate'>
-                <p className='truncate text-sm font-medium whitespace-nowrap text-foreground'>Retail analytics</p>
+                <p className='truncate text-sm font-medium whitespace-nowrap text-foreground'>Pulse analytics</p>
                 <p className='text-left text-xs whitespace-nowrap text-muted-foreground'>Member</p>
               </div>
               <ChevronDown className='size-5 shrink-0 text-muted-foreground' aria-hidden='true' />
@@ -121,11 +121,11 @@ export function WorkspacesDropdownMobile() {
               className='flex aspect-square size-7 items-center justify-center rounded-xl bg-primary p-2 text-xs font-medium text-primary-foreground'
               aria-hidden='true'
             >
-              RA
+              PA
             </span>
             <ChevronRight className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
             <div className='flex min-w-0 flex-1 items-center justify-between gap-x-3'>
-              <p className='truncate text-sm font-medium text-foreground'>Retail analytics</p>
+              <p className='truncate text-sm font-medium text-foreground'>Pulse analytics</p>
               <ChevronDown className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
             </div>
           </button>

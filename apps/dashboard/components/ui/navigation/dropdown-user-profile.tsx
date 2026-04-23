@@ -45,7 +45,7 @@ export function DropdownUserProfile({ children, align = 'start' }: DropdownUserP
       />
       <DropdownMenuContent align={align}>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>emma.stone@acme.com</DropdownMenuLabel>
+          <DropdownMenuLabel>hello@anuragroy.dev</DropdownMenuLabel>
         </DropdownMenuGroup>
         <div className='sm:hidden'>
           <DropdownMenuGroup>

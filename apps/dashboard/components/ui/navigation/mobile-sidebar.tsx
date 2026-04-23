@@ -52,7 +52,7 @@ export function MobileSidebar() {
       />
       <SheetContent side='left' className='w-full sm:max-w-lg' showCloseButton>
         <SheetHeader>
-          <SheetTitle>Retail Analytics</SheetTitle>
+          <SheetTitle>Pulse Analytics</SheetTitle>
         </SheetHeader>
         <div className='px-3 pb-8'>
           <nav aria-label='core mobile navigation links' className='flex flex-1 flex-col gap-8 pt-2'>
