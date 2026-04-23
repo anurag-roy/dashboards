@@ -186,20 +186,20 @@ export default function GeneralPage() {
             </div>
             <div className='space-y-6 md:col-span-2'>
               <Card className='p-4'>
-                <div className='flex items-start justify-between gap-10'>
+                <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-10'>
                   <div>
                     <h4 className='text-sm font-medium text-foreground'>Leave workspace</h4>
                     <p className='mt-2 text-sm leading-6 text-muted-foreground'>
                       Revoke your access to this team. Other people you have added to the workspace will remain.
                     </p>
                   </div>
-                  <Button variant='secondary' className='text-destructive'>
+                  <Button variant='secondary' className='self-start text-destructive sm:self-auto'>
                     Leave
                   </Button>
                 </div>
               </Card>
               <Card className='overflow-hidden p-0'>
-                <CardContent className='flex items-start justify-between gap-10 p-4'>
+                <CardContent className='flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-10'>
                   <div>
                     <h4 className='text-sm font-medium text-muted-foreground'>Delete workspace</h4>
                     <p className='mt-2 text-sm leading-6 text-muted-foreground'>
@@ -209,7 +209,7 @@ export default function GeneralPage() {
                   <Button
                     variant='secondary'
                     disabled
-                    className='whitespace-nowrap text-destructive disabled:opacity-50'
+                    className='self-start whitespace-nowrap text-destructive disabled:opacity-50 sm:self-auto'
                   >
                     Delete workspace
                   </Button>

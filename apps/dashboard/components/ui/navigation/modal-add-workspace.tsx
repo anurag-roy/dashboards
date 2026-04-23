@@ -63,20 +63,20 @@ export function ModalAddWorkspace({ itemName, onSelect, onOpenChange }: ModalAdd
               <DialogDescription className='mt-1 text-sm leading-6'>
                 With free plan, you can add up to 10 workspaces.
               </DialogDescription>
-              <div className='mt-4 grid grid-cols-2 gap-4'>
-                <div>
+              <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                <div className='min-w-0'>
                   <Label htmlFor='workspace-name' className='font-medium'>
                     Workspace name
                   </Label>
                   <Input id='workspace-name' name='workspace-name' placeholder='my_workspace' className='mt-2' />
                 </div>
-                <div>
+                <div className='min-w-0'>
                   <Label htmlFor='starter-kit' className='font-medium'>
                     Starter kit
                   </Label>
                   <Select defaultValue='empty-workspace' items={starterKitOptions}>
                     <SelectTrigger id='starter-kit' name='starter-kit' className='mt-2 w-full'>
-                      <SelectValue />
+                      <SelectValue className='truncate' />
                     </SelectTrigger>
                     <SelectContent>
                       {starterKitOptions.map((starterKitOption) => (
@@ -93,7 +93,7 @@ export function ModalAddWorkspace({ itemName, onSelect, onOpenChange }: ModalAdd
                   </Label>
                   <Select defaultValue='europe-west-01' items={databaseRegionOptions}>
                     <SelectTrigger id='database-region' name='database-region' className='mt-2 w-full'>
-                      <SelectValue />
+                      <SelectValue className='truncate' />
                     </SelectTrigger>
                     <SelectContent>
                       {databaseRegionOptions.map((databaseRegionOption) => (
@@ -114,7 +114,7 @@ export function ModalAddWorkspace({ itemName, onSelect, onOpenChange }: ModalAdd
                   {databases.map((database) => (
                     <label
                       key={database.value}
-                      className='flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-transparent has-[:checked]:border-primary has-[:checked]:ring-primary/20'
+                      className='flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-transparent has-checked:border-primary has-checked:ring-primary/20'
                     >
                       <input
                         type='radio'

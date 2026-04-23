@@ -47,32 +47,58 @@ export function DropdownUserProfile({ children, align = 'start' }: DropdownUserP
         <DropdownMenuGroup>
           <DropdownMenuLabel>emma.stone@acme.com</DropdownMenuLabel>
         </DropdownMenuGroup>
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup
-                value={theme}
-                onValueChange={(value) => {
-                  setTheme(value);
-                }}
-              >
-                <DropdownMenuRadioItem value='light' aria-label='Switch to Light Mode'>
-                  <Sun className='size-4 shrink-0' aria-hidden='true' />
-                  Light
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value='dark' aria-label='Switch to Dark Mode'>
-                  <Moon className='size-4 shrink-0' aria-hidden='true' />
-                  Dark
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value='system' aria-label='Switch to System Mode'>
-                  <Computer className='size-4 shrink-0' aria-hidden='true' />
-                  System
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
+        <div className='sm:hidden'>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Theme</DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={theme}
+              onValueChange={(value) => {
+                setTheme(value);
+              }}
+            >
+              <DropdownMenuRadioItem value='light' aria-label='Switch to Light Mode'>
+                <Sun className='size-4 shrink-0' aria-hidden='true' />
+                Light
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value='dark' aria-label='Switch to Dark Mode'>
+                <Moon className='size-4 shrink-0' aria-hidden='true' />
+                Dark
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value='system' aria-label='Switch to System Mode'>
+                <Computer className='size-4 shrink-0' aria-hidden='true' />
+                System
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuGroup>
+        </div>
+        <div className='hidden sm:block'>
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuRadioGroup
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value);
+                  }}
+                >
+                  <DropdownMenuRadioItem value='light' aria-label='Switch to Light Mode'>
+                    <Sun className='size-4 shrink-0' aria-hidden='true' />
+                    Light
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value='dark' aria-label='Switch to Dark Mode'>
+                    <Moon className='size-4 shrink-0' aria-hidden='true' />
+                    Dark
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value='system' aria-label='Switch to System Mode'>
+                    <Computer className='size-4 shrink-0' aria-hidden='true' />
+                    System
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
