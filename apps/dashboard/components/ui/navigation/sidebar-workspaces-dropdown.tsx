@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { ModalAddWorkspace } from '@/components/ui/navigation/modal-add-workspace';
-import { cn, focusInput } from '@/lib/utils';
+import { ModalAddWorkspace } from "@/components/ui/navigation/modal-add-workspace";
+import { DashboardAvatar } from "@/components/dashboard-avatar";
+import { cn, focusInput } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,19 +11,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import * as React from 'react';
+} from "@workspace/ui/components/dropdown-menu";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import * as React from "react";
 
 const workspaces = [
   {
-    value: 'pulse-analytics',
-    name: 'Pulse analytics',
-    initials: 'PA',
-    role: 'Member',
-    color: 'bg-primary',
+    value: "pulse-analytics",
+    name: "Pulse analytics",
+    role: "Member",
   },
 ] as const;
+
+const selectedWorkspace = workspaces[0];
+
+const getWorkspaceAvatarSeed = (workspace: (typeof workspaces)[number]) =>
+  workspace.value;
 
 export function WorkspacesDropdownDesktop() {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -38,58 +42,76 @@ export function WorkspacesDropdownDesktop() {
   };
 
   return (
-    <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen} modal={false}>
+    <DropdownMenu
+      open={dropdownOpen}
+      onOpenChange={setDropdownOpen}
+      modal={false}
+    >
       <DropdownMenuTrigger
         ref={dropdownTriggerRef}
         render={
           <button
-            type='button'
+            type="button"
             className={cn(
-              'flex w-full items-center gap-x-3 rounded-2xl border border-border bg-card p-2.5 text-sm shadow-sm transition-all hover:bg-muted/60',
-              focusInput
+              "flex w-full items-center gap-x-3 rounded-2xl border border-border bg-card p-2.5 text-sm shadow-sm transition-all hover:bg-muted/60",
+              focusInput,
             )}
           >
-            <span
-              className='flex aspect-square size-8 items-center justify-center rounded-2xl bg-primary p-2 text-xs font-medium text-primary-foreground'
-              aria-hidden='true'
-            >
-              PA
-            </span>
-            <div className='flex w-full items-center justify-between gap-x-4 truncate'>
-              <div className='truncate'>
-                <p className='truncate text-sm font-medium whitespace-nowrap text-foreground'>Pulse analytics</p>
-                <p className='text-left text-xs whitespace-nowrap text-muted-foreground'>Member</p>
+            <DashboardAvatar
+              seed={getWorkspaceAvatarSeed(selectedWorkspace)}
+              square
+              className="size-8 rounded-2xl border-border/70"
+            />
+            <div className="flex w-full items-center justify-between gap-x-4 truncate">
+              <div className="truncate">
+                <p className="truncate text-sm font-medium whitespace-nowrap text-foreground">
+                  {selectedWorkspace.name}
+                </p>
+                <p className="text-left text-xs whitespace-nowrap text-muted-foreground">
+                  {selectedWorkspace.role}
+                </p>
               </div>
-              <ChevronDown className='size-5 shrink-0 text-muted-foreground' aria-hidden='true' />
+              <ChevronDown
+                className="size-5 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
             </div>
           </button>
         }
       />
-      <DropdownMenuContent className={cn('min-w-72', hasOpenDialog && 'hidden')}>
+      <DropdownMenuContent
+        className={cn("min-w-72", hasOpenDialog && "hidden")}
+      >
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Workspaces ({workspaces.length})</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            Workspaces ({workspaces.length})
+          </DropdownMenuLabel>
           {workspaces.map((workspace) => (
             <DropdownMenuItem key={workspace.value}>
-              <div className='flex w-full items-center gap-x-2.5'>
-                <span
-                  className={cn(
-                    workspace.color,
-                    'flex aspect-square size-8 items-center justify-center rounded-xl p-2 text-xs font-medium text-primary-foreground'
-                  )}
-                  aria-hidden='true'
-                >
-                  {workspace.initials}
-                </span>
+              <div className="flex w-full items-center gap-x-2.5">
+                <DashboardAvatar
+                  seed={getWorkspaceAvatarSeed(workspace)}
+                  square
+                  className="size-8 rounded-2xl border-border/70"
+                />
                 <div>
-                  <p className='text-sm font-medium text-foreground'>{workspace.name}</p>
-                  <p className='text-xs text-muted-foreground'>{workspace.role}</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {workspace.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {workspace.role}
+                  </p>
                 </div>
               </div>
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <ModalAddWorkspace onSelect={() => {}} onOpenChange={handleDialogItemOpenChange} itemName='Add workspace' />
+        <ModalAddWorkspace
+          onSelect={() => {}}
+          onOpenChange={handleDialogItemOpenChange}
+          itemName="Add workspace"
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -109,53 +131,72 @@ export function WorkspacesDropdownMobile() {
   };
 
   return (
-    <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen} modal={false}>
+    <DropdownMenu
+      open={dropdownOpen}
+      onOpenChange={setDropdownOpen}
+      modal={false}
+    >
       <DropdownMenuTrigger
         ref={dropdownTriggerRef}
         render={
           <button
-            type='button'
-            className='flex max-w-[min(100%,20rem)] min-w-0 items-center gap-x-1.5 rounded-2xl p-2.5 hover:bg-muted focus:outline-none'
+            type="button"
+            className="flex max-w-[min(100%,20rem)] min-w-0 items-center gap-x-1.5 rounded-2xl p-2.5 hover:bg-muted focus:outline-none"
           >
-            <span
-              className='flex aspect-square size-7 items-center justify-center rounded-xl bg-primary p-2 text-xs font-medium text-primary-foreground'
-              aria-hidden='true'
-            >
-              PA
-            </span>
-            <ChevronRight className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
-            <div className='flex min-w-0 flex-1 items-center justify-between gap-x-3'>
-              <p className='truncate text-sm font-medium text-foreground'>Pulse analytics</p>
-              <ChevronDown className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
+            <DashboardAvatar
+              seed={getWorkspaceAvatarSeed(selectedWorkspace)}
+              square
+              className="size-8 rounded-2xl border-border/70"
+            />
+            <ChevronRight
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-x-3">
+              <p className="truncate text-sm font-medium text-foreground">
+                {selectedWorkspace.name}
+              </p>
+              <ChevronDown
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
             </div>
           </button>
         }
       />
-      <DropdownMenuContent className={cn('!min-w-72', hasOpenDialog && 'hidden')}>
+      <DropdownMenuContent
+        className={cn("min-w-72!", hasOpenDialog && "hidden")}
+      >
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Workspaces ({workspaces.length})</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            Workspaces ({workspaces.length})
+          </DropdownMenuLabel>
           {workspaces.map((workspace) => (
             <DropdownMenuItem key={workspace.value}>
-              <div className='flex w-full items-center gap-x-2.5'>
-                <span
-                  className={cn(
-                    workspace.color,
-                    'flex size-8 items-center justify-center rounded-xl p-2 text-xs font-medium text-primary-foreground'
-                  )}
-                  aria-hidden='true'
-                >
-                  {workspace.initials}
-                </span>
+              <div className="flex w-full items-center gap-x-2.5">
+                <DashboardAvatar
+                  seed={getWorkspaceAvatarSeed(workspace)}
+                  square
+                  className="size-8 rounded-2xl border-border/70"
+                />
                 <div>
-                  <p className='text-sm font-medium text-foreground'>{workspace.name}</p>
-                  <p className='text-xs text-muted-foreground'>{workspace.role}</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {workspace.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {workspace.role}
+                  </p>
                 </div>
               </div>
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <ModalAddWorkspace onSelect={() => {}} onOpenChange={handleDialogItemOpenChange} itemName='Add workspace' />
+        <ModalAddWorkspace
+          onSelect={() => {}}
+          onOpenChange={handleDialogItemOpenChange}
+          itemName="Add workspace"
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
