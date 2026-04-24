@@ -55,3 +55,39 @@ Use this guide when migrating any app into this monorepo with shadcn/ui.
   - lint
   - typecheck
   - build (for affected app)
+
+## Base UI / shadcn Integration Gotchas
+
+- Many `@workspace/ui` wrappers are Base UI based (not Radix APIs).
+- Prefer `render` patterns expected by the wrapper APIs; do not assume `asChild` support.
+- For dropdown labels in this codebase, keep `DropdownMenuLabel` inside `DropdownMenuGroup` to avoid missing group context runtime errors.
+- Avoid controlled/uncontrolled flips in Base UI components (`Select`, etc.); initialize and reset with stable value shapes.
+
+## Select Rules (Behavior, Not Just Spacing)
+
+- For user-facing `Select` labels, pass `items` to `Select` and use proper `label`/child text so selected values are human-readable (not kebab-case IDs).
+- Select triggers used in forms should explicitly get `w-full` when they sit in grid columns; otherwise they may collapse to content width.
+
+## Tabs Rules
+
+- Use shadcn `Tabs` primitives directly for settings-like tab rows.
+- Keep `TabsTrigger` as a native button; for route tabs, navigate via `Tabs` `onValueChange` + router push.
+- For `line` variant tabs, avoid custom color overrides unless required; defaults handle active/hover/dark states better.
+- Prevent equal-width stretching by setting triggers to content width (`flex-none`) when needed.
+
+## Chart Migration Rules
+
+- Use `@workspace/ui/components/chart` primitives for new charts.
+- Keep Recharts versions aligned across workspace packages (single major/version). Mixed versions can render empty charts without obvious errors.
+- Prefer semantic chart tokens (`--chart-*`, `text-muted-foreground`, etc.) over hardcoded palette classes.
+
+## Mobile Navigation Rules
+
+- On mobile, avoid stacking nested dropdown/popover flows for account/workspace controls.
+- Prefer a single hamburger surface with flat menu items for theme/account/workspace actions.
+- Avoid duplicate identity surfaces (workspace/account shown twice in one mobile sheet).
+
+## Layout Norms For Dashboard Shell
+
+- Default dashboard pattern: sidebar pinned left, content area constrained and centered on RHS (`max-w-*` content column).
+- Avoid centering the whole shell by default unless explicitly requested.
