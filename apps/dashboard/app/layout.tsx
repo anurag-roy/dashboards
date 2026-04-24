@@ -3,8 +3,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import '@workspace/ui/globals.css';
 import { siteConfig } from '@/app/siteConfig';
-import { Sidebar } from '@/components/ui/navigation/sidebar';
+import { MobileSidebarHeader, Sidebar } from '@/components/ui/navigation/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SidebarInset, SidebarProvider } from '@workspace/ui/components/sidebar';
 import { cn } from '@workspace/ui/lib/utils';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 
@@ -52,10 +53,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <TooltipProvider delay={0}>
-            <div className='mx-auto max-w-screen-2xl'>
+            <SidebarProvider>
               <Sidebar />
-              <main className='lg:pl-72'>{children}</main>
-            </div>
+              <SidebarInset>
+                <MobileSidebarHeader />
+                <div className='mx-auto w-full max-w-7xl'>{children}</div>
+              </SidebarInset>
+            </SidebarProvider>
           </TooltipProvider>
         </ThemeProvider>
       </body>

@@ -11,7 +11,8 @@ const insightBadgeVariants = tv({
       neutral: 'bg-muted text-muted-foreground ring-border dark:bg-muted/60',
       success:
         'bg-emerald-500/10 text-emerald-800 ring-emerald-600/30 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30',
-      error: 'bg-red-500/10 text-red-800 ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20',
+      error:
+        'bg-destructive/10 text-destructive ring-destructive/30 dark:bg-destructive/15 dark:text-destructive dark:ring-destructive/40',
       warning:
         'bg-amber-500/10 text-amber-800 ring-amber-600/30 dark:bg-amber-500/10 dark:text-amber-500 dark:ring-amber-500/20',
     },

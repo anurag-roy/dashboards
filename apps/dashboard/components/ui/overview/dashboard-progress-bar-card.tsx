@@ -47,7 +47,7 @@ export function ProgressBarCard({
                   </span>
                 </span>
               </p>
-              <ProgressBar value={item.percentage} className='mt-2 [&>*]:h-1.5' />
+              <ProgressBar value={item.percentage} className='mt-2 *:h-1.5' />
             </li>
           ))}
         </ul>

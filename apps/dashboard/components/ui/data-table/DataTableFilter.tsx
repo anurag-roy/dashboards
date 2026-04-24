@@ -226,7 +226,9 @@ export function DataTableFilter<TData, TValue>({
                     value={numberFilter.value?.[1] as string | number}
                     onChange={(e) => {
                       setSelectedValues((prev) => {
-                        const previousNumberFilter = isConditionFilter(prev) ? prev : { condition: '', value: ['', ''] };
+                        const previousNumberFilter = isConditionFilter(prev)
+                          ? prev
+                          : { condition: '', value: ['', ''] };
                         return {
                           condition: previousNumberFilter.condition,
                           value: [previousNumberFilter.value?.[0], e.target.value],

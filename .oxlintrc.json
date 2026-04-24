@@ -3,7 +3,7 @@
   "settings": {
     "react": { "version": "19.0.0" },
     "next": {
-      "rootDir": ["apps/web", "apps/dashboard"]
+      "rootDir": ["apps/dashboard"]
     }
   },
   "plugins": ["unicorn", "typescript", "react", "nextjs"],
@@ -20,8 +20,7 @@
     "dist/**",
     ".next/**",
     "**/.turbo/**",
-    "**/coverage/**",
-    "apps/dashboard/components/line-chart.tsx"
+    "**/coverage/**"
   ],
   "rules": {
     "constructor-super": "error",

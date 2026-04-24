@@ -93,12 +93,7 @@ function SelectLabel({ className, ...props }: SelectPrimitive.GroupLabel.Props) 
 
 function SelectItem({ className, children, label, ...props }: SelectPrimitive.Item.Props) {
   const inferredLabel =
-    label ??
-    (typeof children === 'string'
-      ? children
-      : typeof children === 'number'
-        ? String(children)
-        : undefined);
+    label ?? (typeof children === 'string' ? children : typeof children === 'number' ? String(children) : undefined);
 
   return (
     <SelectPrimitive.Item

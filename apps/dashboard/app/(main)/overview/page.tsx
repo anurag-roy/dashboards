@@ -96,7 +96,7 @@ export default function OverviewPage() {
         <h1 id='usage-overview' className='mt-16 scroll-mt-8 text-lg font-semibold text-foreground sm:text-xl'>
           Overview
         </h1>
-        <div className='sticky top-16 z-20 flex items-center justify-between border-b border-border bg-background pt-4 pb-4 sm:pt-6 lg:top-0 lg:mx-0 lg:px-0 lg:pt-8 dark:bg-background'>
+        <div className='sticky top-16 z-20 flex items-center justify-between border-b border-border bg-background pt-4 pb-4 sm:pt-6 md:top-0 md:mx-0 md:px-0 md:pt-8 dark:bg-background'>
           <Filterbar
             maxDate={maxDate}
             minDate={new Date(2024, 0, 1)}

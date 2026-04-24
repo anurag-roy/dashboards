@@ -38,7 +38,7 @@ const Searchbar = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         <div className='pointer-events-none absolute bottom-0 left-3 flex h-full items-center justify-center text-muted-foreground'>
-          <Search className='size-[1.125rem] shrink-0' aria-hidden='true' />
+          <Search className='size-4.5 shrink-0' aria-hidden='true' />
         </div>
       </div>
     );

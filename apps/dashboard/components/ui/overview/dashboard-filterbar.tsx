@@ -115,7 +115,9 @@ export function Filterbar({
             <DialogTitle>Customise overview charts</DialogTitle>
             <DialogDescription className='sr-only'>Add or remove the charts for the overview panel.</DialogDescription>
           </DialogHeader>
-          <div className={cn('mt-2 grid max-h-[70vh] grid-cols-1 gap-5 overflow-y-auto md:grid-cols-2 2xl:grid-cols-3')}>
+          <div
+            className={cn('mt-2 grid max-h-[70vh] grid-cols-1 gap-5 overflow-y-auto md:grid-cols-2 2xl:grid-cols-3')}
+          >
             {categories.map((category) => (
               <Label
                 htmlFor={category.title}

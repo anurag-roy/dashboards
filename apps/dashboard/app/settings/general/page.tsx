@@ -84,7 +84,7 @@ export default function GeneralPage() {
                     Role
                   </Label>
                   <Select defaultValue='member' items={roles}>
-                    <SelectTrigger name='role' id='role' className='mt-2' disabled>
+                    <SelectTrigger name='role' id='role' className='mt-2 w-full' disabled>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

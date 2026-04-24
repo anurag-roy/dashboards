@@ -20,8 +20,8 @@ const progressCircleVariants = tv({
         circle: 'stroke-amber-500',
       },
       error: {
-        background: 'stroke-red-200 dark:stroke-red-500/30',
-        circle: 'stroke-red-500',
+        background: 'stroke-destructive/15 dark:stroke-destructive/25',
+        circle: 'stroke-destructive',
       },
       success: {
         background: 'stroke-emerald-200 dark:stroke-emerald-500/30',

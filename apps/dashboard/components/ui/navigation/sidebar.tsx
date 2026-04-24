@@ -1,14 +1,29 @@
 'use client';
 
 import { siteConfig } from '@/app/siteConfig';
-import { cn, focusRing } from '@/lib/utils';
-import { Home, Link2, ListChecks, Settings } from 'lucide-react';
+import { Button } from '@workspace/ui/components/button';
+import { Computer, ExternalLink, Home, Link2, ListChecks, Menu, Moon, Settings, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import * as React from 'react';
+import {
+  Sidebar as SidebarPrimitive,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@workspace/ui/components/sidebar';
+import { useTheme } from 'next-themes';
 
-import { MobileSidebar } from './mobile-sidebar';
-import { UserProfileDesktop, UserProfileMobile } from './user-profile';
-import { WorkspacesDropdownDesktop, WorkspacesDropdownMobile } from './sidebar-workspaces-dropdown';
+import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { UserProfileDesktop } from './user-profile';
+import { WorkspacesDropdownDesktop } from './sidebar-workspaces-dropdown';
 
 const navigation = [
   { name: 'Overview', href: siteConfig.baseLinks.overview, icon: Home },
@@ -43,71 +58,213 @@ const shortcuts = [
   },
 ] as const;
 
-export function Sidebar() {
+const workspaceSummary = {
+  name: 'Pulse analytics',
+  role: 'Member',
+  seed: 'pulse-analytics',
+} as const;
+
+const mobileAccountItems = [
+  { name: 'Changelog', icon: ExternalLink },
+  { name: 'Documentation', icon: ExternalLink },
+  { name: 'Join Slack community', icon: ExternalLink },
+] as const;
+
+type MobileSidebarUtilityGroupsProps = {
+  isMobile: boolean;
+  onItemClick: () => void;
+};
+
+function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtilityGroupsProps) {
+  const [mounted, setMounted] = React.useState(false);
+  const { theme, setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isMobile) {
+    return null;
+  }
+
+  return (
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'light'}
+                onClick={() => {
+                  setTheme('light');
+                }}
+              >
+                <Sun className='size-4 shrink-0' aria-hidden='true' />
+                <span>Light theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'dark'}
+                onClick={() => {
+                  setTheme('dark');
+                }}
+              >
+                <Moon className='size-4 shrink-0' aria-hidden='true' />
+                <span>Dark theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'system'}
+                onClick={() => {
+                  setTheme('system');
+                }}
+              >
+                <Computer className='size-4 shrink-0' aria-hidden='true' />
+                <span>System theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {mobileAccountItems.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton type='button' onClick={onItemClick}>
+                  <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
+                  <span>{item.name}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+            <SidebarMenuItem>
+              <SidebarMenuButton type='button' onClick={onItemClick}>
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </>
+  );
+}
+
+function SidebarNavContent() {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleItemClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   const isActive = (itemHref: string) => {
     if (itemHref === siteConfig.baseLinks.settings.general) {
       return pathname.startsWith('/settings');
     }
     return pathname === itemHref || pathname.startsWith(itemHref);
   };
+
   return (
     <>
-      <nav className='hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col' aria-label='App'>
-        <aside className='flex grow flex-col gap-y-8 overflow-y-auto border-r border-border bg-background px-4 py-5'>
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {navigation.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  isActive={isActive(item.href)}
+                  render={<Link href={item.href} onClick={handleItemClick} />}
+                >
+                  <item.icon className='size-4 shrink-0' aria-hidden='true' />
+                  <span>{item.name}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Shortcuts</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {shortcuts.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton render={<Link href={item.href} onClick={handleItemClick} />}>
+                  <item.icon className='size-4 shrink-0' aria-hidden='true' />
+                  <span>{item.name}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <MobileSidebarUtilityGroups isMobile={isMobile} onItemClick={handleItemClick} />
+    </>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <SidebarPrimitive>
+      <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
+        <div className='hidden md:block'>
           <WorkspacesDropdownDesktop />
-          <nav aria-label='core navigation links' className='flex flex-1 flex-col gap-10'>
-            <ul role='list' className='flex flex-col gap-1'>
-              {navigation.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      isActive(item.href)
-                        ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
-                        : 'text-muted-foreground hover:text-foreground',
-                      'flex items-center gap-x-2.5 rounded-2xl px-3 py-2 text-sm font-medium transition hover:bg-muted',
-                      focusRing
-                    )}
-                  >
-                    <item.icon className='size-4 shrink-0' aria-hidden='true' />
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div>
-              <span className='text-xs leading-6 font-semibold text-muted-foreground'>Shortcuts</span>
-              <ul aria-label='shortcuts' role='list' className='mt-1 flex flex-col gap-1'>
-                {shortcuts.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        'flex items-center gap-x-2.5 rounded-2xl px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground',
-                        focusRing
-                      )}
-                    >
-                      <item.icon className='size-4 shrink-0' aria-hidden='true' />
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        </div>
+        <div className='px-1 md:hidden'>
+          <div className='flex items-center gap-3 rounded-2xl px-3 py-2.5'>
+            <DashboardAvatar seed={workspaceSummary.seed} square className='size-8 rounded-2xl border-border/70' />
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-medium text-foreground'>{workspaceSummary.name}</p>
+              <p className='truncate text-xs text-muted-foreground'>{workspaceSummary.role}</p>
             </div>
-          </nav>
-          <div className='mt-auto'>
+          </div>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarNavContent />
+      </SidebarContent>
+      <SidebarFooter>
+        <div className='md:block'>
+          <div className='hidden md:block'>
             <UserProfileDesktop />
           </div>
-        </aside>
-      </nav>
-      <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 shadow-sm backdrop-blur sm:gap-x-6 sm:px-5 lg:hidden'>
-        <WorkspacesDropdownMobile />
-        <div className='flex items-center gap-1 sm:gap-2'>
-          <UserProfileMobile />
-          <MobileSidebar />
+          <div className='px-3 py-2 md:hidden'>
+            <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
+              <DashboardAvatar seed='Anurag Roy' className='size-8' />
+              <div className='min-w-0'>
+                <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
+                <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarFooter>
+    </SidebarPrimitive>
+  );
+}
+
+export function MobileSidebarHeader() {
+  const { toggleSidebar } = useSidebar();
+
+  return (
+    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 shadow-sm backdrop-blur sm:gap-x-6 sm:px-5 md:hidden'>
+      <div className='flex min-w-0 items-center gap-2.5'>
+        <DashboardAvatar seed={workspaceSummary.seed} square className='size-7 rounded-2xl border-border/70' />
+        <div className='min-w-0'>
+          <p className='truncate text-sm font-medium text-foreground'>{workspaceSummary.name}</p>
         </div>
       </div>
-    </>
+      <Button
+        type='button'
+        variant='ghost'
+        aria-label='open sidebar'
+        className='group flex items-center rounded-2xl p-2.5 text-sm font-medium hover:bg-muted'
+        onClick={toggleSidebar}
+      >
+        <Menu className='size-6 shrink-0 sm:size-5' aria-hidden='true' />
+      </Button>
+    </div>
   );
 }
