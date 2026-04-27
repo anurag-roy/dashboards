@@ -54,6 +54,33 @@
         "typescript": "^5.9.3",
       },
     },
+    "apps/insights": {
+      "name": "insights",
+      "version": "0.0.1",
+      "dependencies": {
+        "@tanstack/react-table": "^8.21.3",
+        "@workspace/ui": "workspace:*",
+        "boring-avatars": "^2.0.4",
+        "clsx": "^2.1.1",
+        "date-fns": "^4.1.0",
+        "lucide-react": "^1.9.0",
+        "next": "16.2.4",
+        "next-themes": "^0.4.6",
+        "react": "^19.2.5",
+        "react-dom": "^19.2.5",
+        "recharts": "3.8.0",
+        "tailwind-merge": "^3.5.0",
+        "zod": "^4.1.12",
+      },
+      "devDependencies": {
+        "@tailwindcss/postcss": "^4.2.4",
+        "@types/node": "^25.6.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "@workspace/typescript-config": "workspace:*",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/typescript-config": {
       "name": "@workspace/typescript-config",
       "version": "0.0.0",
@@ -1005,6 +1032,8 @@
     "imurmurhash": ["imurmurhash@0.1.4", "", {}, "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA=="],
 
     "inherits": ["inherits@2.0.4", "", {}, "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ=="],
+
+    "insights": ["insights@workspace:apps/insights"],
 
     "internmap": ["internmap@2.0.3", "", {}, "sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg=="],
 

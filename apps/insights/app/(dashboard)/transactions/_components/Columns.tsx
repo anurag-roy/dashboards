@@ -1,0 +1,126 @@
+'use client';
+
+import { createColumnHelper, type ColumnDef, type Row } from '@tanstack/react-table';
+import { MoreHorizontal } from 'lucide-react';
+import { Button } from '@workspace/ui/components/button';
+import { Checkbox } from '@workspace/ui/components/checkbox';
+import { InsightBadge } from '@workspace/ui/components/insight-badge';
+
+import { expenseStatuses, type Transaction } from '@/lib/data/schema';
+import { formatters } from '@/lib/utils';
+import { DataTableColumnHeader } from './DataTableColumnHeader';
+
+const columnHelper = createColumnHelper<Transaction>();
+const transactionDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+  timeZone: 'UTC',
+});
+
+export const getColumns = ({ onEditClick }: { onEditClick: (row: Row<Transaction>) => void }) =>
+  [
+    columnHelper.display({
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={!table.getIsAllPageRowsSelected() && table.getIsSomeRowsSelected()}
+          onCheckedChange={() => table.toggleAllPageRowsSelected()}
+          aria-label='Select all'
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onClick={(event) => event.stopPropagation()}
+          onCheckedChange={() => row.toggleSelected()}
+          aria-label='Select row'
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        displayName: 'Select',
+      },
+    }),
+    columnHelper.accessor('transaction_date', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Purchased on' />,
+      cell: ({ getValue }) => transactionDateFormatter.format(new Date(getValue())),
+      enableSorting: true,
+      enableHiding: false,
+      meta: {
+        className: 'tabular-nums',
+        displayName: 'Purchased on',
+      },
+    }),
+    columnHelper.accessor('expense_status', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+      enableSorting: true,
+      meta: {
+        className: 'text-left',
+        displayName: 'Status',
+      },
+      cell: ({ row }) => {
+        const value = row.getValue('expense_status');
+        const status = expenseStatuses.find((item) => item.value === value);
+        if (!status) {
+          return value;
+        }
+        return <InsightBadge variant={status.variant}>{status.label}</InsightBadge>;
+      },
+    }),
+    columnHelper.accessor('merchant', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Merchant' />,
+      enableSorting: false,
+      meta: {
+        className: 'text-left',
+        displayName: 'Merchant',
+      },
+    }),
+    columnHelper.accessor('category', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Category' />,
+      enableSorting: false,
+      meta: {
+        className: 'text-left',
+        displayName: 'Category',
+      },
+    }),
+    columnHelper.accessor('amount', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+      enableSorting: true,
+      meta: {
+        className: 'text-right',
+        displayName: 'Amount',
+      },
+      cell: ({ getValue }) => <span className='font-medium'>{formatters.currency(getValue())}</span>,
+    }),
+    columnHelper.display({
+      id: 'actions',
+      header: () => <span className='sr-only'>Actions</span>,
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        className: 'text-right',
+        displayName: 'Actions',
+      },
+      cell: ({ row }) => (
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon-sm'
+          className='rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground'
+          aria-label='Open transaction details'
+          onClick={(event) => {
+            event.stopPropagation();
+            onEditClick(row);
+          }}
+        >
+          <MoreHorizontal className='size-4' aria-hidden='true' />
+        </Button>
+      ),
+    }),
+  ] as ColumnDef<Transaction>[];

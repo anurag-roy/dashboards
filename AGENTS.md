@@ -66,12 +66,14 @@ Use this guide when migrating any app into this monorepo with shadcn/ui.
 ## Select Rules (Behavior, Not Just Spacing)
 
 - For user-facing `Select` labels, pass `items` to `Select` and use proper `label`/child text so selected values are human-readable (not kebab-case IDs).
+- Do not rely on `SelectValue` inferring display text from raw `value`; always provide `items` (and `SelectItem label`) so trigger text matches option casing.
 - Select triggers used in forms should explicitly get `w-full` when they sit in grid columns; otherwise they may collapse to content width.
 
 ## Tabs Rules
 
 - Use shadcn `Tabs` primitives directly for settings-like tab rows.
 - Keep `TabsTrigger` as a native button; for route tabs, navigate via `Tabs` `onValueChange` + router push.
+- Do not render `Link` directly as a `TabsTrigger` `render` target when `nativeButton` semantics are expected; this triggers Base UI native button warnings.
 - For `line` variant tabs, avoid custom color overrides unless required; defaults handle active/hover/dark states better.
 - Prevent equal-width stretching by setting triggers to content width (`flex-none`) when needed.
 
@@ -85,9 +87,16 @@ Use this guide when migrating any app into this monorepo with shadcn/ui.
 
 - On mobile, avoid stacking nested dropdown/popover flows for account/workspace controls.
 - Prefer a single hamburger surface with flat menu items for theme/account/workspace actions.
+- Keep the mobile top bar minimal: workspace summary + hamburger trigger; avoid separate profile/avatar trigger in the header.
+- Ensure mobile sidebar closes after nav/action clicks via `setOpenMobile(false)` handlers.
 - Avoid duplicate identity surfaces (workspace/account shown twice in one mobile sheet).
 
 ## Layout Norms For Dashboard Shell
 
-- Default dashboard pattern: sidebar pinned left, content area constrained and centered on RHS (`max-w-*` content column).
+- Default dashboard pattern: sidebar pinned left, content area constrained and centered on RHS (`max-w-*` content column, currently `max-w-7xl` in this app).
 - Avoid centering the whole shell by default unless explicitly requested.
+
+## Sidebar Surface Styling
+
+- Keep desktop workspace trigger visually aligned with user profile surface (flat/ghost-like) unless a stronger card treatment is explicitly requested.
+- Use subtle separators (`border-sidebar-border` variants) for header grouping before adding elevated cards/shadows.

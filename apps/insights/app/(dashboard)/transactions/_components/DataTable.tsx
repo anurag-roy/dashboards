@@ -1,54 +1,82 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
-import { cn } from '@/lib/utils';
-import * as React from 'react';
-
-import { DataTableBulkEditor } from './DataTableBulkEditor';
-import { Filterbar } from './DataTableFilterbar';
-import { DataTablePagination } from './DataTablePagination';
-
+import { useMemo, useState } from 'react';
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type ColumnFiltersState,
+  type Row,
+  type SortingState,
+  type VisibilityState,
   useReactTable,
 } from '@tanstack/react-table';
+import { Input } from '@workspace/ui/components/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
 
-interface DataTableProps<TData> {
-  columns: ColumnDef<TData>[];
-  data: TData[];
-}
+import { type Transaction } from '@/lib/data/schema';
+import { cn } from '@/lib/utils';
+import { getColumns } from './Columns';
+import { DataTablePagination } from './DataTablePagination';
+import { TableBulkEditor } from './TableBulkEditor';
 
-export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
-  const pageSize = 20;
-  const [rowSelection, setRowSelection] = React.useState({});
+type DataTableProps = {
+  data: Transaction[];
+  pageSize?: number;
+  onEditClick: (row: Row<Transaction>) => void;
+};
+
+export function DataTable({ data, pageSize = 12, onEditClick }: DataTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'transaction_date',
+      desc: true,
+    },
+  ]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  const columns = useMemo(() => getColumns({ onEditClick }), [onEditClick]);
+
   const table = useReactTable({
     data,
     columns,
     state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
       rowSelection,
     },
+    enableRowSelection: true,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     initialState: {
       pagination: {
-        pageIndex: 0,
         pageSize,
       },
     },
-    enableRowSelection: true,
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
-    <div className='space-y-3'>
-      <Filterbar table={table} />
+    <div className='space-y-3 pb-[calc(3.75rem+env(safe-area-inset-bottom))] sm:pb-0'>
+      <div className='flex w-full flex-col gap-3 sm:w-fit sm:flex-row sm:items-center'>
+        <Input
+          placeholder='Search by merchant...'
+          value={(table.getColumn('merchant')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('merchant')?.setFilterValue(event.target.value)}
+          className='h-9 w-full sm:max-w-[260px]'
+        />
+      </div>
+
       <div className='relative overflow-hidden overflow-x-auto'>
         <Table>
           <TableHeader>
@@ -69,13 +97,12 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
-                  onClick={() => row.toggleSelected(!row.getIsSelected())}
-                  className='group cursor-pointer select-none'
+                  className='group select-none'
                 >
                   {row.getVisibleCells().map((cell, index) => (
                     <TableCell
@@ -95,15 +122,16 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
+                <TableCell colSpan={columns.length} className='h-24 text-center text-muted-foreground'>
+                  No transactions found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-        <DataTableBulkEditor table={table} rowSelection={rowSelection} />
+        <TableBulkEditor table={table} rowSelection={rowSelection} />
       </div>
+
       <DataTablePagination table={table} pageSize={pageSize} />
     </div>
   );

@@ -204,7 +204,7 @@ export function ChartCard({ title, type, selectedDates, selectedPeriod, isThumbn
                             {rowLabel ?? (isPreviousValue ? 'Comparison period' : 'Current period')}
                           </span>
                         </div>
-                        <span className='font-mono font-medium text-foreground tabular-nums'>
+                        <span className='font-medium text-foreground'>
                           {formatter(Number(value ?? 0))}
                         </span>
                       </div>
