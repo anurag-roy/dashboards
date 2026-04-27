@@ -59,7 +59,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
             placeholder='Search continent or country'
           />
 
-          <div className='max-h-72 space-y-4 overflow-y-auto pr-1'>
+          <div className='max-h-72 space-y-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
             {filteredLocations.length === 0 ? (
               <p className='text-sm text-muted-foreground'>No matching location.</p>
             ) : (
@@ -72,7 +72,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
                   <div key={location.name} className='space-y-2'>
                     <label
                       htmlFor={continentId}
-                      className='sticky top-0 z-10 -mx-0.5 flex cursor-pointer items-center gap-2 rounded-xl border-b border-border/80 bg-popover px-2 py-1.5 transition-colors hover:bg-foreground/5'
+                      className='-mx-0.5 flex cursor-pointer items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-foreground/10'
                     >
                       <Checkbox
                         id={continentId}
@@ -88,7 +88,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
                           onCountriesChange(Array.from(next));
                         }}
                       />
-                      <span className='min-w-0 flex-1 text-sm font-medium text-foreground'>{location.name}</span>
+                      <span className='min-w-0 flex-1 text-sm font-medium'>{location.name}</span>
                     </label>
 
                     <div className='ml-5 space-y-1'>
@@ -100,7 +100,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
                           <label
                             key={country}
                             htmlFor={countryId}
-                            className='flex cursor-pointer items-center gap-2 rounded-lg py-1.5 pr-2 pl-2 transition-colors hover:bg-foreground/5'
+                            className='flex cursor-pointer items-center gap-2 rounded-lg py-1.5 pr-2 pl-2 transition-colors hover:bg-foreground/10'
                           >
                             <Checkbox
                               id={countryId}
@@ -115,7 +115,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
                                 onCountriesChange(Array.from(next));
                               }}
                             />
-                            <span className='min-w-0 flex-1 text-sm font-normal text-foreground'>{country}</span>
+                            <span className='min-w-0 flex-1 text-sm font-normal'>{country}</span>
                           </label>
                         );
                       })}
