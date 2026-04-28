@@ -20,9 +20,9 @@ export default function UsersPage() {
       <section aria-labelledby='existing-users'>
         <div className='sm:flex sm:items-center sm:justify-between'>
           <div>
-            <h3 id='existing-users' className='scroll-mt-10 font-semibold text-foreground'>
+            <h2 id='existing-users' className='scroll-mt-10 font-semibold text-foreground'>
               Users
-            </h3>
+            </h2>
             <p className='text-sm leading-6 text-muted-foreground'>
               Workspace administrators can add, manage, and remove users.
             </p>
@@ -99,7 +99,7 @@ export default function UsersPage() {
                     }
                   />
                   <DropdownMenuContent align='end' className='w-36'>
-                    <DropdownMenuItem disabled={user.role === 'admin'}>View details</DropdownMenuItem>
+                    <DropdownMenuItem>View details</DropdownMenuItem>
                     <DropdownMenuItem variant='destructive' disabled={user.role === 'admin'}>
                       Delete
                     </DropdownMenuItem>

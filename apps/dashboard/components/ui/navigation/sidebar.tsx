@@ -249,7 +249,7 @@ export function MobileSidebarHeader() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 shadow-sm backdrop-blur sm:gap-x-6 sm:px-5 md:hidden'>
+    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur sm:gap-x-6 sm:px-5 md:hidden supports-[backdrop-filter]:bg-background/80'>
       <div className='flex min-w-0 items-center gap-2.5'>
         <DashboardAvatar seed={workspaceSummary.seed} square className='size-7 rounded-2xl border-border/70' />
         <div className='min-w-0'>

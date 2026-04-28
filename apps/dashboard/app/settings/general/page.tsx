@@ -149,12 +149,12 @@ export default function GeneralPage() {
                     <Label htmlFor='workspace-execution'>Platform incidents</Label>
                   </li>
                   <li className='flex items-center gap-x-3 py-3'>
-                    <Checkbox id='query-caching' name='query-caching' defaultChecked />
-                    <Label htmlFor='query-caching'>Payment transactions</Label>
+                    <Checkbox id='payment-transactions' name='payment-transactions' defaultChecked />
+                    <Label htmlFor='payment-transactions'>Payment transactions</Label>
                   </li>
                   <li className='flex items-center gap-x-3 py-3'>
-                    <Checkbox id='storage' name='storage' defaultChecked />
-                    <Label htmlFor='storage'>User behavior</Label>
+                    <Checkbox id='user-behavior' name='user-behavior' defaultChecked />
+                    <Label htmlFor='user-behavior'>User behavior</Label>
                   </li>
                 </ul>
               </fieldset>
@@ -201,9 +201,9 @@ export default function GeneralPage() {
               <Card className='overflow-hidden p-0'>
                 <CardContent className='flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-10'>
                   <div>
-                    <h4 className='text-sm font-medium text-muted-foreground'>Delete workspace</h4>
+                    <h4 className='text-sm font-medium text-foreground'>Delete workspace</h4>
                     <p className='mt-2 text-sm leading-6 text-muted-foreground'>
-                      Revoke your access to this team. Other people you have added to the workspace will remain.
+                      Permanently delete this workspace and all its data. This action cannot be undone.
                     </p>
                   </div>
                   <Button

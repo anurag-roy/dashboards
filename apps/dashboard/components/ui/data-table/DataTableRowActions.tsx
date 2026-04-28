@@ -22,6 +22,7 @@ export function DataTableRowActions<TData>(_props: DataTableRowActionsProps<TDat
           <Button
             variant='ghost'
             className='group aspect-square p-1.5 hover:border hover:border-border hover:bg-muted data-open:border-border data-open:bg-muted'
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <MoreHorizontal
               className='size-4 shrink-0 text-muted-foreground group-hover:text-foreground'
@@ -31,7 +32,6 @@ export function DataTableRowActions<TData>(_props: DataTableRowActionsProps<TDat
         }
       />
       <DropdownMenuContent align='end' className='min-w-40'>
-        <DropdownMenuItem>Add</DropdownMenuItem>
         <DropdownMenuItem>Edit</DropdownMenuItem>
         <DropdownMenuItem variant='destructive'>Delete</DropdownMenuItem>
       </DropdownMenuContent>

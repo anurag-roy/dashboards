@@ -36,20 +36,28 @@ export function ModalAddUser({ children }: ModalAddUserProps) {
           <DialogHeader>
             <DialogTitle>Invite people to your workspace</DialogTitle>
             <DialogDescription className='mt-1 text-sm leading-6'>
-              With free plan, you can add up to 10 users to each workspace.
+              On the free plan, you can add up to 10 users to each workspace.
             </DialogDescription>
-            <div className='mt-4'>
+          </DialogHeader>
+          <div className='mt-4 space-y-4'>
+            <div>
               <Label htmlFor='email-new-user' className='font-medium'>
                 Email
               </Label>
-              <Input id='email-new-user' name='email-new-user' placeholder='Insert email...' className='mt-2' />
+              <Input
+                id='email-new-user'
+                name='email-new-user'
+                placeholder='you@company.com'
+                type='email'
+                className='mt-2'
+              />
             </div>
-            <div className='mt-4'>
+            <div>
               <Label htmlFor='role-new-user' className='font-medium'>
                 Select role
               </Label>
               <Select items={roles}>
-                <SelectTrigger id='role-new-user' name='role-new-user' className='mt-2'>
+                <SelectTrigger id='role-new-user' name='role-new-user' className='mt-2 w-full'>
                   <SelectValue placeholder='Select role...' />
                 </SelectTrigger>
                 <SelectContent align='end'>
@@ -61,7 +69,7 @@ export function ModalAddUser({ children }: ModalAddUserProps) {
                 </SelectContent>
               </Select>
             </div>
-          </DialogHeader>
+          </div>
           <DialogFooter className='mt-6'>
             <DialogClose
               className='mt-2 w-full sm:mt-0 sm:w-auto'

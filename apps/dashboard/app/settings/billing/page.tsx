@@ -1,6 +1,6 @@
 'use client';
 
-import { ProgressBar } from '@/components/progress-bar';
+import { ProgressBar } from '@workspace/ui/components/progress-bar';
 import { ProgressCircle } from '@workspace/ui/components/progress-circle';
 import { cn } from '@/lib/utils';
 import { Button } from '@workspace/ui/components/button';
@@ -32,7 +32,7 @@ const data: {
     percentageValue: 10.1,
   },
   {
-    name: 'Bandwith',
+    name: 'Bandwidth',
     description: 'Used 2.9 GB',
     value: '$10',
     capacity: '5 GB included',
@@ -57,7 +57,7 @@ export default function BillingPage() {
   return (
     <>
       <div className='rounded-2xl bg-muted/40 p-6 ring-1 ring-border ring-inset'>
-        <h4 className='text-sm font-semibold text-foreground'>This workspace is currently on free plan</h4>
+        <h4 className='text-sm font-semibold text-foreground'>This workspace is currently on the free plan</h4>
         <p className='mt-1 max-w-2xl text-sm leading-6 text-muted-foreground'>
           Boost your analytics and unlock advanced features with our premium plans.{' '}
           <a href='#' className='inline-flex items-center gap-1 text-primary'>
@@ -101,7 +101,7 @@ export default function BillingPage() {
               </ul>
               <div className='px-2 py-4 md:p-4'>
                 <p className='flex items-center justify-between text-sm font-medium text-foreground'>
-                  <span>Total for May 24</span>
+                  <span>Total (current cycle)</span>
                   <span className='font-semibold'>$280</span>
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function BillingPage() {
                   Add-Ons
                 </h2>
                 <p className='mt-1 text-sm leading-6 text-muted-foreground'>
-                  Additional services to boost your services.
+                  Additional services to enhance your workspace.
                 </p>
               </div>
               <div className='space-y-6 md:col-span-2'>

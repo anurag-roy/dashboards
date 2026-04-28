@@ -7,6 +7,7 @@ import * as React from 'react';
 import { DataTableBulkEditor } from './DataTableBulkEditor';
 import { Filterbar } from './DataTableFilterbar';
 import { DataTablePagination } from './DataTablePagination';
+import { MobileUsageList } from './MobileUsageList';
 
 import {
   type ColumnDef,
@@ -49,62 +50,70 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   return (
     <div className='space-y-3'>
       <Filterbar table={table} />
-      <div className='relative overflow-hidden overflow-x-auto'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='border-y border-border hover:bg-transparent'>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className={cn(
-                      'text-sm whitespace-nowrap sm:text-xs',
-                      (header.column.columnDef.meta as { className?: string } | undefined)?.className
-                    )}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? 'selected' : undefined}
-                  onClick={() => row.toggleSelected(!row.getIsSelected())}
-                  className='group cursor-pointer select-none'
-                >
-                  {row.getVisibleCells().map((cell, index) => (
-                    <TableCell
-                      key={cell.id}
+      {/* Desktop table */}
+      <div className='hidden md:block'>
+        <div className='relative overflow-hidden overflow-x-auto rounded-3xl border border-border shadow-sm'>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className='border-b border-border hover:bg-transparent'>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
                       className={cn(
-                        'relative whitespace-nowrap text-muted-foreground first:w-10',
-                        (cell.column.columnDef.meta as { className?: string } | undefined)?.className
+                        'whitespace-nowrap text-muted-foreground',
+                        (header.column.columnDef.meta as { className?: string } | undefined)?.className
                       )}
                     >
-                      {index === 0 && row.getIsSelected() && (
-                        <div className='absolute inset-y-0 left-0 w-0.5 bg-primary' />
-                      )}
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <DataTableBulkEditor table={table} rowSelection={rowSelection} />
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? 'selected' : undefined}
+                    onClick={() => row.toggleSelected(!row.getIsSelected())}
+                    className='group cursor-pointer select-none'
+                  >
+                    {row.getVisibleCells().map((cell, index) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          'relative whitespace-nowrap text-muted-foreground first:w-10',
+                          (cell.column.columnDef.meta as { className?: string } | undefined)?.className
+                        )}
+                      >
+                        {index === 0 && row.getIsSelected() && (
+                          <div className='absolute inset-y-0 left-0 w-0.5 bg-primary' />
+                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className='h-24 text-center'>
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <DataTableBulkEditor table={table} rowSelection={rowSelection} />
+        </div>
+        <div className='mt-3'>
+          <DataTablePagination table={table} pageSize={pageSize} />
+        </div>
       </div>
-      <DataTablePagination table={table} pageSize={pageSize} />
+
+      {/* Mobile card list */}
+      <MobileUsageList table={table} />
     </div>
   );
 }

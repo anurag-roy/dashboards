@@ -11,6 +11,8 @@ import { Calendar } from '@workspace/ui/components/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
 
+import { useMediaQuery } from '@/lib/use-media-query';
+
 type DateRangePickerProps = {
   value?: DateRange;
   onChange?: (range: DateRange | undefined) => void;
@@ -32,6 +34,7 @@ export function DateRangePicker({
   align = 'center',
   placeholder = 'Select date range',
 }: DateRangePickerProps) {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<DateRange | undefined>(value);
 
@@ -100,7 +103,7 @@ export function DateRangePicker({
           <div className='overflow-x-auto'>
             <Calendar
               mode='range'
-              numberOfMonths={2}
+              numberOfMonths={isDesktop ? 2 : 1}
               selected={draft}
               onSelect={setDraft}
               disabled={disabledDays}

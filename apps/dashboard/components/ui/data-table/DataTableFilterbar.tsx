@@ -1,9 +1,9 @@
 'use client';
 
-import { Searchbar } from '@/components/searchbar';
 import { conditions, regions, statuses } from '@/lib/data/data';
 import { formatters } from '@/lib/utils';
 import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import { Download } from 'lucide-react';
 import { type Table } from '@tanstack/react-table';
 import { useState } from 'react';
@@ -49,12 +49,12 @@ export function Filterbar<TData>({ table }: DataTableToolbarProps<TData>) {
           />
         )}
         {table.getColumn('owner')?.getIsVisible() && (
-          <Searchbar
+          <Input
             type='search'
             placeholder='Search by owner...'
             value={searchTerm}
             onChange={handleSearchChange}
-            className='w-full sm:max-w-[260px] [&>input]:h-9'
+            className='h-9 w-full sm:max-w-[260px]'
           />
         )}
         {isFiltered && (

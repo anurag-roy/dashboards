@@ -1,5 +1,5 @@
 import { InsightBadge } from '@workspace/ui/components/insight-badge';
-import { ProgressBar } from '@/components/progress-bar';
+import { ProgressBar } from '@workspace/ui/components/progress-bar';
 import type { KpiEntry } from '@/lib/types/overview';
 
 export type ProgressBarCardProps = {
