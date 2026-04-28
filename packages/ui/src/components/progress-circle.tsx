@@ -90,6 +90,7 @@ export const ProgressCircle = React.forwardRef<SVGSVGElement, ProgressCircleProp
               cx={radius}
               cy={radius}
               strokeWidth={strokeWidth}
+              strokeLinecap='round'
               strokeDasharray={`${circumference} ${circumference}`}
               strokeDashoffset={offset}
               fill='transparent'

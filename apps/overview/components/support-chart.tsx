@@ -47,6 +47,7 @@ export function SupportChart({ className }: SupportChartProps) {
           dataKey='Today'
           stroke='var(--color-Today)'
           strokeWidth={2}
+          strokeLinecap='round'
           dot={false}
           activeDot={{ r: 3, className: 'fill-background stroke-[var(--color-Today)]' }}
         />
@@ -55,6 +56,7 @@ export function SupportChart({ className }: SupportChartProps) {
           dataKey='Yesterday'
           stroke='var(--color-Yesterday)'
           strokeWidth={2}
+          strokeLinecap='round'
           dot={false}
           activeDot={{ r: 3, className: 'fill-background stroke-[var(--color-Yesterday)]' }}
         />

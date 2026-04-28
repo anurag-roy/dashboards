@@ -219,6 +219,7 @@ export function ChartCard({ title, type, selectedDates, selectedPeriod, isThumbn
             type='monotone'
             stroke='var(--color-value)'
             strokeWidth={2}
+            strokeLinecap='round'
             dot={false}
             activeDot={{ r: 4 }}
           />
@@ -228,6 +229,7 @@ export function ChartCard({ title, type, selectedDates, selectedPeriod, isThumbn
               type='monotone'
               stroke='var(--color-previousValue)'
               strokeWidth={1.75}
+              strokeLinecap='round'
               dot={false}
               activeDot={{ r: 3 }}
             />

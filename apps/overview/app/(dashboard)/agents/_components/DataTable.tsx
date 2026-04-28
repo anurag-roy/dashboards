@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { agentColumns } from './columns';
 import { DataTableFilterbar } from './DataTableFilterbar';
 import { DataTablePagination } from './DataTablePagination';
+import { MobileAgentList } from './MobileAgentList';
 
 const fuzzyFilter: FilterFn<Agent> = (row, _columnId, filterValue, addMeta) => {
   if (filterValue === undefined || filterValue === null || String(filterValue).trim() === '') {
@@ -103,54 +104,62 @@ export function DataTable({ data }: DataTableProps) {
         }}
       />
 
-      <div className='relative overflow-hidden overflow-x-auto rounded-3xl border border-border shadow-sm'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className={cn(
-                      'whitespace-nowrap text-muted-foreground',
-                      (header.column.columnDef.meta as { className?: string } | undefined)?.className
-                    )}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className='group border-border select-none'>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
+      {/* Desktop table */}
+      <div className='hidden md:block'>
+        <div className='relative overflow-hidden overflow-x-auto rounded-3xl border border-border shadow-sm'>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
                       className={cn(
                         'whitespace-nowrap text-muted-foreground',
-                        (cell.column.columnDef.meta as { className?: string } | undefined)?.className
+                        (header.column.columnDef.meta as { className?: string } | undefined)?.className
                       )}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center text-muted-foreground'>
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} className='group border-border select-none'>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          'whitespace-nowrap text-muted-foreground',
+                          (cell.column.columnDef.meta as { className?: string } | undefined)?.className
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className='h-24 text-center text-muted-foreground'>
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className='mt-6'>
+          <DataTablePagination table={table} pageSize={PAGE_SIZE} />
+        </div>
       </div>
 
-      <DataTablePagination table={table} pageSize={PAGE_SIZE} />
+      {/* Mobile card list */}
+      <MobileAgentList table={table} />
     </div>
   );
 }
