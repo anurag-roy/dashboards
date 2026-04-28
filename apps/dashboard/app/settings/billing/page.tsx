@@ -1,7 +1,7 @@
 'use client';
 
 import { ProgressBar } from '@/components/progress-bar';
-import { ProgressCircle } from '@/components/progress-circle';
+import { ProgressCircle } from '@workspace/ui/components/progress-circle';
 import { cn } from '@/lib/utils';
 import { Button } from '@workspace/ui/components/button';
 import { Card } from '@workspace/ui/components/card';
