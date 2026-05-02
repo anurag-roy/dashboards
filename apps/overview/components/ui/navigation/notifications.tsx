@@ -131,7 +131,7 @@ export function Notifications() {
           <Bell className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
         </span>
       </PopoverTrigger>
-      <PopoverContent align='end' className='z-20 ml-2 w-[26rem] max-w-[95vw] px-4 sm:ml-0'>
+      <PopoverContent align='end' className='z-20 ml-2 w-104 max-w-[95vw] px-4 sm:ml-0'>
         <div className='flex items-center justify-between gap-4'>
           <h2 className='text-base font-semibold text-foreground'>Notifications</h2>
           <Button variant='ghost' size='sm' className='shrink-0'>

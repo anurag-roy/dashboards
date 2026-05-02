@@ -69,7 +69,7 @@ export default function TransactionPolicy() {
                 <div className='flex flex-row flex-wrap items-baseline gap-x-2 gap-y-1'>
                   <p className='text-2xl font-semibold text-foreground tabular-nums'>{item.count.toLocaleString()}</p>
                   <InsightBadge variant={item.variant} className='shrink-0'>
-                    {item.volume} volume
+                    {item.volume} spent
                   </InsightBadge>
                 </div>
               </CardContent>
@@ -91,7 +91,7 @@ export default function TransactionPolicy() {
                 <div className='flex items-center gap-2'>
                   <span className='text-sm text-muted-foreground tabular-nums'>{keyword.flagged}</span>
                   <Button variant='ghost' size='icon-sm' aria-label={`Remove ${keyword.label}`}>
-                    <Trash2 className='size-4 text-muted-foreground' />
+                    <Trash2 className='size-4 text-muted-foreground' aria-hidden='true' />
                   </Button>
                 </div>
               </div>

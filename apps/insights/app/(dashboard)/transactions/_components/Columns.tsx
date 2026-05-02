@@ -4,6 +4,12 @@ import { createColumnHelper, type ColumnDef, type Row } from '@tanstack/react-ta
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Checkbox } from '@workspace/ui/components/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu';
 import { InsightBadge } from '@workspace/ui/components/insight-badge';
 
 import { expenseStatuses, type Transaction } from '@/lib/data/schema';
@@ -108,19 +114,26 @@ export const getColumns = ({ onEditClick }: { onEditClick: (row: Row<Transaction
         displayName: 'Actions',
       },
       cell: ({ row }) => (
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon-sm'
-          className='rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground'
-          aria-label='Open transaction details'
-          onClick={(event) => {
-            event.stopPropagation();
-            onEditClick(row);
-          }}
-        >
-          <MoreHorizontal className='size-4' aria-hidden='true' />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon-sm'
+                className='rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground data-open:bg-muted data-open:text-foreground'
+                aria-label='Open transaction actions'
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              />
+            }
+          >
+            <MoreHorizontal className='size-4' aria-hidden='true' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='min-w-40'>
+            <DropdownMenuItem onClick={() => onEditClick(row)}>Edit</DropdownMenuItem>
+            <DropdownMenuItem variant='destructive'>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     }),
   ] as ColumnDef<Transaction>[];

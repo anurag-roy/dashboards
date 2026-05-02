@@ -155,7 +155,7 @@ export default function BillingPage() {
                   <div className='mt-5 space-y-4'>
                     <div className='space-y-2'>
                       <Label htmlFor='card-name'>Cardholder name</Label>
-                      <Input id='card-name' placeholder='Cardholder Name' />
+                      <Input id='card-name' placeholder='Ada Lovelace' />
                     </div>
                     <div className='space-y-2'>
                       <Label htmlFor='card-number'>Card number</Label>
@@ -228,7 +228,12 @@ export default function BillingPage() {
         </div>
 
         <div className='md:col-span-2'>
-          <form className='space-y-4 rounded-3xl border border-border/70 bg-card p-4 sm:p-6'>
+          <form
+            className='space-y-4 rounded-3xl border border-border/70 bg-card p-4 sm:p-6'
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
             <div className='space-y-2'>
               <Label htmlFor='address-line-1'>Address line 1</Label>
               <Input id='address-line-1' defaultValue='8272 Postal Way' />

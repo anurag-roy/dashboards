@@ -161,7 +161,7 @@ export default function AuditRules() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Input type='number' min={0} placeholder='0' />
+                  <Input type='number' min={0} placeholder='0' aria-label='Threshold amount' />
                 </CardContent>
               </Card>
 

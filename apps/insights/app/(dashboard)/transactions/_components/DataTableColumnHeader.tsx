@@ -1,5 +1,8 @@
+'use client';
+
 import { type Column } from '@tanstack/react-table';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronsUpDown } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
+import { Button } from '@workspace/ui/components/button';
 
 import { cn } from '@/lib/utils';
 
@@ -20,30 +23,23 @@ export function DataTableColumnHeader<TData, TValue>({
   }
 
   return (
-    <div
-      role='button'
-      tabIndex={0}
-      onClick={column.getToggleSortingHandler()}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          column.getToggleSortingHandler()?.(event);
-        }
-      }}
-      className={cn(
-        '-mx-2 inline-flex cursor-pointer items-center gap-2 rounded-2xl px-2.5 py-1.5 select-none hover:bg-muted',
-        sortState && 'text-primary',
-        className
-      )}
-    >
-      <span>{title}</span>
-      {sortState === 'asc' ? (
-        <ArrowDownNarrowWide className='size-3.5 text-primary' aria-hidden='true' />
-      ) : sortState === 'desc' ? (
-        <ArrowDownWideNarrow className='size-3.5 text-primary' aria-hidden='true' />
-      ) : (
-        <ChevronsUpDown className='size-3.5 text-muted-foreground' aria-hidden='true' />
-      )}
+    <div className={cn(className)}>
+      <Button
+        type='button'
+        variant='ghost'
+        size='sm'
+        className='-ml-2 h-8 gap-1.5 px-2 font-medium text-foreground hover:bg-muted'
+        onClick={column.getToggleSortingHandler()}
+      >
+        <span>{title}</span>
+        {sortState === 'asc' ? (
+          <ChevronUp className='size-3.5 shrink-0 text-foreground' aria-hidden='true' />
+        ) : sortState === 'desc' ? (
+          <ChevronDown className='size-3.5 shrink-0 text-foreground' aria-hidden='true' />
+        ) : (
+          <ChevronsUpDown className='size-3.5 shrink-0 text-muted-foreground' aria-hidden='true' />
+        )}
+      </Button>
     </div>
   );
 }
