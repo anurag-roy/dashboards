@@ -6,7 +6,6 @@ import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 function ThemeProvider({ children, ...props }: React.ComponentProps<typeof NextThemesProvider>) {
   return (
     <NextThemesProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange {...props}>
-      <ThemeHotkey />
       {children}
     </NextThemesProvider>
   );
@@ -56,4 +55,4 @@ function ThemeHotkey() {
   return null;
 }
 
-export { ThemeProvider };
+export { ThemeProvider, ThemeHotkey };

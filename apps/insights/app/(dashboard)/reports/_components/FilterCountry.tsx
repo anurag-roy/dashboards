@@ -59,7 +59,7 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
             placeholder='Search continent or country'
           />
 
-          <div className='max-h-72 space-y-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+          <div className='max-h-72 space-y-4 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {filteredLocations.length === 0 ? (
               <p className='text-sm text-muted-foreground'>No matching location.</p>
             ) : (

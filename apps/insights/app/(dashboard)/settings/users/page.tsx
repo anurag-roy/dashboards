@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
 
 import { departments, members } from '@/lib/data/data';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 
 const defaultDepartmentValue = departments[0]?.value ?? 'all-areas';
 

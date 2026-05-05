@@ -36,8 +36,7 @@ export default function ReportsPage() {
     const rangeStartDate = subDays(new Date(), RANGE_DAYS[deferredFilters.range]);
     const { expenseStatus, amountRange, selectedCountries } = deferredFilters;
     const [rangeMin, rangeMax] = amountRange;
-    const countrySet =
-      selectedCountries.length === 0 ? null : new Set<string>(selectedCountries);
+    const countrySet = selectedCountries.length === 0 ? null : new Set<string>(selectedCountries);
 
     return transactions.filter((transaction) => {
       const statusMatch = expenseStatus === 'all' || transaction.expense_status === expenseStatus;

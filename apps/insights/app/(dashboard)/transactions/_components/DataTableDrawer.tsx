@@ -6,7 +6,14 @@ import { type Row } from '@tanstack/react-table';
 import { FileText, Upload, X } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Checkbox } from '@workspace/ui/components/checkbox';
-import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@workspace/ui/components/drawer';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@workspace/ui/components/drawer';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
@@ -176,7 +183,11 @@ function DrawerFormContent({
                   </SelectTrigger>
                   <SelectContent align='start'>
                     {departments.map((departmentOption) => (
-                      <SelectItem key={departmentOption.value} value={departmentOption.value} label={departmentOption.label}>
+                      <SelectItem
+                        key={departmentOption.value}
+                        value={departmentOption.value}
+                        label={departmentOption.label}
+                      >
                         {departmentOption.label}
                       </SelectItem>
                     ))}
@@ -430,7 +441,7 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side='right'
-        className='data-[side=right]:w-full overflow-hidden p-0 data-[side=right]:sm:max-w-[min(53vw,38.5rem)] data-[side=right]:lg:max-w-[min(38vw,38.5rem)]'
+        className='overflow-hidden p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-[min(53vw,38.5rem)] data-[side=right]:lg:max-w-[min(38vw,38.5rem)]'
       >
         <SheetHeader className='shrink-0 border-b border-border/70'>
           <SheetTitle>{transaction ? `Transaction ${transaction.transaction_id}` : 'Transaction details'}</SheetTitle>

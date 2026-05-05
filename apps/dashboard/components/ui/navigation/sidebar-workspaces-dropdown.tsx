@@ -1,7 +1,7 @@
 'use client';
 
 import { ModalAddWorkspace } from '@/components/ui/navigation/modal-add-workspace';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { cn, focusRing } from '@/lib/utils';
 import {
   DropdownMenu,

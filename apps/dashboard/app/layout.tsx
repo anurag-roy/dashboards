@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import '@workspace/ui/globals.css';
 import { siteConfig } from '@/app/siteConfig';
 import { MobileSidebarHeader, Sidebar } from '@/components/ui/navigation/sidebar';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@workspace/ui/components/theme-provider';
 import { SidebarInset, SidebarProvider } from '@workspace/ui/components/sidebar';
 import { cn } from '@workspace/ui/lib/utils';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';

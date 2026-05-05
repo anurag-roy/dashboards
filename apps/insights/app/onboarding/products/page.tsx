@@ -5,14 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Checkbox } from '@workspace/ui/components/checkbox';
-import {
-  Field,
-  FieldContent,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-  FieldTitle,
-} from '@workspace/ui/components/field';
+import { Field, FieldContent, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@workspace/ui/components/field';
 
 import { siteConfig } from '@/app/siteConfig';
 import { choiceCardFieldClass, choiceCardFieldLabelClass } from '@/app/onboarding/choice-card-styles';

@@ -52,7 +52,7 @@ export default function OnboardingLayout({
 
   return (
     <>
-      <header className='fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:justify-start md:px-6 supports-[backdrop-filter]:bg-background/80'>
+      <header className='fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between gap-2 border-b border-border bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:justify-start md:px-6'>
         <div className='hidden min-w-0 md:block' aria-hidden='true' />
         <div className='flex justify-start md:justify-center'>
           <StepProgress steps={steps} />

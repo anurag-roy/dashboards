@@ -52,7 +52,12 @@ export const supportColumns = [
     header: 'Status',
     meta: { className: 'text-left' },
     cell: (ctx) => (
-      <span className={cn('inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 capitalize', statusPillClass(ctx.getValue()))}>
+      <span
+        className={cn(
+          'inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ring-1',
+          statusPillClass(ctx.getValue())
+        )}
+      >
         {ctx.getValue().replace('-', ' ')}
       </span>
     ),

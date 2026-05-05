@@ -119,9 +119,7 @@ export default function OnboardingInfrastructurePage() {
                       <provider.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
                       <span className='truncate'>{provider.label}</span>
                     </FieldTitle>
-                    <FieldDescription>
-                      {regionOptions[provider.value].length} regions available
-                    </FieldDescription>
+                    <FieldDescription>{regionOptions[provider.value].length} regions available</FieldDescription>
                   </FieldContent>
                   <RadioGroupItem id={provider.value} value={provider.value} />
                 </Field>

@@ -287,7 +287,11 @@ function StepThreeContent({ formData }: { formData: TicketFormData }) {
 }
 
 const stepTitles = ['Create Support Ticket', 'Ticket Details', 'Review Ticket'] as const;
-const stepDescriptions = ['Ticket type and category', 'Priority and description', 'Confirm details before submitting'] as const;
+const stepDescriptions = [
+  'Ticket type and category',
+  'Priority and description',
+  'Confirm details before submitting',
+] as const;
 
 function FooterButtons({
   step,

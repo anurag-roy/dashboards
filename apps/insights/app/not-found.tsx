@@ -22,10 +22,7 @@ export default function NotFound() {
         Sorry, we couldn&apos;t find the page you&apos;re looking for.
       </p>
 
-      <Link
-        href={siteConfig.baseLinks.reports}
-        className={cn(buttonVariants({ variant: 'secondary' }), 'mt-8 gap-2')}
-      >
+      <Link href={siteConfig.baseLinks.reports} className={cn(buttonVariants({ variant: 'secondary' }), 'mt-8 gap-2')}>
         Go to the home page
         <MoveRight className='size-4' aria-hidden='true' />
       </Link>

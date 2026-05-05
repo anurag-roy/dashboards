@@ -113,7 +113,11 @@ export default function SupportPage() {
               <dd className='space-y-3 whitespace-nowrap'>
                 <div>
                   <div className='flex items-center gap-2'>
-                    <span className='size-2.5 shrink-0 rounded-sm' style={{ backgroundColor: 'var(--chart-2)' }} aria-hidden />
+                    <span
+                      className='size-2.5 shrink-0 rounded-sm'
+                      style={{ backgroundColor: 'var(--chart-2)' }}
+                      aria-hidden
+                    />
                     <span className='text-sm text-muted-foreground'>Today</span>
                   </div>
                   <span className='mt-1 block text-2xl font-semibold text-foreground'>
@@ -122,8 +126,12 @@ export default function SupportPage() {
                 </div>
                 <div>
                   <div className='flex items-center gap-2'>
-                  <span className='size-2.5 shrink-0 rounded-sm' style={{ backgroundColor: 'var(--chart-1)' }} aria-hidden />
-                  <span className='text-sm text-muted-foreground'>Yesterday</span>
+                    <span
+                      className='size-2.5 shrink-0 rounded-sm'
+                      style={{ backgroundColor: 'var(--chart-1)' }}
+                      aria-hidden
+                    />
+                    <span className='text-sm text-muted-foreground'>Yesterday</span>
                   </div>
                   <span className='mt-1 block text-2xl font-semibold text-foreground'>
                     {yesterdayVolumeTotal.toLocaleString('en-US')}

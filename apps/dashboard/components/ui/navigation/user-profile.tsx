@@ -1,7 +1,7 @@
 'use client';
 
 import { cn, focusRing } from '@/lib/utils';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { Button } from '@workspace/ui/components/button';
 import { MoreHorizontal } from 'lucide-react';
 

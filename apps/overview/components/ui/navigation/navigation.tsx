@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetClose } from '@workspace/ui/components/sheet'
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 
 import { siteConfig } from '@/app/siteConfig';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { Logo } from './logo';
 import { Notifications } from './notifications';
 import { DropdownUserProfile } from './user-profile';
@@ -138,7 +138,7 @@ export function Navigation() {
 
   return (
     <div className='sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80'>
-      <div className='mx-auto flex max-w-7xl items-center justify-between px-4 pt-3 pb-3 md:pb-0 sm:px-6'>
+      <div className='mx-auto flex max-w-7xl items-center justify-between px-4 pt-3 pb-3 sm:px-6 md:pb-0'>
         <Logo className='h-6' />
 
         {/* Desktop header actions */}
@@ -180,7 +180,6 @@ export function Navigation() {
           </div>
         </Tabs>
       </div>
-
     </div>
   );
 }

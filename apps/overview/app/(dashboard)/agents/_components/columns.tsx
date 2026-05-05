@@ -56,9 +56,7 @@ export const agentColumns: ColumnDef<Agent>[] = [
         <span className='font-medium text-foreground'>{row.original.full_name}</span>
         <div className='flex items-center gap-1 text-xs'>
           <span className='text-muted-foreground'>AgID</span>
-          <span className='font-mono font-medium uppercase tabular-nums text-foreground'>
-            {row.original.agent_id}
-          </span>
+          <span className='font-mono font-medium text-foreground uppercase tabular-nums'>{row.original.agent_id}</span>
           <ShieldCheck
             className={cn(
               'size-3 shrink-0',
@@ -93,7 +91,7 @@ export const agentColumns: ColumnDef<Agent>[] = [
     },
     cell: ({ row }) => (
       <div className='flex flex-col gap-1'>
-        <span className='tabular-nums text-foreground'>
+        <span className='text-foreground tabular-nums'>
           {row.original.end_date ? (
             <>
               End:{' '}
@@ -109,7 +107,7 @@ export const agentColumns: ColumnDef<Agent>[] = [
             </Badge>
           )}
         </span>
-        <span className='text-xs tabular-nums text-muted-foreground'>
+        <span className='text-xs text-muted-foreground tabular-nums'>
           Start:{' '}
           {new Date(row.original.start_date).toLocaleDateString('en-GB', {
             day: '2-digit',

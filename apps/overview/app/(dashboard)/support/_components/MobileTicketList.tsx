@@ -53,13 +53,13 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
       <div className='flex items-start justify-between gap-3'>
         <span
           className={cn(
-            'inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 capitalize',
+            'inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ring-1',
             statusPillClass(ticket.status)
           )}
         >
           {ticket.status.replace('-', ' ')}
         </span>
-        <span className='flex items-center gap-1.5 text-xs capitalize text-muted-foreground'>
+        <span className='flex items-center gap-1.5 text-xs text-muted-foreground capitalize'>
           <span className={cn('size-1.5 shrink-0 rounded-full', priorityDotClass(ticket.priority))} aria-hidden />
           {ticket.priority}
         </span>

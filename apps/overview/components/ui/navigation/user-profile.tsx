@@ -21,7 +21,7 @@ import {
 import Link from 'next/link';
 
 import { siteConfig } from '@/app/siteConfig';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 
 export function DropdownUserProfile() {
   const [mounted, setMounted] = React.useState(false);

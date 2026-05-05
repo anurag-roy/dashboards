@@ -18,13 +18,7 @@ import { formatters } from '@/lib/utils';
 
 const BATCH_SIZE = 10;
 
-function TransactionCard({
-  transaction,
-  onEditClick,
-}: {
-  transaction: Transaction;
-  onEditClick: () => void;
-}) {
+function TransactionCard({ transaction, onEditClick }: { transaction: Transaction; onEditClick: () => void }) {
   const status = expenseStatuses.find((s) => s.value === transaction.expense_status);
 
   return (
@@ -32,12 +26,10 @@ function TransactionCard({
       <div className='flex items-start justify-between gap-3'>
         <div className='min-w-0 flex-1'>
           <p className='truncate text-sm font-semibold text-foreground'>{transaction.merchant}</p>
-          <div className='mt-1'>
-            {status && <InsightBadge variant={status.variant}>{status.label}</InsightBadge>}
-          </div>
+          <div className='mt-1'>{status && <InsightBadge variant={status.variant}>{status.label}</InsightBadge>}</div>
         </div>
         <div className='flex shrink-0 items-center gap-2'>
-          <span className='text-sm font-semibold tabular-nums text-foreground'>
+          <span className='text-sm font-semibold text-foreground tabular-nums'>
             {formatters.currency(transaction.amount)}
           </span>
           <DropdownMenu>
@@ -113,11 +105,7 @@ export function MobileTransactionList({ table, onEditClick }: MobileTransactionL
     <div className='space-y-3 md:hidden'>
       {visible.length > 0 ? (
         visible.map((row) => (
-          <TransactionCard
-            key={row.id}
-            transaction={row.original}
-            onEditClick={() => onEditClick(row)}
-          />
+          <TransactionCard key={row.id} transaction={row.original} onEditClick={() => onEditClick(row)} />
         ))
       ) : (
         <p className='py-8 text-center text-sm text-muted-foreground'>No transactions found.</p>

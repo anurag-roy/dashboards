@@ -17,7 +17,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { approvers, departments } from '@/lib/data/data';
 
 export default function Approvers() {

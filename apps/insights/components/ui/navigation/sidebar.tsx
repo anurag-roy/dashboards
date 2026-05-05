@@ -21,7 +21,7 @@ import {
 } from '@workspace/ui/components/sidebar';
 
 import { siteConfig } from '@/app/siteConfig';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { UserProfileDesktop } from './user-profile';
 
 const workspace = {
@@ -241,7 +241,7 @@ export function MobileSidebarHeader() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur sm:gap-x-6 sm:px-5 md:hidden supports-[backdrop-filter]:bg-background/80'>
+    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-x-6 sm:px-5 md:hidden'>
       <div className='flex min-w-0 items-center gap-2.5'>
         <DashboardAvatar seed={workspace.seed} square className='size-7 rounded-2xl border-border/70' />
         <div className='min-w-0'>

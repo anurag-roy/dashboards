@@ -48,11 +48,11 @@ function AgentCard({ agent }: { agent: Agent }) {
           </div>
           <div className='mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground'>
             <span>AgID</span>
-            <span className='font-mono font-medium uppercase tabular-nums text-foreground'>{agent.agent_id}</span>
+            <span className='font-mono font-medium text-foreground uppercase tabular-nums'>{agent.agent_id}</span>
           </div>
         </div>
         {agent.end_date ? (
-          <span className='shrink-0 text-xs tabular-nums text-muted-foreground'>
+          <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
             Ends{' '}
             {new Date(agent.end_date).toLocaleDateString('en-GB', {
               day: '2-digit',

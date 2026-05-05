@@ -1,7 +1,7 @@
 'use client';
 
 import { ModalAddUser } from '@/components/ui/settings/modal-add-user';
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { invitedUsers, roles, users } from '@/lib/data/data';
 import { Button } from '@workspace/ui/components/button';
 import {

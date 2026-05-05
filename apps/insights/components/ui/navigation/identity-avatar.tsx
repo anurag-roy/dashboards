@@ -1,4 +1,4 @@
-import { DashboardAvatar } from '@/components/dashboard-avatar';
+import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 
 type IdentityAvatarProps = {
   name: string;

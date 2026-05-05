@@ -62,7 +62,11 @@ export default function LoginPage() {
         <h1 className='mt-4 text-center text-xl font-semibold text-foreground'>Sign in to Overview</h1>
 
         <div className='mt-10 flex w-full flex-col gap-4'>
-          <Button nativeButton={false} className='w-full gap-2' render={<Link href='/support' className='inline-flex' />}>
+          <Button
+            nativeButton={false}
+            className='w-full gap-2'
+            render={<Link href='/support' className='inline-flex' />}
+          >
             <GoogleIcon className='size-5 shrink-0' />
             Continue with Google
           </Button>

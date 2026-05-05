@@ -94,7 +94,7 @@ function ChartContainer({
         data-slot='chart'
         data-chart={chartId}
         className={cn(
-          "relative flex w-full min-w-0 min-h-0 flex-col text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "relative flex min-h-0 w-full min-w-0 flex-col text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className
         )}
         {...props}
@@ -189,11 +189,7 @@ function ChartTooltipContent({
     const itemConfig = getPayloadConfigFromPayload(config, item, key);
     const value = !labelKey && typeof label === 'string' ? (config[label]?.label ?? label) : itemConfig?.label;
 
-    const labelRowClass = cn(
-      'font-medium',
-      !nestLabel && 'mb-0.5 border-b border-border/60 pb-1.5',
-      labelClassName
-    );
+    const labelRowClass = cn('font-medium', !nestLabel && 'mb-0.5 border-b border-border/60 pb-1.5', labelClassName);
 
     if (labelFormatter) {
       return <div className={labelRowClass}>{labelFormatter(value, payload)}</div>;
@@ -248,7 +244,8 @@ function ChartTooltipContent({
                             {
                               'size-2 rounded-[2px]': indicator === 'dot',
                               'h-2.5 w-1 rounded-sm': indicator === 'line',
-                              'w-0 border-[1.5px] border-dashed bg-transparent shadow-none ring-0': indicator === 'dashed',
+                              'w-0 border-[1.5px] border-dashed bg-transparent shadow-none ring-0':
+                                indicator === 'dashed',
                               'my-0.5': nestLabel && indicator === 'dashed',
                             }
                           )}

@@ -30,7 +30,7 @@ function UsageCard({ row }: { row: { original: Usage; id: string } }) {
           </div>
         </div>
         <div className='flex shrink-0 items-center gap-2'>
-          <span className='text-sm font-semibold tabular-nums text-foreground'>
+          <span className='text-sm font-semibold text-foreground tabular-nums'>
             {formatters.currency!(Number(item.costs ?? 0))}
           </span>
           <DataTableRowActions row={row as never} />
@@ -86,9 +86,7 @@ export function MobileUsageList<TData>({ table }: MobileUsageListProps<TData>) {
   return (
     <div className='space-y-3 md:hidden'>
       {visible.length > 0 ? (
-        visible.map((row) => (
-          <UsageCard key={row.id} row={row as unknown as { original: Usage; id: string }} />
-        ))
+        visible.map((row) => <UsageCard key={row.id} row={row as unknown as { original: Usage; id: string }} />)
       ) : (
         <p className='py-8 text-center text-sm text-muted-foreground'>No results.</p>
       )}

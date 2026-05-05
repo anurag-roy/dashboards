@@ -36,8 +36,7 @@ const chartConfig = {
 const chartByType = {
   amount: {
     title: 'Total Transaction Amount',
-    tooltip:
-      'Total amount of transactions for the selected period, status, amount range, and location filters.',
+    tooltip: 'Total amount of transactions for the selected period, status, amount range, and location filters.',
     valueFormatter: (value: number) => formatters.currency(value),
     aggregate(rows: Transaction[]): ChartDataItem[] {
       const map = new Map<string, number>();
@@ -97,7 +96,13 @@ const chartByType = {
   },
 } as const;
 
-export function TransactionChart({ type, transactions, yAxisWidth = 70, showYAxis = true, className }: TransactionChartProps) {
+export function TransactionChart({
+  type,
+  transactions,
+  yAxisWidth = 70,
+  showYAxis = true,
+  className,
+}: TransactionChartProps) {
   const definition = chartByType[type];
 
   const data = useMemo(() => definition.aggregate(transactions), [definition, transactions]);
@@ -115,7 +120,11 @@ export function TransactionChart({ type, transactions, yAxisWidth = 70, showYAxi
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <button type='button' aria-label={`${definition.title} info`} className='rounded-full p-1 text-muted-foreground'>
+                  <button
+                    type='button'
+                    aria-label={`${definition.title} info`}
+                    className='rounded-full p-1 text-muted-foreground'
+                  >
                     <Info className='size-4' />
                   </button>
                 }
@@ -150,9 +159,7 @@ export function TransactionChart({ type, transactions, yAxisWidth = 70, showYAxi
             )}
             <ChartTooltip
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.25 }}
-              content={
-                <ChartTooltipContent valueFormatter={(value) => definition.valueFormatter(Number(value))} />
-              }
+              content={<ChartTooltipContent valueFormatter={(value) => definition.valueFormatter(Number(value))} />}
             />
             <Bar dataKey='value' fill='var(--color-value)' radius={8} />
           </BarChart>

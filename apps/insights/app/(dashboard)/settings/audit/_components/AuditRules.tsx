@@ -74,7 +74,9 @@ export default function AuditRules() {
             <AccordionItem value='rule-1' className='rounded-2xl border border-border bg-background'>
               <AccordionTrigger className='rounded-2xl px-4 py-3 hover:no-underline'>
                 <div className='flex w-full items-center justify-between gap-3 text-left'>
-                  <span className='truncate text-sm font-medium text-foreground'>IRS receipt rule for all US employees</span>
+                  <span className='truncate text-sm font-medium text-foreground'>
+                    IRS receipt rule for all US employees
+                  </span>
                   <Badge
                     variant='outline'
                     className='shrink-0 rounded-full border-primary/20 bg-primary/10 text-primary dark:border-primary/30 dark:bg-primary/20'
@@ -87,7 +89,9 @@ export default function AuditRules() {
                 <ol className='space-y-3'>
                   {ruleSteps.map((step, index) => (
                     <li key={step.id} className='flex items-start gap-3'>
-                      <span className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-xl ${step.iconClassName}`}>
+                      <span
+                        className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-xl ${step.iconClassName}`}
+                      >
                         <step.icon className='size-4' aria-hidden='true' />
                       </span>
                       <div>
