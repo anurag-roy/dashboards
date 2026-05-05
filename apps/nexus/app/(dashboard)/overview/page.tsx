@@ -38,7 +38,7 @@ import { ArrowRight } from 'lucide-react';
 
 import { overviewStats, getOverviewSummary } from '@/lib/data/overview-stats';
 import { models, modelMap } from '@/lib/data/models';
-import { getChartModelTotals } from '@/lib/data/usage-by-model';
+import { getModelTotals } from '@/lib/data/usage-by-model';
 import { traces } from '@/lib/data/traces';
 import { formatters, relativeTime } from '@/lib/utils';
 import { cn } from '@workspace/ui/lib/utils';
@@ -49,6 +49,23 @@ const periodItems = [
   { value: '30', label: '30 days' },
   { value: '90', label: '90 days' },
 ];
+
+function aggregateOthers<T extends ReturnType<typeof getModelTotals>[number]>(models: T[], name = 'Others') {
+  return {
+    id: 'others',
+    name,
+    provider: 'Various',
+    providerId: 'other',
+    color: 'var(--muted-foreground)',
+    costPer1kInput: 0,
+    costPer1kOutput: 0,
+    featured: false as const,
+    totalRequests: models.reduce((sum, model) => sum + model.totalRequests, 0),
+    totalTokens: models.reduce((sum, model) => sum + model.totalTokens, 0),
+    totalCost: Math.round(models.reduce((sum, model) => sum + model.totalCost, 0) * 100) / 100,
+    avgLatency: Math.round(models.reduce((sum, model) => sum + model.avgLatency, 0) / (models.length || 1)),
+  };
+}
 
 // --- KPI Card Sparkline ---
 function KpiCard({
@@ -117,7 +134,7 @@ export default function OverviewPage() {
   const days = Number(period);
   const chartData = overviewStats.slice(-days);
   const currentSummary = React.useMemo(() => getOverviewSummary(days), [days]);
-  const chartModelTotals = React.useMemo(() => getChartModelTotals(days), [days]);
+  const modelTotals = React.useMemo(() => getModelTotals(days), [days]);
 
   // Sparkline data for KPIs
   const requestSparkline = chartData.map((d) => ({ value: d.totalRequests }));
@@ -130,27 +147,39 @@ export default function OverviewPage() {
     promptTokens: { label: 'Prompt Tokens', color: 'var(--chart-1)' },
   } satisfies ChartConfig;
 
-  // Cost by model (featured + Other)
-  const costByModelData = chartModelTotals.map((m) => ({
+  const costByModelTotals = React.useMemo(() => {
+    return [...modelTotals].sort((a, b) => b.totalCost - a.totalCost).slice(0, 4);
+  }, [modelTotals]);
+
+  const requestDistributionTotals = React.useMemo(() => {
+    const sorted = [...modelTotals].sort((a, b) => b.totalRequests - a.totalRequests);
+    const topModels = sorted.slice(0, 4);
+    const otherModels = sorted.slice(4);
+
+    return otherModels.length > 0 ? [...topModels, aggregateOthers(otherModels)] : topModels;
+  }, [modelTotals]);
+
+  // Cost by model (top 4)
+  const costByModelData = costByModelTotals.map((m) => ({
     name: m.name,
     cost: m.totalCost,
     fill: m.color,
   }));
 
   const costByModelConfig = Object.fromEntries(
-    chartModelTotals.map((m) => [m.name, { label: m.name, color: m.color }])
+    costByModelTotals.map((m) => [m.name, { label: m.name, color: m.color }])
   ) satisfies ChartConfig;
 
-  // Request distribution donut (featured + Other)
-  const totalModelRequests = chartModelTotals.reduce((s, m) => s + m.totalRequests, 0);
-  const requestDistData = chartModelTotals.map((m) => ({
+  // Request distribution donut (top 4 + Others)
+  const totalModelRequests = requestDistributionTotals.reduce((s, m) => s + m.totalRequests, 0);
+  const requestDistData = requestDistributionTotals.map((m) => ({
     name: m.name,
     value: m.totalRequests,
     fill: m.color,
   }));
 
   const donutConfig = Object.fromEntries(
-    chartModelTotals.map((m) => [m.name, { label: m.name, color: m.color }])
+    requestDistributionTotals.map((m) => [m.name, { label: m.name, color: m.color }])
   ) satisfies ChartConfig;
 
   // Latency sparkline
@@ -334,11 +363,15 @@ export default function OverviewPage() {
                     content={({ viewBox }) => {
                       if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                         return (
-                          <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle' dominantBaseline='middle'>
-                            <tspan x={viewBox.cx} y={viewBox.cy} className='fill-foreground text-2xl font-bold'>
+                          <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle'>
+                            <tspan
+                              x={viewBox.cx}
+                              y={(viewBox.cy || 0) - 5}
+                              className='fill-foreground text-2xl font-bold'
+                            >
                               {formatters.compact(totalModelRequests)}
                             </tspan>
-                            <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 20} className='fill-muted-foreground text-xs'>
+                            <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 15} className='fill-muted-foreground text-xs'>
                               Requests
                             </tspan>
                           </text>

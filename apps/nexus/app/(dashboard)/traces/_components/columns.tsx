@@ -164,10 +164,8 @@ export const columns: ColumnDef<Trace>[] = [
           <DropdownMenuContent align='end' className='w-[160px]'>
             <DropdownMenuItem
               onClick={() => {
-                const onRowClick = (table.options.meta as any)?.onRowClick as ((trace: Trace) => void) | undefined;
-                if (onRowClick) {
-                  onRowClick(trace);
-                }
+                const meta = table.options.meta as { onRowClick?: (trace: Trace) => void } | undefined;
+                meta?.onRowClick?.(trace);
               }}
             >
               <Eye className='size-4' />

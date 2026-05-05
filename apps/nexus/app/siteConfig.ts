@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: 'Nexus AI',
-  url: 'https://nexus.tremor.so',
+  url: 'https://nexus-ai.anuragroy.dev',
   description: 'LLM operations dashboard for monitoring AI model performance, costs, and traces.',
   baseLinks: {
     home: '/',

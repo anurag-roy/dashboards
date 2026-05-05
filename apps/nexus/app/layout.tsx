@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://yoururl.com'),
+  metadataBase: new URL(siteConfig.url),
   title: siteConfig.name,
   description: siteConfig.description,
   keywords: [],
-  authors: [{ name: 'yourname', url: '' }],
-  creator: 'yourname',
+  authors: [{ name: 'Anurag Roy', url: 'https://anuragroy.dev' }],
+  creator: 'Anurag Roy',
   openGraph: {
     type: 'website',
     locale: 'en_US',

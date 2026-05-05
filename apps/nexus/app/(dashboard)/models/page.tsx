@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import {
   ChartContainer,
@@ -12,16 +12,18 @@ import {
   type ChartConfig,
 } from '@workspace/ui/components/chart';
 import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import { Separator } from '@workspace/ui/components/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
-import { InsightBadge } from '@workspace/ui/components/insight-badge';
+import { RotateCcw } from 'lucide-react';
 
-import { featuredModels } from '@/lib/data/models';
+import { modelMap, type ModelDefinition } from '@/lib/data/models';
 import { getModelTotals, usageByModel } from '@/lib/data/usage-by-model';
-import { latencyBuckets } from '@/lib/data/latency-buckets';
+import { getLatencyBuckets } from '@/lib/data/latency-buckets';
 import { formatters } from '@/lib/utils';
 import { ProviderLogo } from '@/components/ProviderLogo';
+import { ModelMultiSelect } from '@/components/ModelMultiSelect';
 
 const periodItems = [
   { value: '7', label: '7 days' },
@@ -29,93 +31,166 @@ const periodItems = [
   { value: '90', label: '90 days' },
 ];
 
+const defaultModelIds = ['gpt-5.5-pro', 'claude-opus-4-7', 'gemini-3.1-pro'];
+const maxCompareModels = 5;
+const bucketLabels = ['<100ms', '100-250ms', '250-500ms', '500ms-1s', '>1s'];
+const allUsageDates = [...new Set(usageByModel.map((entry) => entry.date))].sort();
+const usageLookup = new Map(usageByModel.map((entry) => [`${entry.date}:${entry.modelId}`, entry]));
+
+function chartKeyForModel(modelId: string) {
+  return `model_${modelId.replace(/[^a-zA-Z0-9]/g, '_')}`;
+}
+
+function formatDateTick(value: string) {
+  const date = new Date(value);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function getSelectedModels(modelIds: string[]) {
+  return modelIds.map((id) => modelMap[id]).filter((model): model is ModelDefinition => Boolean(model));
+}
+
 export default function ModelsPage() {
-  const [costPeriod, setCostPeriod] = React.useState('30');
-  const costDays = Number(costPeriod);
+  const [period, setPeriod] = React.useState('30');
+  const [selectedModelIds, setSelectedModelIds] = React.useState(defaultModelIds);
+  const days = Number(period);
 
-  // --- Model Comparison Cards ---
-  const modelCardSparkConfigs = featuredModels.map((m) => ({
-    value: { label: m.name, color: m.color },
-  })) satisfies ChartConfig[];
+  const selectedModels = React.useMemo(() => getSelectedModels(selectedModelIds), [selectedModelIds]);
+  const selectedDateSet = React.useMemo(() => new Set(allUsageDates.slice(-days)), [days]);
 
-  // Only use featured models for the latency/cost charts
-  const featuredModelTotals = React.useMemo(() => {
-    const all = getModelTotals(90);
-    return all.filter((m) => m.featured);
+  const totalsById = React.useMemo(() => {
+    const totals = getModelTotals(days);
+    return new Map(totals.map((model) => [model.id, model]));
+  }, [days]);
+
+  const totalRequestsAllModels = React.useMemo(() => {
+    let total = 0;
+    for (const model of totalsById.values()) {
+      total += model.totalRequests;
+    }
+    return total;
+  }, [totalsById]);
+
+  const selectedModelTotals = React.useMemo(() => {
+    return selectedModels.map((model) => {
+      const totals = totalsById.get(model.id);
+      const requestShare =
+        totalRequestsAllModels > 0 ? ((totals?.totalRequests ?? 0) / totalRequestsAllModels) * 100 : 0;
+
+      return {
+        ...model,
+        totalRequests: totals?.totalRequests ?? 0,
+        totalTokens: totals?.totalTokens ?? 0,
+        totalCost: totals?.totalCost ?? 0,
+        avgLatency: totals?.avgLatency ?? 0,
+        requestShare,
+      };
+    });
+  }, [selectedModels, totalRequestsAllModels, totalsById]);
+
+  const chartConfig = React.useMemo(() => {
+    return Object.fromEntries(
+      selectedModelTotals.map((model) => [
+        chartKeyForModel(model.id),
+        {
+          label: model.name,
+          color: model.color,
+        },
+      ])
+    ) satisfies ChartConfig;
+  }, [selectedModelTotals]);
+
+  const latencyChartData = React.useMemo(() => {
+    const latencyLookup = new Map(
+      getLatencyBuckets(days, selectedModelIds).map((entry) => [`${entry.bucket}:${entry.modelId}`, entry.count])
+    );
+
+    return bucketLabels.map((bucket) => {
+      const row: Record<string, string | number> = { bucket };
+      for (const model of selectedModelTotals) {
+        row[chartKeyForModel(model.id)] = latencyLookup.get(`${bucket}:${model.id}`) ?? 0;
+      }
+      return row;
+    });
+  }, [days, selectedModelIds, selectedModelTotals]);
+
+  const costChartData = React.useMemo(() => {
+    return allUsageDates.slice(-days).map((date) => {
+      const row: Record<string, string | number> = { date };
+      for (const model of selectedModelTotals) {
+        row[chartKeyForModel(model.id)] = usageLookup.get(`${date}:${model.id}`)?.cost ?? 0;
+      }
+      return row;
+    });
+  }, [days, selectedModelTotals]);
+
+  const modelSparklines = React.useMemo(() => {
+    return new Map(
+      selectedModelTotals.map((model) => [
+        model.id,
+        allUsageDates
+          .filter((date) => selectedDateSet.has(date))
+          .map((date) => ({ value: usageLookup.get(`${date}:${model.id}`)?.requests ?? 0 })),
+      ])
+    );
+  }, [selectedDateSet, selectedModelTotals]);
+
+  const handleResetModels = React.useCallback(() => {
+    setSelectedModelIds(defaultModelIds);
   }, []);
-
-  // --- Latency Distribution ---
-  const bucketLabels = ['<100ms', '100-250ms', '250-500ms', '500ms-1s', '>1s'];
-  const latencyChartData = bucketLabels.map((bucket) => {
-    const row: Record<string, string | number> = { bucket };
-    for (const model of featuredModels) {
-      const entry = latencyBuckets.find((b) => b.bucket === bucket && b.modelId === model.id);
-      row[model.id] = entry?.count ?? 0;
-    }
-    return row;
-  });
-
-  const latencyChartConfig = Object.fromEntries(
-    featuredModels.map((m) => [m.id, { label: m.name, color: m.color }])
-  ) satisfies ChartConfig;
-
-  // --- Daily Cost by Model ---
-  const uniqueDates = [...new Set(usageByModel.map((d) => d.date))].sort().slice(-costDays);
-  const costChartData = uniqueDates.map((date) => {
-    const row: Record<string, string | number> = { date };
-    for (const model of featuredModels) {
-      const entry = usageByModel.find((d) => d.date === date && d.modelId === model.id);
-      row[model.id] = entry?.cost ?? 0;
-    }
-    return row;
-  });
-
-  const costChartConfig = Object.fromEntries(
-    featuredModels.map((m) => [m.id, { label: m.name, color: m.color }])
-  ) satisfies ChartConfig;
-
-  // --- Per-model sparkline data ---
-  const modelSparklines = featuredModels.map((model) => {
-    const data = usageByModel
-      .filter((d) => d.modelId === model.id)
-      .slice(-30)
-      .map((d) => ({ value: d.requests }));
-    return data;
-  });
-
-  // --- Performance table data ---
-  const performanceRows = [
-    { label: 'Provider', values: featuredModels.map((m) => m.provider) },
-    { label: 'Total Requests', values: featuredModelTotals.map((m) => formatters.compact(m.totalRequests)) },
-    { label: 'Total Tokens', values: featuredModelTotals.map((m) => formatters.compact(m.totalTokens)) },
-    { label: 'Avg Latency', values: featuredModelTotals.map((m) => `${m.avgLatency}ms`) },
-    { label: 'Total Cost', values: featuredModelTotals.map((m) => formatters.currency(m.totalCost)) },
-    { label: 'Cost / 1K Input', values: featuredModels.map((m) => formatters.currencyPrecise(m.costPer1kInput)) },
-    { label: 'Cost / 1K Output', values: featuredModels.map((m) => formatters.currencyPrecise(m.costPer1kOutput)) },
-  ];
 
   return (
     <div>
-      <div>
-        <h1 className='text-2xl font-semibold text-foreground'>Models</h1>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          Compare model performance, costs, and usage patterns across your AI stack
-        </p>
+      <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
+        <div>
+          <h1 className='text-2xl font-semibold text-foreground'>Models</h1>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            Compare model performance, costs, and usage patterns across your AI stack
+          </p>
+        </div>
+        <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <Select value={period} onValueChange={(value) => value && setPeriod(value)} items={periodItems}>
+            <SelectTrigger className='w-full sm:w-[128px]'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {periodItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <ModelMultiSelect
+            selectedModels={selectedModelIds}
+            onModelsChange={setSelectedModelIds}
+            allLabel='Select models'
+            contentAlign='end'
+            maxSelected={maxCompareModels}
+            minSelected={1}
+            showLimit
+            triggerClassName='h-9 w-full justify-between gap-1.5 rounded-3xl bg-input/50 px-3 py-2 font-normal hover:bg-input/60 sm:w-[220px]'
+            triggerText={(count) => (count === 1 ? '1 model selected' : `${count} models selected`)}
+          />
+          <Button type='button' variant='ghost' className='w-full gap-1.5 sm:w-auto' onClick={handleResetModels}>
+            <RotateCcw className='size-3.5' aria-hidden='true' />
+            Reset
+          </Button>
+        </div>
       </div>
       <Separator className='my-6' />
 
-      {/* Section A: Model Comparison Cards */}
       <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-        {featuredModelTotals.map((model, index) => {
+        {selectedModelTotals.map((model) => {
           const sparkConfig = { value: { label: model.name, color: model.color } } satisfies ChartConfig;
-          const sparkData = modelSparklines[index] ?? [];
+          const sparkData = modelSparklines.get(model.id) ?? [];
           return (
             <Card key={model.id} className='rounded-3xl shadow-sm'>
               <CardHeader className='pb-2'>
                 <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-2'>
+                  <div className='flex min-w-0 items-center gap-2'>
                     <ProviderLogo providerId={model.providerId} size={16} />
-                    <CardTitle className='text-base font-semibold'>{model.name}</CardTitle>
+                    <CardTitle className='truncate text-base font-semibold'>{model.name}</CardTitle>
                   </div>
                   <Badge variant='secondary' className='rounded-full text-xs'>
                     {model.provider}
@@ -124,6 +199,12 @@ export default function ModelsPage() {
               </CardHeader>
               <CardContent>
                 <div className='grid grid-cols-2 gap-3'>
+                  <div>
+                    <p className='text-xs text-muted-foreground'>Request share</p>
+                    <p className='text-sm font-semibold text-foreground tabular-nums'>
+                      {model.requestShare.toFixed(1)}%
+                    </p>
+                  </div>
                   <div>
                     <p className='text-xs text-muted-foreground'>Requests</p>
                     <p className='text-sm font-semibold text-foreground tabular-nums'>
@@ -176,14 +257,13 @@ export default function ModelsPage() {
         })}
       </div>
 
-      {/* Section B: Latency Distribution */}
       <Card className='mt-8 rounded-3xl shadow-sm'>
         <CardHeader>
           <CardTitle className='text-base font-medium'>Latency Distribution by Model</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartContainer
-            config={latencyChartConfig}
+            config={chartConfig}
             className='aspect-auto h-72 w-full'
             initialDimension={{ width: 800, height: 288 }}
           >
@@ -192,8 +272,8 @@ export default function ModelsPage() {
               <XAxis dataKey='bucket' tickLine={false} axisLine={false} tickMargin={8} />
               <YAxis tickLine={false} axisLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />
-              {featuredModels.map((m) => (
-                <Bar key={m.id} dataKey={m.id} fill={m.color} radius={[2, 2, 0, 0]} />
+              {selectedModelTotals.map((model) => (
+                <Bar key={model.id} dataKey={chartKeyForModel(model.id)} fill={model.color} radius={[2, 2, 0, 0]} />
               ))}
               <ChartLegend content={<ChartLegendContent />} />
             </BarChart>
@@ -201,35 +281,22 @@ export default function ModelsPage() {
         </CardContent>
       </Card>
 
-      {/* Section C: Daily Cost by Model */}
       <Card className='mt-8 rounded-3xl shadow-sm'>
-        <CardHeader className='flex flex-row items-center justify-between'>
+        <CardHeader>
           <CardTitle className='text-base font-medium'>Daily Cost by Model</CardTitle>
-          <Select value={costPeriod} onValueChange={(v) => v && setCostPeriod(v)} items={periodItems}>
-            <SelectTrigger className='w-[120px]'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {periodItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </CardHeader>
         <CardContent>
           <ChartContainer
-            config={costChartConfig}
+            config={chartConfig}
             className='aspect-auto h-64 w-full'
             initialDimension={{ width: 800, height: 256 }}
           >
             <AreaChart data={costChartData} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
               <defs>
-                {featuredModels.map((m) => (
-                  <linearGradient key={m.id} id={`costFill-${m.id}`} x1='0' y1='0' x2='0' y2='1'>
-                    <stop offset='0%' stopColor={m.color} stopOpacity={0.2} />
-                    <stop offset='100%' stopColor={m.color} stopOpacity={0.01} />
+                {selectedModelTotals.map((model) => (
+                  <linearGradient key={model.id} id={`costFill-${model.id}`} x1='0' y1='0' x2='0' y2='1'>
+                    <stop offset='0%' stopColor={model.color} stopOpacity={0.2} />
+                    <stop offset='100%' stopColor={model.color} stopOpacity={0.01} />
                   </linearGradient>
                 ))}
               </defs>
@@ -240,22 +307,19 @@ export default function ModelsPage() {
                 axisLine={false}
                 minTickGap={32}
                 tickMargin={8}
-                tickFormatter={(v) => {
-                  const d = new Date(v);
-                  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                }}
+                tickFormatter={formatDateTick}
               />
               <YAxis hide />
               <ChartTooltip content={<ChartTooltipContent valueFormatter={(v) => formatters.currency(Number(v))} />} />
-              {featuredModels.map((m) => (
+              {selectedModelTotals.map((model) => (
                 <Area
-                  key={m.id}
+                  key={model.id}
                   type='monotone'
-                  dataKey={m.id}
+                  dataKey={chartKeyForModel(model.id)}
                   stackId='1'
-                  stroke={m.color}
+                  stroke={model.color}
                   strokeWidth={1.5}
-                  fill={`url(#costFill-${m.id})`}
+                  fill={`url(#costFill-${model.id})`}
                   dot={false}
                 />
               ))}
@@ -265,7 +329,6 @@ export default function ModelsPage() {
         </CardContent>
       </Card>
 
-      {/* Section D: Performance Comparison Table */}
       <Card className='mt-8 rounded-3xl shadow-sm'>
         <CardHeader>
           <CardTitle className='text-base font-medium'>Performance Comparison</CardTitle>
@@ -275,28 +338,48 @@ export default function ModelsPage() {
             <Table>
               <TableHeader>
                 <TableRow className='hover:bg-transparent'>
-                  <TableHead className='sticky left-0 z-10 bg-card text-muted-foreground'>Metric</TableHead>
-                  {featuredModels.map((m) => (
-                    <TableHead key={m.id} className='text-center text-foreground'>
-                      <div className='flex items-center justify-center gap-1.5'>
-                        <ProviderLogo providerId={m.providerId} size={14} />
-                        {m.name}
-                      </div>
-                    </TableHead>
-                  ))}
+                  <TableHead className='min-w-52 text-muted-foreground'>Model</TableHead>
+                  <TableHead className='text-muted-foreground'>Provider</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Requests</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Tokens</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Cost</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Avg Latency</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Input / 1K</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Output / 1K</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Share</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {performanceRows.map((row, index) => (
-                  <TableRow key={row.label} className={index % 2 === 0 ? 'bg-muted/30' : ''}>
-                    <TableCell className='sticky left-0 z-10 bg-inherit font-medium text-foreground'>
-                      {row.label}
+                {selectedModelTotals.map((model, index) => (
+                  <TableRow key={model.id} className={index % 2 === 0 ? 'bg-muted/30' : ''}>
+                    <TableCell className='font-medium text-foreground'>
+                      <div className='flex items-center gap-2'>
+                        <ProviderLogo providerId={model.providerId} size={14} />
+                        <span className='whitespace-nowrap'>{model.name}</span>
+                      </div>
                     </TableCell>
-                    {row.values.map((val, i) => (
-                      <TableCell key={featuredModels[i]!.id} className='text-center text-muted-foreground tabular-nums'>
-                        {val}
-                      </TableCell>
-                    ))}
+                    <TableCell className='text-muted-foreground'>{model.provider}</TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.compact(model.totalRequests)}
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.compact(model.totalTokens)}
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.currency(model.totalCost)}
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {model.avgLatency}ms
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.currencyPrecise(model.costPer1kInput)}
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.currencyPrecise(model.costPer1kOutput)}
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {model.requestShare.toFixed(1)}%
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

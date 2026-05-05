@@ -7,17 +7,19 @@ import { Separator } from '@workspace/ui/components/separator';
 import { Button } from '@workspace/ui/components/button';
 import { ExternalLink } from 'lucide-react';
 
-import { modelTotals } from '@/lib/data/usage-by-model';
+import { getModelTotals } from '@/lib/data/usage-by-model';
 import { overviewSummary } from '@/lib/data/overview-stats';
 import { formatters } from '@/lib/utils';
 import { ProviderLogo } from '@/components/ProviderLogo';
 
 const totalBudget = 20_000;
 const tokenBudget = 1_000_000_000;
+const billingCycleDays = 30;
 
 export default function BillingPage() {
   const usagePct = Math.round((overviewSummary.totalCost.value / totalBudget) * 100);
   const tokenPct = Math.round((overviewSummary.totalTokens.value / tokenBudget) * 100);
+  const billingModelTotals = [...getModelTotals(billingCycleDays)].sort((a, b) => b.totalCost - a.totalCost);
 
   return (
     <div className='space-y-10'>
@@ -100,7 +102,7 @@ export default function BillingPage() {
           </div>
           <div className='md:col-span-2'>
             <ul role='list' className='divide-y divide-border'>
-              {modelTotals.map((model) => (
+              {billingModelTotals.map((model) => (
                 <li key={model.id} className='flex items-center justify-between py-4'>
                   <div className='flex items-center gap-3'>
                     <ProviderLogo providerId={model.providerId} size={18} />

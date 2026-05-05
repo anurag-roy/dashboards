@@ -15,12 +15,31 @@ const bucketRanges = [
   { label: '>1s', min: 1_000, max: Infinity },
 ] as const;
 
-export const latencyBuckets: LatencyBucket[] = models.flatMap((model) => {
-  const modelTraces = traces.filter((t) => t.model === model.id);
+const latestTraceTime = traces.reduce((latest, trace) => {
+  return Math.max(latest, new Date(trace.timestamp).getTime());
+}, 0);
 
-  return bucketRanges.map((range) => ({
-    bucket: range.label,
-    modelId: model.id,
-    count: modelTraces.filter((t) => t.latencyMs >= range.min && t.latencyMs < range.max).length,
-  }));
-});
+export function getLatencyBuckets(days?: number, modelIds?: string[]): LatencyBucket[] {
+  const cutoff = days ? latestTraceTime - days * 24 * 60 * 60 * 1_000 : null;
+  const selectedModelIds = modelIds ? new Set(modelIds) : null;
+
+  return models
+    .filter((model) => !selectedModelIds || selectedModelIds.has(model.id))
+    .flatMap((model) => {
+      const modelTraces = traces.filter((trace) => {
+        if (trace.model !== model.id) {
+          return false;
+        }
+
+        return cutoff === null || new Date(trace.timestamp).getTime() >= cutoff;
+      });
+
+      return bucketRanges.map((range) => ({
+        bucket: range.label,
+        modelId: model.id,
+        count: modelTraces.filter((trace) => trace.latencyMs >= range.min && trace.latencyMs < range.max).length,
+      }));
+    });
+}
+
+export const latencyBuckets = getLatencyBuckets();

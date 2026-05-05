@@ -74,7 +74,18 @@ export function DataTable({ columns, data, onRowClick }: DataTableProps) {
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} className='transition-colors hover:bg-muted/50'>
+                  <TableRow
+                    key={row.id}
+                    tabIndex={0}
+                    className='cursor-pointer transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none'
+                    onClick={() => onRowClick(row.original)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onRowClick(row.original);
+                      }
+                    }}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
