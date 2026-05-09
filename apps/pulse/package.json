@@ -1,0 +1,45 @@
+{
+  "name": "pulse",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 3003",
+    "build": "next build",
+    "start": "next start -p 3003",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "typecheck": "tsc --noEmit",
+    "generate:agents": "tsx --tsconfig tsconfig.scripts.json lib/data/agents/generator.ts",
+    "generate:support": "tsx --tsconfig tsconfig.scripts.json lib/data/support/generator.ts",
+    "generate:retention": "tsx --tsconfig tsconfig.scripts.json lib/data/retention/generator.ts",
+    "generate:workflow": "tsx --tsconfig tsconfig.scripts.json lib/data/workflow/generator.ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.8.0",
+    "@tanstack/match-sorter-utils": "^8.19.4",
+    "@tanstack/react-table": "^8.21.3",
+    "@workspace/ui": "workspace:*",
+    "boring-avatars": "^2.0.4",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^1.9.0",
+    "next": "16.2.4",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "recharts": "3.8.0",
+    "tailwind-merge": "^3.5.0",
+    "use-debounce": "^10.0.4",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@workspace/typescript-config": "workspace:*",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.3"
+  }
+}

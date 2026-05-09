@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { Check, Copy } from 'lucide-react';
 
-import { Button } from './button';
-import { cn } from '../lib/utils';
+import { Button } from '@workspace/ui/components/button';
+import { cn } from '@workspace/ui/lib/utils';
 
 interface CopyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string;
