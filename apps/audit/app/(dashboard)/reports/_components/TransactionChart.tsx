@@ -32,8 +32,15 @@ const chartColors = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(
 
 const amountChartConfig = {
   value: {
-    label: 'Value',
-    color: 'var(--chart-5)',
+    label: 'Amount',
+    color: 'var(--chart-1)',
+  },
+} satisfies ChartConfig;
+
+const countChartConfig = {
+  value: {
+    label: 'Count',
+    color: 'var(--chart-2)',
   },
 } satisfies ChartConfig;
 
@@ -63,7 +70,7 @@ const chartByType = {
   },
   count: {
     title: 'Transaction Count',
-    chartConfig: amountChartConfig,
+    chartConfig: countChartConfig,
     tooltip: 'Total number of transactions matching the selected filters.',
     valueFormatter: (value: number) => formatters.number(value),
     aggregate(rows: Transaction[]): ChartDataItem[] {

@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import '@workspace/ui/globals.css';
 import './theme.css';
 import { siteConfig } from '@/app/siteConfig';
+import { AuditToaster } from '@/components/audit-toaster';
 import { ThemeProvider } from '@workspace/ui/components/theme-provider';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 import { cn } from '@workspace/ui/lib/utils';
@@ -58,6 +59,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <TooltipProvider delay={0}>{children}</TooltipProvider>
+          <AuditToaster />
         </ThemeProvider>
       </body>
     </html>

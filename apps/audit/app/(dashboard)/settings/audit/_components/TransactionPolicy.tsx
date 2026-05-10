@@ -8,12 +8,7 @@ import { Input } from '@workspace/ui/components/input';
 import { InsightBadge } from '@workspace/ui/components/insight-badge';
 import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
-
-const overview = [
-  { label: 'Blocked transactions', count: 1234, volume: '$4,653', variant: 'error' as const },
-  { label: 'Suspicious transactions', count: 319, volume: '$1,201', variant: 'warning' as const },
-  { label: 'Successful transactions', count: 10_546, volume: '$213,642', variant: 'neutral' as const },
-] as const;
+import { toast } from '@workspace/ui/components/sonner';
 
 const keywordOptions = [
   { label: 'Coffee shop', flagged: 831, category: 'block' as const },
@@ -41,11 +36,66 @@ const badgeVariantByCategory = {
   suspicious: 'warning',
 } as const;
 
+type KeywordRule = {
+  id: string;
+  label: string;
+  flagged: number;
+  category: (typeof policyTypes)[number]['value'];
+};
+
+function titleCaseKeyword(value: string) {
+  return value
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export default function TransactionPolicy() {
   const [showAddKeyword, setShowAddKeyword] = useState(false);
   const [keywordPolicyType, setKeywordPolicyType] = useState<(typeof policyTypes)[number]['value']>(
     policyTypes[0].value
   );
+  const [keywordRules, setKeywordRules] = useState<KeywordRule[]>(() =>
+    keywordOptions.map((keyword) => ({ ...keyword, id: keyword.label }))
+  );
+  const [keywordValue, setKeywordValue] = useState('');
+
+  const blockedCount =
+    18 +
+    keywordRules
+      .filter((keyword) => keyword.category === 'block')
+      .reduce((total, keyword) => total + keyword.flagged, 0);
+  const suspiciousCount = keywordRules
+    .filter((keyword) => keyword.category === 'suspicious')
+    .reduce((total, keyword) => total + keyword.flagged, 0);
+  const overview = [
+    { label: 'Blocked transactions', count: blockedCount, volume: '$4,653', variant: 'error' as const },
+    { label: 'Suspicious transactions', count: suspiciousCount, volume: '$1,201', variant: 'warning' as const },
+    { label: 'Successful transactions', count: 10_546, volume: '$213,642', variant: 'neutral' as const },
+  ];
+
+  function handleSaveKeyword() {
+    const trimmedKeyword = keywordValue.trim();
+
+    if (!trimmedKeyword) {
+      toast.warning('Enter a keyword before saving.');
+      return;
+    }
+
+    const nextKeyword = titleCaseKeyword(trimmedKeyword);
+    const nextRule = {
+      id: `${nextKeyword}-${Date.now()}`,
+      label: nextKeyword,
+      flagged: Math.max(24, nextKeyword.length * 17),
+      category: keywordPolicyType,
+    };
+
+    setKeywordRules((current) => [nextRule, ...current]);
+    setKeywordValue('');
+    setShowAddKeyword(false);
+    toast.success(`${nextKeyword} added as a ${keywordPolicyType} rule.`);
+  }
 
   return (
     <section aria-labelledby='transaction-policy-heading' className='grid grid-cols-1 gap-8 md:grid-cols-3'>
@@ -82,15 +132,23 @@ export default function TransactionPolicy() {
             <CardTitle className='text-sm'>Keyword / merchant category rules</CardTitle>
           </CardHeader>
           <CardContent className='space-y-1'>
-            {keywordOptions.map((keyword) => (
+            {keywordRules.map((keyword) => (
               <div
-                key={keyword.label}
+                key={keyword.id}
                 className='flex items-center justify-between gap-3 rounded-2xl px-2 py-2 hover:bg-muted/40'
               >
                 <InsightBadge variant={badgeVariantByCategory[keyword.category]}>{keyword.label}</InsightBadge>
                 <div className='flex items-center gap-2'>
                   <span className='text-sm text-muted-foreground tabular-nums'>{keyword.flagged}</span>
-                  <Button variant='ghost' size='icon-sm' aria-label={`Remove ${keyword.label}`}>
+                  <Button
+                    variant='ghost'
+                    size='icon-sm'
+                    aria-label={`Remove ${keyword.label}`}
+                    onClick={() => {
+                      setKeywordRules((current) => current.filter((rule) => rule.id !== keyword.id));
+                      toast.success(`${keyword.label} removed from policy rules.`);
+                    }}
+                  >
                     <Trash2 className='size-4 text-muted-foreground' aria-hidden='true' />
                   </Button>
                 </div>
@@ -128,14 +186,27 @@ export default function TransactionPolicy() {
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='keyword-input'>Keyword</Label>
-                    <Input id='keyword-input' placeholder='Insert keyword or merchant category' />
+                    <Input
+                      id='keyword-input'
+                      value={keywordValue}
+                      onChange={(event) => setKeywordValue(event.target.value)}
+                      placeholder='Insert keyword or merchant category'
+                    />
                   </div>
                 </div>
                 <div className='mt-3 flex justify-end gap-2'>
-                  <Button variant='secondary' onClick={() => setShowAddKeyword(false)}>
+                  <Button
+                    variant='secondary'
+                    onClick={() => {
+                      setKeywordValue('');
+                      setShowAddKeyword(false);
+                    }}
+                  >
                     Cancel
                   </Button>
-                  <Button>Save keyword</Button>
+                  <Button onClick={handleSaveKeyword} disabled={!keywordValue.trim()}>
+                    Save keyword
+                  </Button>
                 </div>
               </div>
             )}
@@ -144,7 +215,12 @@ export default function TransactionPolicy() {
 
         {!showAddKeyword && (
           <div className='flex justify-start sm:justify-end'>
-            <Button variant='secondary' onClick={() => setShowAddKeyword(true)}>
+            <Button
+              variant='secondary'
+              onClick={() => {
+                setShowAddKeyword(true);
+              }}
+            >
               Add keyword
             </Button>
           </div>
