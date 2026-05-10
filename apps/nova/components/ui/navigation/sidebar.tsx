@@ -17,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
 
@@ -149,6 +150,7 @@ function SidebarNavContent() {
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton
                   isActive={isActive(item.href)}
+                  tooltip={item.name}
                   render={<Link href={item.href} onClick={closeMobileMenu} />}
                 >
                   <item.icon className='size-4 shrink-0' aria-hidden='true' />
@@ -167,12 +169,12 @@ function SidebarNavContent() {
 
 export function Sidebar() {
   return (
-    <SidebarPrimitive>
+    <SidebarPrimitive collapsible='icon'>
       <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
         <div className='hidden md:block'>
-          <div className='flex items-center gap-3 rounded-2xl px-3 py-2.5'>
+          <div className='flex items-center gap-3 rounded-2xl px-3 py-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
             <AppLogo iconClassName='size-8' />
-            <div className='min-w-0'>
+            <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
               <p className='truncate text-lg font-bold text-foreground'>{workspace.name}</p>
             </div>
           </div>
@@ -205,6 +207,7 @@ export function Sidebar() {
           </div>
         </div>
       </SidebarFooter>
+      <SidebarRail />
     </SidebarPrimitive>
   );
 }
@@ -213,7 +216,7 @@ export function MobileSidebarHeader() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-x-6 sm:px-5 md:hidden'>
+    <div className='sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur supports-backdrop-filter:bg-background/80 sm:gap-x-6 sm:px-5 md:hidden'>
       <div className='flex min-w-0 items-center gap-2.5'>
         <AppLogo iconClassName='size-7' />
         <div className='min-w-0'>

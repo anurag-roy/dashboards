@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@workspace/ui/component
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@workspace/ui/components/chart';
 import type { ChartConfig } from '@workspace/ui/components/chart';
 
-
 import { formatters, cn } from '@/lib/utils';
 import type { Transaction } from '@/lib/data/schema';
 
@@ -170,7 +169,9 @@ export function TransactionChart({
           </div>
         </div>
         <p className='text-xs leading-relaxed text-muted-foreground md:hidden'>{definition.tooltip}</p>
-        <p className={cn('text-2xl font-semibold text-foreground', isVertical ? '' : 'md:mb-6')}>{definition.valueFormatter(total)}</p>
+        <p className={cn('text-2xl font-semibold text-foreground', isVertical ? '' : 'md:mb-6')}>
+          {definition.valueFormatter(total)}
+        </p>
       </CardHeader>
       <CardContent>
         <ChartContainer config={definition.chartConfig} className='h-64 min-h-64 w-full min-w-0'>

@@ -17,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
 import { useTheme } from 'next-themes';
@@ -169,6 +170,7 @@ function SidebarNavContent() {
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton
                   isActive={isActive(item.href)}
+                  tooltip={item.name}
                   render={<Link href={item.href} onClick={handleItemClick} />}
                 >
                   <item.icon className='size-4 shrink-0' aria-hidden='true' />
@@ -185,7 +187,7 @@ function SidebarNavContent() {
           <SidebarMenu>
             {shortcuts.map((item) => (
               <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton render={<Link href={item.href} onClick={handleItemClick} />}>
+                <SidebarMenuButton tooltip={item.name} render={<Link href={item.href} onClick={handleItemClick} />}>
                   <item.icon className='size-4 shrink-0' aria-hidden='true' />
                   <span>{item.name}</span>
                 </SidebarMenuButton>
@@ -201,9 +203,9 @@ function SidebarNavContent() {
 
 function BrandHeader({ compact = false }: { compact?: boolean }) {
   return (
-    <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2.5'>
+    <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
       <AppLogo iconClassName={compact ? 'size-7' : 'size-8'} />
-      <div className='min-w-0'>
+      <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
         <p className='truncate text-lg font-bold text-foreground'>Orbit</p>
       </div>
     </div>
@@ -212,7 +214,7 @@ function BrandHeader({ compact = false }: { compact?: boolean }) {
 
 export function Sidebar() {
   return (
-    <SidebarPrimitive>
+    <SidebarPrimitive collapsible='icon'>
       <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
         <div className='hidden md:block'>
           <BrandHeader />
@@ -240,6 +242,7 @@ export function Sidebar() {
           </div>
         </div>
       </SidebarFooter>
+      <SidebarRail />
     </SidebarPrimitive>
   );
 }

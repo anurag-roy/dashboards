@@ -2,7 +2,6 @@
 
 import { useTheme } from 'next-themes';
 import { Toaster as Sonner, toast, type ToasterProps } from 'sonner';
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from 'lucide-react';
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme();
@@ -22,7 +21,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: 'cn-toast',
-          closeButton: '!right-0 !left-auto !translate-x-1/2'
+          closeButton: '!right-0 !left-auto !translate-x-1/2',
         },
       }}
       {...props}
