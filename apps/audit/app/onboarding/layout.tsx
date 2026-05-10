@@ -72,7 +72,7 @@ export default function OnboardingLayout({
         </div>
       </header>
 
-      <main className='mx-auto mt-24 mb-12 w-full max-w-2xl px-4 sm:px-6'>{children}</main>
+      <main className='mx-auto mt-24 mb-12 w-full max-w-2xl px-4 pb-28 sm:px-6 md:pb-0'>{children}</main>
     </>
   );
 }

@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { ChevronRight, Trash2 } from 'lucide-react';
+import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Input } from '@workspace/ui/components/input';
-import { InsightBadge } from '@workspace/ui/components/insight-badge';
-import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
+import { Separator } from '@workspace/ui/components/separator';
 import { toast } from '@workspace/ui/components/sonner';
 
 const keywordOptions = [
@@ -32,8 +31,8 @@ const policyTypes = [
 ] as const;
 
 const badgeVariantByCategory = {
-  block: 'error',
-  suspicious: 'warning',
+  block: 'outline',
+  suspicious: 'outline',
 } as const;
 
 type KeywordRule = {
@@ -42,6 +41,28 @@ type KeywordRule = {
   flagged: number;
   category: (typeof policyTypes)[number]['value'];
 };
+
+type OverviewItem = {
+  label: string;
+  count: number;
+  volume: string;
+  category: 'blocked' | 'suspicious' | 'successful';
+};
+
+const overviewStyles = {
+  blocked: {
+    marker: 'bg-destructive',
+    bar: 'bg-destructive',
+  },
+  suspicious: {
+    marker: 'bg-orange-500',
+    bar: 'bg-orange-500',
+  },
+  successful: {
+    marker: 'bg-muted-foreground',
+    bar: 'bg-muted-foreground/70',
+  },
+} as const;
 
 function titleCaseKeyword(value: string) {
   return value
@@ -70,10 +91,11 @@ export default function TransactionPolicy() {
     .filter((keyword) => keyword.category === 'suspicious')
     .reduce((total, keyword) => total + keyword.flagged, 0);
   const overview = [
-    { label: 'Blocked transactions', count: blockedCount, volume: '$4,653', variant: 'error' as const },
-    { label: 'Suspicious transactions', count: suspiciousCount, volume: '$1,201', variant: 'warning' as const },
-    { label: 'Successful transactions', count: 10_546, volume: '$213,642', variant: 'neutral' as const },
-  ];
+    { label: 'Blocked transactions', count: blockedCount, volume: '$4,653', category: 'blocked' },
+    { label: 'Suspicious transactions', count: suspiciousCount, volume: '$1,201', category: 'suspicious' },
+    { label: 'Successful transactions', count: 10_546, volume: '$213,642', category: 'successful' },
+  ] satisfies OverviewItem[];
+  const transactionTotal = overview.reduce((total, item) => total + item.count, 0);
 
   function handleSaveKeyword() {
     const trimmedKeyword = keywordValue.trim();
@@ -108,123 +130,143 @@ export default function TransactionPolicy() {
         </p>
       </div>
 
-      <div className='space-y-6 md:col-span-2'>
-        <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
-          {overview.map((item) => (
-            <Card key={item.label} className='rounded-2xl'>
-              <CardHeader>
-                <CardTitle className='text-xs font-medium text-muted-foreground'>{item.label}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='flex flex-row flex-wrap items-center justify-between gap-y-1'>
-                  <p className='text-2xl font-semibold text-foreground tabular-nums'>{item.count.toLocaleString()}</p>
-                  <InsightBadge variant={item.variant} className='shrink-0'>
-                    {item.volume} spent
-                  </InsightBadge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-sm'>Keyword / merchant category rules</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-1'>
-            {keywordRules.map((keyword) => (
-              <div
-                key={keyword.id}
-                className='flex items-center justify-between gap-3 rounded-2xl px-2 py-2 hover:bg-muted/40'
-              >
-                <InsightBadge variant={badgeVariantByCategory[keyword.category]}>{keyword.label}</InsightBadge>
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm text-muted-foreground tabular-nums'>{keyword.flagged}</span>
-                  <Button
-                    variant='ghost'
-                    size='icon-sm'
-                    aria-label={`Remove ${keyword.label}`}
-                    onClick={() => {
-                      setKeywordRules((current) => current.filter((rule) => rule.id !== keyword.id));
-                      toast.success(`${keyword.label} removed from policy rules.`);
-                    }}
-                  >
-                    <Trash2 className='size-4 text-muted-foreground' aria-hidden='true' />
+      <div className='md:col-span-2'>
+        <div className='flex flex-col gap-10'>
+          <div className='flex flex-col gap-5'>
+            <h3 className='text-sm font-medium text-foreground'>Overview of blocked transactions</h3>
+            <div className='flex h-2 gap-0.5 overflow-hidden rounded-full bg-muted' aria-hidden='true'>
+              {overview.map((item) => (
+                <span
+                  key={item.category}
+                  className={overviewStyles[item.category].bar}
+                  style={{ width: `${(item.count / transactionTotal) * 100}%` }}
+                />
+              ))}
+            </div>
+            <div className='grid grid-cols-1 gap-5 sm:grid-cols-3'>
+              {overview.map((item) => (
+                <div key={item.category} className='flex flex-col gap-1'>
+                  <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <span className={`size-2.5 rounded-sm ${overviewStyles[item.category].marker}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  <p className='text-xl font-semibold text-foreground tabular-nums'>{item.count.toLocaleString()}</p>
+                  <p className='text-sm text-muted-foreground'>{item.volume} volume</p>
+                  <Button variant='link' size='sm' className='h-auto justify-start px-0 py-1 text-primary'>
+                    Details
+                    <ChevronRight className='size-4' aria-hidden='true' />
                   </Button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
 
-            {showAddKeyword && (
-              <div className='mt-3 rounded-2xl border border-border/70 bg-muted/20 p-3'>
-                <div className='grid grid-cols-1 gap-3 sm:grid-cols-[180px_1fr]'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='policy-type'>Policy</Label>
-                    <Select
-                      value={keywordPolicyType}
-                      items={policyTypes}
-                      onValueChange={(value) => {
-                        if (value) {
-                          setKeywordPolicyType(value as (typeof policyTypes)[number]['value']);
-                        }
-                      }}
+          <div className='flex flex-col gap-4'>
+            <div className='grid grid-cols-[1fr_auto] gap-4 text-sm font-medium text-foreground'>
+              <h3>Keyword / Merchant category</h3>
+              <p># of transactions</p>
+            </div>
+
+            <div className='overflow-hidden rounded-3xl border border-border/70 bg-card px-4 sm:px-5'>
+              {keywordRules.map((keyword, index) => (
+                <div key={keyword.id}>
+                  <div className='grid grid-cols-[1fr_auto] items-center gap-4 py-4'>
+                    <Badge
+                      variant={badgeVariantByCategory[keyword.category]}
+                      className={
+                        keyword.category === 'suspicious'
+                          ? 'w-fit rounded-full border-orange-500/25 bg-orange-500/10 text-orange-700 dark:border-orange-400/25 dark:bg-orange-500/15 dark:text-orange-300'
+                          : 'w-fit rounded-full border-destructive/25 bg-destructive/10 text-destructive dark:border-destructive/40 dark:bg-destructive/15'
+                      }
                     >
-                      <SelectTrigger id='policy-type' className='w-full'>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align='start'>
-                        {policyTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value} label={type.label}>
-                            <div className='space-y-0.5'>
-                              <p>{type.label}</p>
-                              <p className='text-xs font-normal text-muted-foreground'>{type.description}</p>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <span
+                        className={`size-2 rounded-sm ${keyword.category === 'block' ? 'bg-destructive' : 'bg-orange-500'}`}
+                        aria-hidden='true'
+                      />
+                      {keyword.label}
+                    </Badge>
+                    <div className='flex items-center gap-4'>
+                      <span className='text-sm text-muted-foreground tabular-nums'>{keyword.flagged}</span>
+                      <Separator orientation='vertical' className='h-5' />
+                      <Button
+                        variant='ghost'
+                        size='icon-sm'
+                        aria-label={`Remove ${keyword.label}`}
+                        onClick={() => {
+                          setKeywordRules((current) => current.filter((rule) => rule.id !== keyword.id));
+                          toast.success(`${keyword.label} removed from policy rules.`);
+                        }}
+                      >
+                        <Trash2 className='size-4 text-muted-foreground' aria-hidden='true' />
+                      </Button>
+                    </div>
                   </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='keyword-input'>Keyword</Label>
-                    <Input
-                      id='keyword-input'
-                      value={keywordValue}
-                      onChange={(event) => setKeywordValue(event.target.value)}
-                      placeholder='Insert keyword or merchant category'
-                    />
-                  </div>
+                  {index < keywordRules.length - 1 && <Separator />}
                 </div>
-                <div className='mt-3 flex justify-end gap-2'>
-                  <Button
-                    variant='secondary'
-                    onClick={() => {
-                      setKeywordValue('');
-                      setShowAddKeyword(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSaveKeyword} disabled={!keywordValue.trim()}>
-                    Save keyword
-                  </Button>
-                </div>
+              ))}
+            </div>
+
+            {showAddKeyword ? (
+              <div className='grid grid-cols-1 gap-2 rounded-2xl border border-border/70 bg-muted/20 p-3 sm:grid-cols-[160px_1fr_auto_auto]'>
+                <Select
+                  value={keywordPolicyType}
+                  items={policyTypes}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setKeywordPolicyType(value as (typeof policyTypes)[number]['value']);
+                    }
+                  }}
+                >
+                  <SelectTrigger aria-label='Policy type' className='w-full'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align='start'>
+                    {policyTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value} label={type.label}>
+                        <div className='flex items-center gap-2'>
+                          <span
+                            className={`size-2 rounded-sm ${type.value === 'block' ? 'bg-destructive' : 'bg-orange-500'}`}
+                            aria-hidden='true'
+                          />
+                          {type.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  value={keywordValue}
+                  onChange={(event) => setKeywordValue(event.target.value)}
+                  placeholder='Insert keyword'
+                  aria-label='Keyword or merchant category'
+                />
+                <Button
+                  variant='secondary'
+                  onClick={() => {
+                    setKeywordValue('');
+                    setShowAddKeyword(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveKeyword} disabled={!keywordValue.trim()}>
+                  Save
+                </Button>
+              </div>
+            ) : (
+              <div className='flex justify-start sm:justify-end'>
+                <Button
+                  variant='secondary'
+                  onClick={() => {
+                    setShowAddKeyword(true);
+                  }}
+                >
+                  Add keyword
+                </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {!showAddKeyword && (
-          <div className='flex justify-start sm:justify-end'>
-            <Button
-              variant='secondary'
-              onClick={() => {
-                setShowAddKeyword(true);
-              }}
-            >
-              Add keyword
-            </Button>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
