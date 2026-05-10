@@ -17,15 +17,6 @@ import { formatters } from '@/lib/utils';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
 
 const columnHelper = createColumnHelper<Transaction>();
-const transactionDateFormatter = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: '2-digit',
-  year: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-  hour12: true,
-  timeZone: 'UTC',
-});
 
 export const getColumns = ({ onEditClick }: { onEditClick: (row: Row<Transaction>) => void }) =>
   [
@@ -55,7 +46,7 @@ export const getColumns = ({ onEditClick }: { onEditClick: (row: Row<Transaction
     }),
     columnHelper.accessor('transaction_date', {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Purchased on' />,
-      cell: ({ getValue }) => transactionDateFormatter.format(new Date(getValue())),
+      cell: ({ getValue }) => formatters.dateTime(getValue()),
       enableSorting: true,
       enableHiding: false,
       meta: {

@@ -1,5 +1,4 @@
 import { clsx, type ClassValue } from 'clsx';
-import { format } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -7,6 +6,24 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const focusRing = ['outline outline-offset-2 outline-0 focus-visible:outline-2', 'outline-primary'] as const;
+
+const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+function formatUtcDate(value: string | Date) {
+  const date = new Date(value);
+
+  return `${shortMonths[date.getUTCMonth()]} ${String(date.getUTCDate()).padStart(2, '0')}, ${date.getUTCFullYear()}`;
+}
+
+function formatUtcTime(value: string | Date) {
+  const date = new Date(value);
+  const hours = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const hour12 = hours % 12 || 12;
+  const meridiem = hours >= 12 ? 'PM' : 'AM';
+
+  return `${hour12}:${minutes} ${meridiem}`;
+}
 
 export const formatters = {
   currency: (number: number, currency = 'USD') =>
@@ -23,8 +40,8 @@ export const formatters = {
       compactDisplay: 'short',
       maximumFractionDigits: 1,
     }).format(number),
-  date: (value: string | Date) => format(new Date(value), 'MMM dd, yyyy'),
-  dateTime: (value: string | Date) => format(new Date(value), "MMM dd, yyyy 'at' h:mma"),
+  date: (value: string | Date) => formatUtcDate(value),
+  dateTime: (value: string | Date) => `${formatUtcDate(value)} at ${formatUtcTime(value)}`,
 };
 
 export function daysAgo(days: number) {

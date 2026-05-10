@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { format } from 'date-fns';
 import type { Row, Table } from '@tanstack/react-table';
 import { Calendar, MoreHorizontal, ShoppingBag } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
@@ -62,7 +61,7 @@ function TransactionCard({ transaction, onEditClick }: { transaction: Transactio
         </span>
         <span className='flex items-center gap-1'>
           <Calendar className='size-3 shrink-0' aria-hidden />
-          {format(new Date(transaction.transaction_date), 'MMM dd, yyyy')}
+          {formatters.date(transaction.transaction_date)}
         </span>
       </CardContent>
 

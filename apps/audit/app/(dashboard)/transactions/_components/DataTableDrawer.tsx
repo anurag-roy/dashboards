@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { format } from 'date-fns';
+import { type FocusEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { type Row } from '@tanstack/react-table';
 import { FileText, Upload, X } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
@@ -47,10 +46,105 @@ const reimbursementItems = [
   { value: 'bank-transfer', label: 'Bank transfer' },
   { value: 'cash', label: 'Cash reimbursement' },
 ] as const;
+const keyboardVisibilityThreshold = 80;
+const keyboardScrollMargin = 16;
+const nonTextInputTypes = new Set([
+  'checkbox',
+  'radio',
+  'range',
+  'color',
+  'file',
+  'image',
+  'button',
+  'submit',
+  'reset',
+]);
+
+function isKeyboardInput(target: EventTarget | null): target is HTMLElement {
+  if (target instanceof HTMLInputElement) {
+    return !nonTextInputTypes.has(target.type);
+  }
+
+  return target instanceof HTMLTextAreaElement || (target instanceof HTMLElement && target.isContentEditable);
+}
+
+function useKeyboardInset(enabled: boolean) {
+  const [keyboardInset, setKeyboardInset] = useState(0);
+
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined' || !window.visualViewport) {
+      setKeyboardInset(0);
+      return;
+    }
+
+    const viewport = window.visualViewport;
+
+    const updateKeyboardInset = () => {
+      const nextInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardInset(nextInset > keyboardVisibilityThreshold ? Math.round(nextInset) : 0);
+    };
+
+    updateKeyboardInset();
+    viewport.addEventListener('resize', updateKeyboardInset);
+    viewport.addEventListener('scroll', updateKeyboardInset);
+
+    return () => {
+      viewport.removeEventListener('resize', updateKeyboardInset);
+      viewport.removeEventListener('scroll', updateKeyboardInset);
+    };
+  }, [enabled]);
+
+  return keyboardInset;
+}
+
+function keepFocusedFieldVisible(event: FocusEvent<HTMLElement>, scrollRef: React.RefObject<HTMLDivElement | null>) {
+  const target = event.target;
+  const scrollContainer = scrollRef.current;
+
+  if (!isKeyboardInput(target) || !scrollContainer || typeof window === 'undefined') {
+    return;
+  }
+
+  const scrollIntoVisibleArea = () => {
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const viewportBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const visibleTop = Math.max(containerRect.top, viewportTop) + keyboardScrollMargin;
+    const visibleBottom = Math.min(containerRect.bottom, viewportBottom) - keyboardScrollMargin;
+
+    if (targetRect.bottom > visibleBottom) {
+      scrollContainer.scrollBy({ top: targetRect.bottom - visibleBottom, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetRect.top < visibleTop) {
+      scrollContainer.scrollBy({ top: targetRect.top - visibleTop, behavior: 'smooth' });
+    }
+  };
+
+  window.requestAnimationFrame(scrollIntoVisibleArea);
+  window.setTimeout(scrollIntoVisibleArea, 300);
+}
+
+function TransactionDrawerActions({ onClose }: { onClose: () => void }) {
+  return (
+    <>
+      <Button onClick={onClose}>Save changes</Button>
+      <Button variant='secondary' onClick={onClose}>
+        Cancel
+      </Button>
+    </>
+  );
+}
 
 function DrawerFormContent({
   transaction,
   scrollRef,
+  keyboardInset,
+  showInlineActions = false,
+  onClose,
   expenseStatus,
   setExpenseStatus,
   paymentStatus,
@@ -71,6 +165,9 @@ function DrawerFormContent({
 }: {
   transaction: Transaction;
   scrollRef: React.RefObject<HTMLDivElement | null>;
+  keyboardInset: number;
+  showInlineActions?: boolean;
+  onClose: () => void;
   expenseStatus: Transaction['expense_status'];
   setExpenseStatus: (v: Transaction['expense_status']) => void;
   paymentStatus: Transaction['payment_status'];
@@ -90,12 +187,19 @@ function DrawerFormContent({
   activity: { id: string; actor: string; action: string; at: string }[];
 }) {
   return (
-    <div ref={scrollRef} className='min-h-0 flex-1 overflow-y-auto'>
-      <div className='flex flex-col gap-6 p-4 md:p-6'>
+    <div
+      ref={scrollRef}
+      className='min-h-0 flex-1 overflow-y-auto'
+      onFocusCapture={(event) => keepFocusedFieldVisible(event, scrollRef)}
+    >
+      <div
+        className='flex flex-col gap-6 p-4 md:p-6'
+        style={keyboardInset > 0 ? { paddingBottom: keyboardInset + 24 } : undefined}
+      >
         <div className='grid grid-cols-1 gap-3 rounded-3xl border border-border/70 bg-muted/30 p-4 sm:grid-cols-2'>
           <div>
             <p className='text-xs text-muted-foreground'>Purchased on</p>
-            <p className='font-medium'>{format(new Date(transaction.transaction_date), "MMM dd, yyyy 'at' h:mma")}</p>
+            <p className='font-medium'>{formatters.dateTime(transaction.transaction_date)}</p>
           </div>
           <div>
             <p className='text-xs text-muted-foreground'>Amount</p>
@@ -328,6 +432,12 @@ function DrawerFormContent({
             <DataTableDrawerFeed events={activity} />
           </TabsContent>
         </Tabs>
+
+        {showInlineActions && (
+          <div className='flex flex-col gap-2 border-t border-border/70 pt-4'>
+            <TransactionDrawerActions onClose={onClose} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -337,6 +447,8 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const transaction = row?.original ?? null;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const keyboardInset = useKeyboardInset(open && !isDesktop);
+  const keyboardOpen = keyboardInset > 0;
 
   const [expenseStatus, setExpenseStatus] = useState<Transaction['expense_status']>('pending');
   const [paymentStatus, setPaymentStatus] = useState<Transaction['payment_status']>('processing');
@@ -390,6 +502,9 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
   const formProps = {
     transaction: transaction!,
     scrollRef,
+    keyboardInset: isDesktop ? 0 : keyboardInset,
+    showInlineActions: !isDesktop && keyboardOpen,
+    onClose: () => onOpenChange(false),
     expenseStatus,
     setExpenseStatus,
     paymentStatus,
@@ -411,9 +526,9 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
 
   if (!isDesktop) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
-          <DrawerHeader>
+      <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+        <DrawerContent className='data-[vaul-drawer-direction=bottom]:max-h-[90svh]'>
+          <DrawerHeader className='shrink-0'>
             <DrawerTitle>
               {transaction ? `Transaction ${transaction.transaction_id}` : 'Transaction details'}
             </DrawerTitle>
@@ -426,11 +541,8 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
             <div className='p-6 text-sm text-muted-foreground'>Select a transaction to view details.</div>
           )}
 
-          <DrawerFooter className='border-t border-border/70'>
-            <Button onClick={() => onOpenChange(false)}>Save changes</Button>
-            <Button variant='secondary' onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
+          <DrawerFooter className={keyboardOpen ? 'hidden' : 'shrink-0 border-t border-border/70'}>
+            <TransactionDrawerActions onClose={() => onOpenChange(false)} />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
