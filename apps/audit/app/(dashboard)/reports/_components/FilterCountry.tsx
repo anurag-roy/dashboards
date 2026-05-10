@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { Checkbox } from '@workspace/ui/components/checkbox';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@workspace/ui/components/dialog';
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@workspace/ui/components/drawer';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@workspace/ui/components/popover';
@@ -24,7 +24,7 @@ type FilterCountryProps = {
 
 export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCountryProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [draftCountries, setDraftCountries] = useState<string[]>(selectedCountries);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -159,27 +159,29 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
           </PopoverContent>
         </Popover>
       ) : (
-        <Dialog
-          open={dialogOpen}
+        <Drawer
+          open={drawerOpen}
           onOpenChange={(open) => {
-            setDialogOpen(open);
+            setDrawerOpen(open);
             setDraftCountries(selectedCountries);
             setSearchTerm('');
           }}
         >
-          <DialogTrigger id='location-filter' render={trigger} />
-          <DialogContent className='max-h-[calc(100svh-2rem)] overflow-y-auto rounded-3xl p-5' showCloseButton={false}>
-            <DialogHeader>
-              <DialogTitle>Locations</DialogTitle>
-              <DialogDescription>Select the countries included in this report.</DialogDescription>
-            </DialogHeader>
-            <div className='grid gap-3'>{locationControls}</div>
-            <DialogFooter className='border-t border-border/70 pt-4'>
+          <DrawerTrigger id='location-filter' asChild>
+            {trigger}
+          </DrawerTrigger>
+          <DrawerContent className='max-h-[90svh]'>
+            <DrawerHeader className='text-left'>
+              <DrawerTitle>Locations</DrawerTitle>
+              <DrawerDescription>Select the countries included in this report.</DrawerDescription>
+            </DrawerHeader>
+            <div className='grid gap-3 overflow-y-auto px-4 pb-4'>{locationControls}</div>
+            <DrawerFooter className='border-t border-border/70'>
               <Button
                 variant='secondary'
                 onClick={() => {
                   setDraftCountries(selectedCountries);
-                  setDialogOpen(false);
+                  setDrawerOpen(false);
                 }}
               >
                 Cancel
@@ -187,14 +189,14 @@ export function FilterCountry({ selectedCountries, onCountriesChange }: FilterCo
               <Button
                 onClick={() => {
                   onCountriesChange(draftCountries);
-                  setDialogOpen(false);
+                  setDrawerOpen(false);
                 }}
               >
                 Apply
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       )}
     </div>
   );

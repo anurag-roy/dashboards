@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { CircleCheck, Plus } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -12,6 +13,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@workspace/ui/components/drawer';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
@@ -25,6 +36,8 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
+
+import { useMediaQuery } from '@/lib/use-media-query';
 
 const lineItems = [
   {
@@ -54,6 +67,101 @@ const states = [
   { value: 'delaware', label: 'Delaware' },
   { value: 'hawaii', label: 'Hawaii' },
 ] as const;
+
+function AddCardFields({ idPrefix }: { idPrefix: string }) {
+  const nameId = `${idPrefix}-name`;
+  const numberId = `${idPrefix}-number`;
+  const expiryId = `${idPrefix}-expiry`;
+  const cvvId = `${idPrefix}-cvv`;
+
+  return (
+    <div className='mt-5 space-y-4'>
+      <div className='space-y-2'>
+        <Label htmlFor={nameId}>Cardholder name</Label>
+        <Input id={nameId} placeholder='Ada Lovelace' />
+      </div>
+      <div className='space-y-2'>
+        <Label htmlFor={numberId}>Card number</Label>
+        <Input id={numberId} placeholder='**** **** **** 1234' />
+      </div>
+      <div className='grid grid-cols-2 gap-3'>
+        <div className='space-y-2'>
+          <Label htmlFor={expiryId}>Expiry date</Label>
+          <Input id={expiryId} placeholder='MM/YY' />
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor={cvvId}>CVV</Label>
+          <Input id={cvvId} placeholder='123' />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddCardOverlay() {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const id = useId();
+  const trigger = (
+    <Button className='gap-2'>
+      <Plus className='size-4' aria-hidden='true' />
+      Add card
+    </Button>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog>
+        <DialogTrigger render={trigger} />
+        <DialogContent className='sm:max-w-lg'>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Add payment card</DialogTitle>
+              <DialogDescription>Enter card details to add a new payment method.</DialogDescription>
+            </DialogHeader>
+            <AddCardFields idPrefix={`${id}-desktop`} />
+            <DialogFooter className='mt-6'>
+              <DialogClose render={<Button type='button' variant='secondary' />}>Cancel</DialogClose>
+              <Button type='submit'>Add card</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+      <DrawerContent className='max-h-[90svh]'>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <DrawerHeader className='text-left'>
+            <DrawerTitle>Add payment card</DrawerTitle>
+            <DrawerDescription>Enter card details to add a new payment method.</DrawerDescription>
+          </DrawerHeader>
+          <div className='overflow-y-auto px-4 pb-4'>
+            <AddCardFields idPrefix={`${id}-mobile`} />
+          </div>
+          <DrawerFooter className='border-t border-border/70'>
+            <DrawerClose asChild>
+              <Button type='button' variant='secondary'>
+                Cancel
+              </Button>
+            </DrawerClose>
+            <Button type='submit'>Add card</Button>
+          </DrawerFooter>
+        </form>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 export default function BillingPage() {
   return (
@@ -133,52 +241,7 @@ export default function BillingPage() {
         <div className='space-y-4 md:col-span-2'>
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <p className='text-sm font-medium text-foreground'>Cards</p>
-            <Dialog>
-              <DialogTrigger
-                render={
-                  <Button className='gap-2'>
-                    <Plus className='size-4' aria-hidden='true' />
-                    Add card
-                  </Button>
-                }
-              />
-              <DialogContent className='sm:max-w-lg'>
-                <form
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                  }}
-                >
-                  <DialogHeader>
-                    <DialogTitle>Add payment card</DialogTitle>
-                    <DialogDescription>Enter card details to add a new payment method.</DialogDescription>
-                  </DialogHeader>
-                  <div className='mt-5 space-y-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='card-name'>Cardholder name</Label>
-                      <Input id='card-name' placeholder='Ada Lovelace' />
-                    </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='card-number'>Card number</Label>
-                      <Input id='card-number' placeholder='**** **** **** 1234' />
-                    </div>
-                    <div className='grid grid-cols-2 gap-3'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='card-expiry'>Expiry date</Label>
-                        <Input id='card-expiry' placeholder='MM/YY' />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='card-cvv'>CVV</Label>
-                        <Input id='card-cvv' placeholder='123' />
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter className='mt-6'>
-                    <DialogClose render={<Button type='button' variant='secondary' />}>Cancel</DialogClose>
-                    <Button type='submit'>Add card</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <AddCardOverlay />
           </div>
 
           <div className='overflow-hidden rounded-3xl border border-border/70 bg-card'>

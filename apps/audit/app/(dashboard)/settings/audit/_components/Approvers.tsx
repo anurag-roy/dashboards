@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -13,16 +13,121 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@workspace/ui/components/drawer';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 
 import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { approvers, departments } from '@/lib/data/data';
+import { useMediaQuery } from '@/lib/use-media-query';
+
+const defaultDepartmentValue = departments[0]?.value ?? 'all-areas';
+
+function ApproverFields({ idPrefix }: { idPrefix: string }) {
+  const emailId = `${idPrefix}-email`;
+  const permissionId = `${idPrefix}-permission`;
+
+  return (
+    <div className='mt-5 space-y-4'>
+      <div className='space-y-2'>
+        <Label htmlFor={emailId}>Email</Label>
+        <Input id={emailId} type='email' placeholder='teammate@acme.com' />
+      </div>
+      <div className='space-y-2'>
+        <Label htmlFor={permissionId}>Permission</Label>
+        <Select defaultValue={defaultDepartmentValue} items={departments}>
+          <SelectTrigger id={permissionId} className='w-full'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align='start'>
+            {departments.map((department) => (
+              <SelectItem key={department.value} value={department.value} label={department.label}>
+                {department.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+function AddApproverOverlay() {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const id = useId();
+  const trigger = (
+    <Button className='gap-2'>
+      <Plus className='size-4' aria-hidden='true' />
+      Add user
+    </Button>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog>
+        <DialogTrigger render={trigger} />
+        <DialogContent className='sm:max-w-lg'>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Add approver</DialogTitle>
+              <DialogDescription>Invite a teammate and assign their approval scope.</DialogDescription>
+            </DialogHeader>
+            <ApproverFields idPrefix={`${id}-desktop`} />
+            <DialogFooter className='mt-6'>
+              <DialogClose render={<Button type='button' variant='secondary' />}>Cancel</DialogClose>
+              <Button type='submit'>Send invite</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+      <DrawerContent className='max-h-[90svh]'>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <DrawerHeader className='text-left'>
+            <DrawerTitle>Add approver</DrawerTitle>
+            <DrawerDescription>Invite a teammate and assign their approval scope.</DrawerDescription>
+          </DrawerHeader>
+          <div className='overflow-y-auto px-4 pb-4'>
+            <ApproverFields idPrefix={`${id}-mobile`} />
+          </div>
+          <DrawerFooter className='border-t border-border/70'>
+            <DrawerClose asChild>
+              <Button type='button' variant='secondary'>
+                Cancel
+              </Button>
+            </DrawerClose>
+            <Button type='submit'>Send invite</Button>
+          </DrawerFooter>
+        </form>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 export default function Approvers() {
-  const defaultDepartmentValue = departments[0]?.value ?? 'all-areas';
-
   const initialPermissions = useMemo(
     () =>
       Object.fromEntries(
@@ -31,7 +136,7 @@ export default function Approvers() {
           departments.find((department) => department.label === user.permission)?.value ?? defaultDepartmentValue,
         ])
       ),
-    [defaultDepartmentValue]
+    []
   );
 
   const [permissions, setPermissions] = useState<Record<string, string>>(initialPermissions);
@@ -51,53 +156,7 @@ export default function Approvers() {
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <p className='text-sm font-medium text-foreground'>{approvers.length} users with approval rights</p>
 
-          <Dialog>
-            <DialogTrigger
-              render={
-                <Button className='gap-2'>
-                  <Plus className='size-4' aria-hidden='true' />
-                  Add user
-                </Button>
-              }
-            />
-            <DialogContent className='sm:max-w-lg'>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                }}
-              >
-                <DialogHeader>
-                  <DialogTitle>Add approver</DialogTitle>
-                  <DialogDescription>Invite a teammate and assign their approval scope.</DialogDescription>
-                </DialogHeader>
-                <div className='mt-5 space-y-4'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='approver-email'>Email</Label>
-                    <Input id='approver-email' type='email' placeholder='teammate@acme.com' />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='approver-scope'>Permission</Label>
-                    <Select defaultValue={defaultDepartmentValue} items={departments}>
-                      <SelectTrigger id='approver-scope' className='w-full'>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align='start'>
-                        {departments.map((department) => (
-                          <SelectItem key={department.value} value={department.value} label={department.label}>
-                            {department.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter className='mt-6'>
-                  <DialogClose render={<Button type='button' variant='secondary' />}>Cancel</DialogClose>
-                  <Button type='submit'>Send invite</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <AddApproverOverlay />
         </div>
 
         <ul role='list' className='divide-y divide-border rounded-3xl border border-border/70 bg-card px-4 sm:px-5'>

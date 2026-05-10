@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@workspace/ui/components/dialog';
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@workspace/ui/components/drawer';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@workspace/ui/components/popover';
@@ -32,7 +32,7 @@ function roundToNiceAmount(value: number) {
 
 export function FilterAmount({ minAmount, maxAmount, amountRange, transactions, onAmountChange }: FilterAmountProps) {
   const [localRange, setLocalRange] = useState<[number, number]>(amountRange);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
@@ -183,29 +183,31 @@ export function FilterAmount({ minAmount, maxAmount, amountRange, transactions, 
           </PopoverContent>
         </Popover>
       ) : (
-        <Dialog
-          open={dialogOpen}
+        <Drawer
+          open={drawerOpen}
           onOpenChange={(open) => {
-            setDialogOpen(open);
+            setDrawerOpen(open);
             setLocalRange(amountRange);
           }}
         >
-          <DialogTrigger id='amount-filter' render={trigger} />
-          <DialogContent className='max-h-[calc(100svh-2rem)] overflow-y-auto rounded-3xl p-5' showCloseButton={false}>
-            <DialogHeader>
-              <DialogTitle>Transaction Amount</DialogTitle>
-              <DialogDescription>
+          <DrawerTrigger id='amount-filter' asChild>
+            {trigger}
+          </DrawerTrigger>
+          <DrawerContent className='max-h-[90svh]'>
+            <DrawerHeader className='text-left'>
+              <DrawerTitle>Transaction Amount</DrawerTitle>
+              <DrawerDescription>
                 Choose a transaction amount range between {formatters.currency(minAmount)} and{' '}
                 {formatters.currency(maxAmount)}.
-              </DialogDescription>
-            </DialogHeader>
-            <div className='grid gap-4'>{amountControls}</div>
-            <DialogFooter className='border-t border-border/70 pt-4'>
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className='grid gap-4 overflow-y-auto px-4 pb-4'>{amountControls}</div>
+            <DrawerFooter className='border-t border-border/70'>
               <Button
                 variant='secondary'
                 onClick={() => {
                   setLocalRange(amountRange);
-                  setDialogOpen(false);
+                  setDrawerOpen(false);
                 }}
               >
                 Cancel
@@ -215,14 +217,14 @@ export function FilterAmount({ minAmount, maxAmount, amountRange, transactions, 
                   const normalized = normalizeRange(localRange);
                   onAmountChange(normalized);
                   setLocalRange(normalized);
-                  setDialogOpen(false);
+                  setDrawerOpen(false);
                 }}
               >
                 Apply
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       )}
     </div>
   );
