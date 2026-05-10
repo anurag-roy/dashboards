@@ -162,7 +162,7 @@ export function TransactionChart({
           </div>
         </div>
         <p className='text-xs leading-relaxed text-muted-foreground md:hidden'>{definition.tooltip}</p>
-        <p className='text-2xl font-semibold text-foreground'>{definition.valueFormatter(total)}</p>
+        <p className='text-2xl font-semibold text-foreground mb-4'>{definition.valueFormatter(total)}</p>
       </CardHeader>
       <CardContent>
         <ChartContainer config={definition.chartConfig} className='h-64 min-h-64 w-full min-w-0'>

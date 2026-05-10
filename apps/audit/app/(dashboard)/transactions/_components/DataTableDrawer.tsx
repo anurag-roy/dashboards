@@ -91,7 +91,7 @@ function DrawerFormContent({
 }) {
   return (
     <div ref={scrollRef} className='min-h-0 flex-1 overflow-y-auto'>
-      <div className='flex flex-col gap-6 p-6'>
+      <div className='flex flex-col gap-6 p-4 md:p-6'>
         <div className='grid grid-cols-1 gap-3 rounded-3xl border border-border/70 bg-muted/30 p-4 sm:grid-cols-2'>
           <div>
             <p className='text-xs text-muted-foreground'>Purchased on</p>
@@ -412,7 +412,7 @@ export function DataTableDrawer({ row, open, onOpenChange }: DataTableDrawerProp
   if (!isDesktop) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className='max-h-[96vh]'>
+        <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>
               {transaction ? `Transaction ${transaction.transaction_id}` : 'Transaction details'}

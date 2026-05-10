@@ -70,7 +70,7 @@ export function ReportsClient({ transactions, referenceDateIso, refreshedAt }: R
         <TransactionChart
           type='amount'
           transactions={filteredTransactions}
-          yAxisWidth={70}
+          yAxisWidth={40}
           className='hidden sm:block'
         />
         <TransactionChart type='amount' transactions={filteredTransactions} showYAxis={false} className='sm:hidden' />
@@ -78,14 +78,14 @@ export function ReportsClient({ transactions, referenceDateIso, refreshedAt }: R
         <TransactionChart
           type='count'
           transactions={filteredTransactions}
-          yAxisWidth={70}
+          yAxisWidth={40}
           className='hidden sm:block'
         />
         <TransactionChart type='count' transactions={filteredTransactions} showYAxis={false} className='sm:hidden' />
 
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          <TransactionChart type='category' transactions={filteredTransactions} yAxisWidth={110} />
-          <TransactionChart type='merchant' transactions={filteredTransactions} yAxisWidth={110} />
+          <TransactionChart type='category' transactions={filteredTransactions} yAxisWidth={80} />
+          <TransactionChart type='merchant' transactions={filteredTransactions} yAxisWidth={60} />
         </div>
       </section>
     </>
