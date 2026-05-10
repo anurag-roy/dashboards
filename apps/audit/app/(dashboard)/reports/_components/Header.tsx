@@ -9,12 +9,14 @@ import { FilterCountry } from './FilterCountry';
 import { FilterDate } from './FilterDate';
 import { FilterExpenseStatus } from './FilterExpenseStatus';
 import type { ReportsFilters } from './types';
+import type { Transaction } from '@/lib/data/schema';
 
 type HeaderProps = {
   filters: ReportsFilters;
   refreshedAt: string;
   minAmount: number;
   maxAmount: number;
+  transactions: Transaction[];
   onRangeChange: (value: RangeKey) => void;
   onExpenseStatusChange: (value: ReportsFilters['expenseStatus']) => void;
   onCountriesChange: (countries: string[]) => void;
@@ -27,6 +29,7 @@ export default function Header({
   refreshedAt,
   minAmount,
   maxAmount,
+  transactions,
   onRangeChange,
   onExpenseStatusChange,
   onCountriesChange,
@@ -48,8 +51,10 @@ export default function Header({
 
         <Accordion className='block border-border md:hidden' defaultValue={[]}>
           <AccordionItem value='filters' className='border-none'>
-            <AccordionTrigger className='rounded-2xl px-3 py-2 text-sm'>Filters</AccordionTrigger>
-            <AccordionContent className='pb-2'>
+            <AccordionTrigger className='rounded-2xl px-3 py-2 text-sm aria-expanded:rounded-b-none aria-expanded:border-b-border'>
+              Filters
+            </AccordionTrigger>
+            <AccordionContent className='pt-4 pb-2'>
               <div className='flex flex-col gap-3'>
                 <FilterDate range={filters.range} onRangeChange={onRangeChange} />
                 <FilterCountry selectedCountries={filters.selectedCountries} onCountriesChange={onCountriesChange} />
@@ -58,6 +63,7 @@ export default function Header({
                   minAmount={minAmount}
                   maxAmount={maxAmount}
                   amountRange={filters.amountRange}
+                  transactions={transactions}
                   onAmountChange={onAmountChange}
                 />
                 <Button
@@ -82,6 +88,7 @@ export default function Header({
             minAmount={minAmount}
             maxAmount={maxAmount}
             amountRange={filters.amountRange}
+            transactions={transactions}
             onAmountChange={onAmountChange}
           />
           <div className='flex flex-col gap-1.5'>

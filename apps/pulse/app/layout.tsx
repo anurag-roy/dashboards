@@ -37,7 +37,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         className={cn(
-          'overflow-y-scroll scroll-auto bg-background antialiased selection:bg-primary/20 selection:text-primary',
+          'theme-pulse overflow-y-scroll scroll-auto bg-background antialiased selection:bg-primary/20 selection:text-primary',
           geist.variable,
           geistMono.variable,
           'font-sans'

@@ -62,11 +62,11 @@ export default function TransactionPolicy() {
         <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
           {overview.map((item) => (
             <Card key={item.label} className='rounded-2xl'>
-              <CardHeader className='pb-2'>
+              <CardHeader>
                 <CardTitle className='text-xs font-medium text-muted-foreground'>{item.label}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='flex flex-row flex-wrap items-baseline gap-x-2 gap-y-1'>
+                <div className='flex flex-row flex-wrap items-center justify-between gap-y-1'>
                   <p className='text-2xl font-semibold text-foreground tabular-nums'>{item.count.toLocaleString()}</p>
                   <InsightBadge variant={item.variant} className='shrink-0'>
                     {item.volume} spent
@@ -78,7 +78,7 @@ export default function TransactionPolicy() {
         </div>
 
         <Card>
-          <CardHeader className='pb-2'>
+          <CardHeader>
             <CardTitle className='text-sm'>Keyword / merchant category rules</CardTitle>
           </CardHeader>
           <CardContent className='space-y-1'>

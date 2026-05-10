@@ -1,5 +1,7 @@
 import { cn } from '@workspace/ui/lib/utils';
 
+/* eslint-disable @next/next/no-img-element */
+
 type AppLogoProps = {
   className?: string;
   iconClassName?: string;
@@ -10,10 +12,8 @@ export function AppLogo({ className, iconClassName, showText = false }: AppLogoP
   return (
     <div className={cn('flex min-w-0 items-center gap-3', className)}>
       <span className={cn('relative block size-8 shrink-0 overflow-hidden', iconClassName)}>
-        <span
-          aria-hidden='true'
-          className="block size-full bg-[url('/logos/audit-light.svg')] bg-cover bg-center dark:bg-[url('/logos/audit-dark.svg')]"
-        />
+        <img alt='' aria-hidden='true' className='block size-full dark:hidden' src='/logos/audit-light.svg' />
+        <img alt='' aria-hidden='true' className='hidden size-full dark:block' src='/logos/audit-dark.svg' />
       </span>
       {showText ? <span className='truncate text-lg font-bold text-foreground'>Audit</span> : null}
     </div>

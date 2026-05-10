@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import type { Row, Table } from '@tanstack/react-table';
 import { Calendar, MoreHorizontal, ShoppingBag } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@workspace/ui/components/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,8 +23,8 @@ function TransactionCard({ transaction, onEditClick }: { transaction: Transactio
   const status = expenseStatuses.find((s) => s.value === transaction.expense_status);
 
   return (
-    <div className='rounded-2xl border border-border bg-card p-4 shadow-sm'>
-      <div className='flex items-start justify-between gap-3'>
+    <Card size='sm'>
+      <CardHeader className='grid-cols-[1fr_auto] gap-3'>
         <div className='min-w-0 flex-1'>
           <p className='truncate text-sm font-semibold text-foreground'>{transaction.merchant}</p>
           <div className='mt-1'>{status && <InsightBadge variant={status.variant}>{status.label}</InsightBadge>}</div>
@@ -52,9 +53,9 @@ function TransactionCard({ transaction, onEditClick }: { transaction: Transactio
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </CardHeader>
 
-      <div className='mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground'>
+      <CardContent className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground'>
         <span className='flex items-center gap-1'>
           <ShoppingBag className='size-3 shrink-0' aria-hidden />
           {transaction.category}
@@ -63,8 +64,12 @@ function TransactionCard({ transaction, onEditClick }: { transaction: Transactio
           <Calendar className='size-3 shrink-0' aria-hidden />
           {format(new Date(transaction.transaction_date), 'MMM dd, yyyy')}
         </span>
-      </div>
-    </div>
+      </CardContent>
+
+      <CardFooter className='text-xs text-muted-foreground'>
+        <span className='truncate'>{transaction.country}</span>
+      </CardFooter>
+    </Card>
   );
 }
 

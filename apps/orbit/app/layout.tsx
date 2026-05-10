@@ -50,7 +50,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         className={cn(
-          'overflow-y-scroll scroll-auto antialiased selection:bg-primary/20 selection:text-primary',
+          'theme-orbit overflow-y-scroll scroll-auto antialiased selection:bg-primary/20 selection:text-primary',
           fontMono.variable,
           'font-sans',
           geist.variable

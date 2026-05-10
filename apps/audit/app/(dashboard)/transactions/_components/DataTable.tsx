@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo, useState } from 'react';
 import {
   flexRender,
@@ -74,7 +72,7 @@ export function DataTable({ data, pageSize = 12, onEditClick }: DataTableProps) 
           placeholder='Search by merchant...'
           value={(table.getColumn('merchant')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('merchant')?.setFilterValue(event.target.value)}
-          className='h-9 w-full sm:max-w-[260px]'
+          className='h-9 w-full sm:max-w-65'
         />
       </div>
 

@@ -71,12 +71,10 @@ export default function AuditRules() {
         </CardHeader>
         <CardContent className='space-y-6'>
           <Accordion defaultValue={['rule-1']}>
-            <AccordionItem value='rule-1' className='rounded-2xl border border-border bg-background'>
+            <AccordionItem value='rule-1' className='rounded-2xl bg-background'>
               <AccordionTrigger className='rounded-2xl px-4 py-3 hover:no-underline'>
                 <div className='flex w-full items-center justify-between gap-3 text-left'>
-                  <span className='truncate text-sm font-medium text-foreground'>
-                    IRS receipt rule for all US employees
-                  </span>
+                  <span className='truncate text-sm font-medium text-foreground'>IRS receipt rule</span>
                   <Badge
                     variant='outline'
                     className='shrink-0 rounded-full border-primary/20 bg-primary/10 text-primary dark:border-primary/30 dark:bg-primary/20'
@@ -95,7 +93,7 @@ export default function AuditRules() {
                         <step.icon className='size-4' aria-hidden='true' />
                       </span>
                       <div>
-                        <p className='text-sm font-medium text-foreground'>
+                        <p className='!mb-1 text-sm font-medium text-foreground'>
                           {index + 1}. {step.title}
                         </p>
                         <p className='text-xs text-muted-foreground'>{step.description}</p>
@@ -127,7 +125,7 @@ export default function AuditRules() {
             </div>
             <div className='grid grid-cols-1 gap-3 lg:grid-cols-3'>
               <Card className='rounded-2xl border-border/70'>
-                <CardHeader className='pb-3'>
+                <CardHeader>
                   <CardTitle className='text-sm'>Event</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-2'>
@@ -148,7 +146,7 @@ export default function AuditRules() {
               </Card>
 
               <Card className='rounded-2xl border-border/70'>
-                <CardHeader className='pb-3'>
+                <CardHeader>
                   <CardTitle className='text-sm'>Condition</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-2'>
@@ -170,7 +168,7 @@ export default function AuditRules() {
               </Card>
 
               <Card className='rounded-2xl border-border/70'>
-                <CardHeader className='pb-3'>
+                <CardHeader>
                   <CardTitle className='text-sm'>Action</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-2'>

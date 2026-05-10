@@ -126,7 +126,7 @@ function SelectItem({ className, children, label, ...props }: SelectPrimitive.It
       )}
       {...props}
     >
-      <SelectPrimitive.ItemText className='flex w-0 max-w-full min-w-0 flex-1 items-center gap-2 overflow-hidden text-left [&>svg]:shrink-0'>
+      <SelectPrimitive.ItemText className='flex w-0 max-w-full min-w-0 flex-1 items-center gap-2 text-left [&>svg]:shrink-0'>
         {itemTextContent}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
