@@ -1,160 +1,202 @@
 # Audit App Guide
 
-This document explains how the `apps/audit` app is structured, what each route renders, and which components/patterns are used so another agent can onboard quickly.
+Audit is the reporting and expense-audit dashboard in this monorepo. It runs on port `3002` and redirects `/` to `/reports`.
+
+Use this README as the first context file before editing Audit.
 
 ## Purpose
 
-- A reporting and expense-audit style dashboard (`Next.js 16`, `React 19`, `Tailwind v4`) built on `@workspace/ui`.
-- Product framing and URLs live in `app/siteConfig.ts` (product name: **Audit**).
-- Main UX areas:
-  - filtered reporting charts over transactions
-  - full transactions table with drawer editing and bulk actions
-  - workspace settings (audit policies, billing, users)
-  - multi-step onboarding outside the dashboard shell
+- Expense reporting, transaction review, and audit policy management.
+- Main workflows: reports, transactions, audit settings, billing, users, onboarding, and login.
+- Stack: `Next.js 16`, `React 19`, `Tailwind v4`, `@workspace/ui`, `recharts`, `@tanstack/react-table`, `zod`.
+- Product metadata and route links live in `app/siteConfig.ts`.
 
-## High-Level Structure
+## Start Here
 
-- `app/layout.tsx`
-  - Root fonts (`Geist`, `Geist_Mono`), global styles (`@workspace/ui/globals.css`).
-  - Providers: `ThemeProvider`, `TooltipProvider`.
-- `app/(dashboard)/layout.tsx`
-  - Dashboard shell: `SidebarProvider`, `Sidebar`, `SidebarInset`, `MobileSidebarHeader`.
-  - Layout norm: sidebar pinned left, RHS constrained and centered (`max-w-7xl`).
-- `app/(dashboard)/settings/layout.tsx`
-  - Settings intro copy + route tabs (`Tabs`, `TabsList`, `TabsTrigger`, `variant='line'`).
-- `app/onboarding/layout.tsx`
-  - Fixed header with step progress and “Skip to dashboard”; narrow content column (`max-w-2xl`).
-- `next.config.mjs`
-  - Permanent redirect: `/` → `/reports`.
+- Root providers and app theme: `app/layout.tsx`, `app/theme.css`
+- Dashboard shell: `app/(dashboard)/layout.tsx`
+- Sidebar and mobile navigation: `components/ui/navigation/sidebar.tsx`
+- Reports client flow: `app/(dashboard)/reports/_components/ReportsClient.tsx`
+- Transactions table and detail surface: `app/(dashboard)/transactions/_components/DataTable.tsx`, `app/(dashboard)/transactions/_components/DataTableDrawer.tsx`
+- Audit settings composition: `app/(dashboard)/settings/audit/page.tsx`
+- Onboarding shell: `app/onboarding/layout.tsx`
+- Seed data and schemas: `lib/data/transactions.ts`, `lib/data/report.ts`, `lib/data/schema.ts`, `lib/data/data.ts`
 
 ## Route Map
 
-- `/` → redirects to `/reports`
-- `/reports` → `app/(dashboard)/reports/page.tsx`
-- `/transactions` → `app/(dashboard)/transactions/page.tsx`
-- `/settings` → `app/(dashboard)/settings/page.tsx` (redirects to `/settings/audit`)
-- `/settings/audit` → `app/(dashboard)/settings/audit/page.tsx`
-- `/settings/billing` → `app/(dashboard)/settings/billing/page.tsx`
-- `/settings/users` → `app/(dashboard)/settings/users/page.tsx`
-- `/onboarding` → `app/onboarding/page.tsx` (redirects to `/onboarding/products`)
-- `/onboarding/products` → `app/onboarding/products/page.tsx`
-- `/onboarding/employees` → `app/onboarding/employees/page.tsx`
-- `/onboarding/infrastructure` → `app/onboarding/infrastructure/page.tsx`
-- `/login` → `app/login/page.tsx`
-- `/_not-found` → `app/not-found.tsx`
+- `/` - redirects to `/reports` in `next.config.mjs`
+- `/reports` - `app/(dashboard)/reports/page.tsx`
+- `/transactions` - `app/(dashboard)/transactions/page.tsx`
+- `/settings` - redirects to `/settings/audit`
+- `/settings/audit` - `app/(dashboard)/settings/audit/page.tsx`
+- `/settings/billing` - `app/(dashboard)/settings/billing/page.tsx`
+- `/settings/users` - `app/(dashboard)/settings/users/page.tsx`
+- `/onboarding` - redirects to `/onboarding/products`
+- `/onboarding/products` - `app/onboarding/products/page.tsx`
+- `/onboarding/employees` - `app/onboarding/employees/page.tsx`
+- `/onboarding/infrastructure` - `app/onboarding/infrastructure/page.tsx`
+- `/login` - `app/login/page.tsx`
+- `/_not-found` - `app/not-found.tsx`
+
+## Shell And Navigation
+
+- `app/layout.tsx` owns fonts, `@workspace/ui/globals.css`, `app/theme.css`, `ThemeProvider`, `TooltipProvider`, and `AuditToaster`.
+- `app/(dashboard)/layout.tsx` owns the sidebar dashboard shell.
+- Desktop layout is a pinned left sidebar with a centered `max-w-7xl` content column.
+- Mobile layout uses `MobileSidebarHeader` and the shared sidebar mobile state.
+- Sidebar primary navigation: Reports, Transactions, Settings.
+- Sidebar setup navigation links to the onboarding flow.
+- Settings route state treats every `/settings/*` page as active under Settings.
+- Onboarding lives outside `(dashboard)` and uses its own fixed header with step progress and a "Skip to dashboard" action.
 
 ## Page Composition
 
 ### `/reports`
 
-File: `app/(dashboard)/reports/page.tsx`
+Primary files:
 
-- Client-side filters with `useDeferredValue` for smoother updates.
-- `Header` wires range, expense status, country, and amount filters; reset restores defaults.
-- `TransactionChart` (`recharts` + shared patterns) for amount and count series; responsive duplicate charts for mobile (`sm:hidden` / `hidden sm:block`).
-- Filter helpers and types: `app/(dashboard)/reports/_components/dateRanges.ts`, `types.ts`.
-- Data source: `lib/data/transactions.ts` (see also aggregated series in `lib/data/report.ts`).
+- `app/(dashboard)/reports/page.tsx`
+- `app/(dashboard)/reports/_components/ReportsClient.tsx`
+- `app/(dashboard)/reports/_components/Header.tsx`
+- `app/(dashboard)/reports/_components/TransactionChart.tsx`
+
+Behavior:
+
+- Server page passes `transactions`, `referenceDateIso`, and `refreshedAt` into `ReportsClient`.
+- `ReportsClient` owns filter state and uses `useDeferredValue` before filtering transactions.
+- Filters: date range, expense status, country multi-select, and amount range.
+- Mobile filters collapse into an `Accordion`; desktop filters are inline.
+- Charts include amount, count, category, and merchant views.
+- Amount and count charts render separate mobile and desktop variants for axis density.
 
 ### `/transactions`
 
-File: `app/(dashboard)/transactions/page.tsx`
+Primary files:
 
-- `DataTable` from `app/(dashboard)/transactions/_components/DataTable.tsx` backed by `@tanstack/react-table`.
-- Row actions open `DataTableDrawer`; bulk selection flows through `TableBulkEditor`.
-- Mobile list: `MobileTransactionList`.
-- Types: `Transaction` from `lib/data/schema.ts` (Zod-backed).
+- `app/(dashboard)/transactions/page.tsx`
+- `app/(dashboard)/transactions/_components/DataTable.tsx`
+- `app/(dashboard)/transactions/_components/Columns.tsx`
+- `app/(dashboard)/transactions/_components/DataTableDrawer.tsx`
+- `app/(dashboard)/transactions/_components/MobileTransactionList.tsx`
 
-### `/settings/*` shared wrapper
+Behavior:
 
-File: `app/(dashboard)/settings/layout.tsx`
-
-- Tabs: `Audit`, `Billing & Usage`, `Users`.
-- Route-driven navigation via `Tabs` `onValueChange` + `router.push`.
-- `TabsTrigger` remains a native button (no direct `Link` as trigger).
+- Page owns the selected transaction row and opens the edit/detail surface.
+- `DataTable` uses TanStack Table with sorting, merchant search, row selection, pagination, and a mobile list.
+- Columns include purchased date, status, merchant, category, amount, and row actions.
+- Bulk actions live in `TableBulkEditor`.
+- `DataTableDrawer` renders as a desktop right `Sheet` and a mobile bottom `Drawer`.
+- The transaction detail form includes expense/payment status, department, reimbursement, merchant/category fields, attachments, notes, receipt/priority flags, and an activity tab.
+- Mobile drawer has keyboard-inset handling to keep focused fields visible.
 
 ### `/settings/audit`
 
-File: `app/(dashboard)/settings/audit/page.tsx`
+Primary files:
 
-- Composed sections: `AuditRules`, `Approvers`, `TransactionPolicy` under `settings/audit/_components/`.
+- `app/(dashboard)/settings/audit/page.tsx`
+- `app/(dashboard)/settings/audit/_components/AuditRules.tsx`
+- `app/(dashboard)/settings/audit/_components/Approvers.tsx`
+- `app/(dashboard)/settings/audit/_components/TransactionPolicy.tsx`
+
+Behavior:
+
+- `AuditRules` is a stateful rule builder with event/condition/action steps, pause/resume, edit flow, and toast feedback.
+- `Approvers` manages an in-memory approver list with desktop `Dialog` and mobile `Drawer` invite flows.
+- `TransactionPolicy` manages keyword/merchant category blocking rules, suspicious rules, delete actions, and toast feedback.
+- Department permissions come from `lib/data/data.ts` and `lib/data/schema.ts`.
 
 ### `/settings/billing`
 
 File: `app/(dashboard)/settings/billing/page.tsx`
 
-- Billing line items, totals, and subscription-style UI (`Card`, `Table`, `Dialog` patterns).
+- Subscription-style billing surface using `Card`, `Table`, `Dialog`, and shared form primitives.
+- Includes billing line items, totals, and plan-management UI.
 
 ### `/settings/users`
 
 File: `app/(dashboard)/settings/users/page.tsx`
 
-- Members table seeded from `lib/data/data.ts` (`members`, `department`-linked permissions).
+- Members table seeded from `lib/data/data.ts`.
+- Invite flow uses desktop `Dialog` and mobile `Drawer`.
+- User permissions map department labels to select values.
+- Remove-user action opens a confirmation dialog.
 
 ### `/onboarding/*`
 
-Files: `app/onboarding/*/page.tsx`
+Primary files:
 
-- Wizard steps (products → employees → infrastructure); index route redirects to products.
-- Shared chrome from `app/onboarding/layout.tsx`.
+- `app/onboarding/layout.tsx`
+- `app/onboarding/products/page.tsx`
+- `app/onboarding/employees/page.tsx`
+- `app/onboarding/infrastructure/page.tsx`
+- `app/onboarding/choice-card-styles.ts`
+
+Behavior:
+
+- Step order is products -> employees -> infrastructure.
+- The layout owns fixed header progress and skip behavior.
+- Choice-card styles are shared through `choice-card-styles.ts`.
+- Products step requires at least one product selection before continuing.
+- Employees step stores selected employee count.
+- Infrastructure step includes provider choices and region `Select`.
 
 ### `/login`
 
 File: `app/login/page.tsx`
 
-- Card-based login UI; navigates into the app on success (client-side).
+- Standalone login surface outside the dashboard shell.
+- Successful action routes to `/reports`.
 
-### `/_not-found`
+## Shared Components
 
-File: `app/not-found.tsx`
+- `components/app-logo.tsx` - static Audit logo.
+- `components/audit-toaster.tsx` - app-level toast rendering.
+- `components/ui/navigation/sidebar.tsx` - dashboard sidebar and mobile shell.
+- `components/ui/navigation/user-profile.tsx` and `dropdown-user-profile.tsx` - desktop profile menu.
+- `components/ui/navigation/identity-avatar.tsx` - branded avatar helper.
+- Route-local components stay colocated under `_components` for reports, transactions, and audit settings.
 
-- 404 with CTA back to `/reports` (`siteConfig.baseLinks.reports`).
+## Data Sources
 
-## Navigation and Shell Components
+- `lib/data/transactions.ts` - rolling transaction seed list.
+- `lib/data/report.ts` - report aggregates derived from transactions.
+- `lib/data/schema.ts` - Zod transaction schema, transaction type, department/role/status options.
+- `lib/data/data.ts` - members and approvers for settings.
+- `lib/utils.ts` - formatting and class helpers.
+- `lib/use-media-query.ts` - responsive branching for Dialog/Drawer and Sheet/Drawer behavior.
 
-- Sidebar: `components/ui/navigation/sidebar.tsx`
-  - Primary nav: Reports, Transactions, Settings (defaults to audit).
-  - Secondary: Onboarding entry.
-  - Desktop footer: `UserProfileDesktop`; mobile: theme + utility-style rows.
-- User menu: `dropdown-user-profile.tsx` + `user-profile.tsx`
-- Optional branded avatar helper: `components/ui/navigation/identity-avatar.tsx`
+## Styling And Behavior Notes
 
-## Shared UI/Behavior Building Blocks
-
-- Reports: `app/(dashboard)/reports/_components/*` (`Header`, `TransactionChart`, `FilterDate`, `FilterAmount`, `FilterExpenseStatus`, `FilterCountry`).
-- Transactions: `app/(dashboard)/transactions/_components/*` (`DataTable`, `Columns`, `DataTableDrawer`, `DataTableDrawerFeed`, `DataTablePagination`, `TableBulkEditor`, `MobileTransactionList`, `DataTableColumnHeader`).
-
-## Data Sources and Types
-
-- `lib/data/transactions.ts` — transaction seed list used by reports and table.
-- `lib/data/report.ts` — daily aggregates derived from `transactions`.
-- `lib/data/schema.ts` — Zod `transactionSchema`, `Transaction` type, category/merchant enums.
-- `lib/data/data.ts` — departments and members for settings users.
-- `lib/utils.ts` — shared helpers.
-
-## Design System and Styling Rules
-
-- Use semantic tokens from `@workspace/ui/globals.css` (`bg-background`, `text-foreground`, `border-border`, `text-muted-foreground`, etc.).
-- Prefer `@workspace/ui` wrappers over raw primitives.
-- `Select` components should receive `items` when possible for human-readable trigger labels.
-- Keep `SelectTrigger` `w-full` in form/grid layouts to avoid collapsed width.
-- For charts, keep `recharts` aligned with `@workspace/ui` chart component version.
+- Follow root `AGENTS.md` before changing UI.
+- Use shared `@workspace/ui` primitives and semantic tokens.
+- Audit has an app-specific `theme.css`; inspect it before changing colors.
+- Keep dropdown labels inside `DropdownMenuGroup` when adding dropdown menu labels.
+- Keep desktop/mobile overlay patterns paired: `Dialog` on desktop, `Drawer` on mobile where current code uses that split.
+- Keep settings tabs as native `TabsTrigger` buttons with router-driven navigation.
+- Toast behavior comes from `@workspace/ui/components/sonner` plus `AuditToaster`.
 
 ## Dev Commands
 
 Run inside `apps/audit`:
 
-- `bun run dev` (port `3002`, Turbopack)
-- `bun run typecheck`
-- `bun run lint`
-- `bun run format`
-- `bun run build`
-- `bun run start` (port `3002`)
+```bash
+bun run dev
+bun run typecheck
+bun run lint
+bun run format
+bun run build
+bun run start
+```
 
-## Agent Notes (Quick Start)
+Ports:
 
-If you are a new agent touching this app:
+- `bun run dev` - `3002`
+- `bun run start` - `3002`
 
-- Start with `app/layout.tsx`, `app/(dashboard)/layout.tsx`, `app/(dashboard)/settings/layout.tsx`, and `next.config.mjs` redirects.
-- For dashboard pages, follow colocated `_components` folders per route.
-- Onboarding lives outside `(dashboard)` — it does not use the sidebar layout.
-- For cross-page UI conventions, read root `AGENTS.md` before making style changes.
+## Agent Checklist
+
+- For reports, inspect `ReportsClient`, `Header`, filter components, `TransactionChart`, and transaction data together.
+- For transaction editing, inspect the page, table, columns, drawer, and mobile list together.
+- For audit settings, treat `AuditRules`, `Approvers`, and `TransactionPolicy` as independent stateful surfaces.
+- For onboarding changes, inspect the layout and `choice-card-styles.ts` first.
+- After behavior or style changes, run Audit's format, lint, typecheck, and build gates.
