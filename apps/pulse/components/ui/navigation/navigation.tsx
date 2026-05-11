@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 import { Button } from '@workspace/ui/components/button';
 import { Separator } from '@workspace/ui/components/separator';
-import { Sheet, SheetContent, SheetClose } from '@workspace/ui/components/sheet';
+import { Sheet, SheetContent, SheetClose, SheetTitle } from '@workspace/ui/components/sheet';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 
 import { siteConfig } from '@/app/siteConfig';
@@ -35,8 +35,10 @@ function MobileSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='right' showCloseButton={false} className='w-full sm:max-w-sm'>
-        <div className='flex items-center justify-between p-4 pb-0'>
+      <SheetContent side='right' showCloseButton={false} className='w-full gap-0 p-0 sm:max-w-sm'>
+        <SheetTitle className='sr-only'>Pulse navigation</SheetTitle>
+
+        <div className='flex shrink-0 items-center justify-between p-4'>
           <Logo />
           <SheetClose render={<Button variant='ghost' size='icon-sm' className='rounded-full' />}>
             <X className='size-5' />
@@ -44,85 +46,88 @@ function MobileSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
           </SheetClose>
         </div>
 
-        <div className='flex items-center gap-3 px-4 pt-2 pb-1'>
-          <DashboardAvatar seed='Anurag Roy' className='size-10' />
-          <div className='min-w-0 flex-1'>
-            <p className='text-sm font-medium text-foreground'>Anurag Roy</p>
-            <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
-          </div>
-        </div>
-
-        <Separator className='mx-4 mt-2' />
-
-        <nav className='flex flex-col gap-1 p-4'>
-          <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Navigation</p>
-          {navItems.map((item) => (
-            <Link
-              key={item.value}
-              href={item.value}
-              onClick={() => onOpenChange(false)}
-              className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-                pathname === item.value
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-            >
-              <item.icon className='size-4 shrink-0' aria-hidden='true' />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <Separator className='mx-4' />
-
-        {mounted && (
-          <div className='flex flex-col gap-1 p-4'>
-            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Theme</p>
-            {(
-              [
-                { value: 'light', label: 'Light', icon: Sun },
-                { value: 'dark', label: 'Dark', icon: Moon },
-                { value: 'system', label: 'System', icon: Computer },
-              ] as const
-            ).map((item) => (
-              <button
+        <div className='min-h-0 flex-1 overflow-y-auto'>
+          <nav className='flex flex-col gap-1 px-4 pt-2 pb-4'>
+            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Navigation</p>
+            {navItems.map((item) => (
+              <Link
                 key={item.value}
-                type='button'
-                onClick={() => setTheme(item.value)}
+                href={item.value}
+                onClick={() => onOpenChange(false)}
                 className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-                  theme === item.value
+                  pathname === item.value
                     ? 'bg-muted text-foreground'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <item.icon className='size-4 shrink-0' aria-hidden='true' />
                 {item.label}
-              </button>
+              </Link>
             ))}
-          </div>
-        )}
+          </nav>
 
-        <Separator className='mx-4' />
+          <Separator className='mx-4' />
 
-        <div className='flex flex-col gap-1 p-4'>
-          <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Account</p>
-          {[{ label: 'Changelog' }, { label: 'Documentation' }, { label: 'Join Slack community' }].map((item) => (
-            <a
-              key={item.label}
-              href='#'
+          {mounted && (
+            <div className='flex flex-col gap-1 p-4'>
+              <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Theme</p>
+              {(
+                [
+                  { value: 'light', label: 'Light', icon: Sun },
+                  { value: 'dark', label: 'Dark', icon: Moon },
+                  { value: 'system', label: 'System', icon: Computer },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.value}
+                  type='button'
+                  onClick={() => setTheme(item.value)}
+                  className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                    theme === item.value
+                      ? 'bg-muted text-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <item.icon className='size-4 shrink-0' aria-hidden='true' />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <Separator className='mx-4' />
+
+          <div className='flex flex-col gap-1 p-4'>
+            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Account</p>
+            {[{ label: 'Changelog' }, { label: 'Documentation' }, { label: 'Join Slack community' }].map((item) => (
+              <a
+                key={item.label}
+                href='#'
+                onClick={() => onOpenChange(false)}
+                className='flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground'
+              >
+                {item.label}
+                <ExternalLink className='size-3.5 shrink-0' aria-hidden='true' />
+              </a>
+            ))}
+            <Link
+              href={siteConfig.baseLinks.login}
+              onClick={() => onOpenChange(false)}
               className='flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground'
             >
-              {item.label}
-              <ExternalLink className='size-3.5 shrink-0' aria-hidden='true' />
-            </a>
-          ))}
-          <Link
-            href={siteConfig.baseLinks.login}
-            onClick={() => onOpenChange(false)}
-            className='flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground'
-          >
-            Sign out
-          </Link>
+              Sign out
+            </Link>
+          </div>
+        </div>
+
+        <div className='shrink-0 border-t border-border/70 p-4'>
+          <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
+            <DashboardAvatar seed='Anurag Roy' className='size-8' />
+            <div className='min-w-0 flex-1'>
+              <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
+              <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

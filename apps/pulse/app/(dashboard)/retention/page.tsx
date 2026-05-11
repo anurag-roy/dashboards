@@ -28,13 +28,13 @@ import { Maximize2, X } from 'lucide-react';
 import { useState } from 'react';
 
 const HEATMAP_COLOR_CLASSES = [
-  'bg-blue-50 dark:bg-blue-950',
-  'bg-blue-100 dark:bg-blue-900',
-  'bg-blue-200 dark:bg-blue-800',
-  'bg-blue-300 dark:bg-blue-700',
-  'bg-blue-400 dark:bg-blue-600',
-  'bg-blue-500 dark:bg-blue-500',
-  'bg-blue-600 dark:bg-blue-400',
+  'bg-emerald-50 dark:bg-emerald-950',
+  'bg-emerald-100 dark:bg-emerald-900',
+  'bg-emerald-200 dark:bg-emerald-800',
+  'bg-emerald-300 dark:bg-emerald-700',
+  'bg-emerald-400 dark:bg-emerald-600',
+  'bg-emerald-500 dark:bg-emerald-500',
+  'bg-emerald-600 dark:bg-emerald-400',
 ] as const;
 
 function getBackgroundColor(value: number, minValue: number, maxValue: number) {

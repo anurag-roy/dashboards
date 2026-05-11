@@ -53,11 +53,95 @@ const initialFormData = (): TicketFormData => ({
 
 const categorySelectItems = categoryTypes.map((c) => ({ value: c.value, label: c.name }));
 const policySelectItems = policyTypes.map((p) => ({ value: p.value, label: p.name }));
+const keyboardVisibilityThreshold = 80;
+const keyboardScrollMargin = 16;
+const nonTextInputTypes = new Set([
+  'checkbox',
+  'radio',
+  'range',
+  'color',
+  'file',
+  'image',
+  'button',
+  'submit',
+  'reset',
+]);
 
 type TicketSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
+
+function isKeyboardInput(target: EventTarget | null): target is HTMLElement {
+  if (target instanceof HTMLInputElement) {
+    return !nonTextInputTypes.has(target.type);
+  }
+
+  return target instanceof HTMLTextAreaElement || (target instanceof HTMLElement && target.isContentEditable);
+}
+
+function useKeyboardInset(enabled: boolean) {
+  const [keyboardInset, setKeyboardInset] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!enabled || typeof window === 'undefined' || !window.visualViewport) {
+      setKeyboardInset(0);
+      return;
+    }
+
+    const viewport = window.visualViewport;
+
+    const updateKeyboardInset = () => {
+      const nextInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardInset(nextInset > keyboardVisibilityThreshold ? Math.round(nextInset) : 0);
+    };
+
+    updateKeyboardInset();
+    viewport.addEventListener('resize', updateKeyboardInset);
+    viewport.addEventListener('scroll', updateKeyboardInset);
+
+    return () => {
+      viewport.removeEventListener('resize', updateKeyboardInset);
+      viewport.removeEventListener('scroll', updateKeyboardInset);
+    };
+  }, [enabled]);
+
+  return keyboardInset;
+}
+
+function keepFocusedFieldVisible(
+  event: React.FocusEvent<HTMLElement>,
+  scrollRef: React.RefObject<HTMLDivElement | null>
+) {
+  const target = event.target;
+  const scrollContainer = scrollRef.current;
+
+  if (!isKeyboardInput(target) || !scrollContainer || typeof window === 'undefined') {
+    return;
+  }
+
+  const scrollIntoVisibleArea = () => {
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const viewportBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const visibleTop = Math.max(containerRect.top, viewportTop) + keyboardScrollMargin;
+    const visibleBottom = Math.min(containerRect.bottom, viewportBottom) - keyboardScrollMargin;
+
+    if (targetRect.bottom > visibleBottom) {
+      scrollContainer.scrollBy({ top: targetRect.bottom - visibleBottom, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetRect.top < visibleTop) {
+      scrollContainer.scrollBy({ top: targetRect.top - visibleTop, behavior: 'smooth' });
+    }
+  };
+
+  window.requestAnimationFrame(scrollIntoVisibleArea);
+  window.setTimeout(scrollIntoVisibleArea, 300);
+}
 
 function SummaryItem({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
@@ -344,6 +428,8 @@ export function TicketSheet({ open, onOpenChange }: TicketSheetProps) {
   const [step, setStep] = React.useState(1);
   const isDesktop = useMediaQuery('(min-width: 640px)');
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const keyboardInset = useKeyboardInset(open && !isDesktop);
+  const keyboardOpen = keyboardInset > 0;
 
   const onUpdateForm = React.useCallback((updates: Partial<TicketFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -374,16 +460,27 @@ export function TicketSheet({ open, onOpenChange }: TicketSheetProps) {
 
   if (!isDesktop) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className='h-[90dvh] max-h-[90dvh]'>
-          <DrawerHeader>
+      <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+        <DrawerContent className='data-[vaul-drawer-direction=bottom]:max-h-[90svh]'>
+          <DrawerHeader className='shrink-0'>
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
-          <div ref={scrollRef} className='flex-1 overflow-y-auto px-4 py-2'>
-            {content}
+          <div
+            ref={scrollRef}
+            className='min-h-0 flex-1 overflow-y-auto px-4 py-2'
+            onFocusCapture={(event) => keepFocusedFieldVisible(event, scrollRef)}
+          >
+            <div style={keyboardInset > 0 ? { paddingBottom: keyboardInset + 24 } : undefined}>
+              {content}
+              {keyboardOpen && (
+                <div className='mt-6 flex flex-row justify-between gap-2 border-t border-border pt-4'>
+                  <FooterButtons step={step} setStep={goToStep} onClose={handleClose} onSubmit={handleSubmit} />
+                </div>
+              )}
+            </div>
           </div>
-          <DrawerFooter className='flex-row justify-between gap-2'>
+          <DrawerFooter className={cn('flex-row justify-between gap-2', keyboardOpen && 'hidden')}>
             <FooterButtons step={step} setStep={goToStep} onClose={handleClose} onSubmit={handleSubmit} />
           </DrawerFooter>
         </DrawerContent>

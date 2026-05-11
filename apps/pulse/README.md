@@ -76,7 +76,7 @@ File: `app/(dashboard)/retention/page.tsx`
 Behavior:
 
 - Renders a cohort retention heatmap from `lib/data/retention/cohorts.ts`.
-- Uses explicit blue heatmap classes for retention intensity; this is a deliberate data-viz exception to semantic-only colors.
+- Uses explicit emerald heatmap classes for retention intensity; this is a deliberate data-viz exception to semantic-only colors.
 - Clicking a cohort opens `CohortDetailsDialog`.
 - Detail dialog includes activity summary, satisfaction, performance, top issues, and channel distribution.
 - Aggregate metrics come from `lib/data/retention/cohortsAggregate.ts`.

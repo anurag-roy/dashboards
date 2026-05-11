@@ -48,11 +48,7 @@ export default function WorkflowPage() {
       : Math.round((aggregateStats.tested_cases / aggregateStats.total_cases) * 100);
   }, [aggregateStats]);
 
-  const [scenarioQuota, setScenarioQuota] = React.useState<number>(actualQuota);
-
-  React.useEffect(() => {
-    setScenarioQuota(actualQuota);
-  }, [actualQuota]);
+  const [scenarioQuota, setScenarioQuota] = React.useState<number>(50);
 
   const calculatePercentage = (numerator: number, denominator: number) => {
     if (denominator === 0) return 0;
@@ -268,7 +264,7 @@ export default function WorkflowPage() {
           <div className='flex flex-col items-center gap-6'>
             <h2 className='text-sm font-medium text-nowrap text-foreground'>1. Completed Cases</h2>
             <div className='flex justify-center'>
-              <ProgressCircle radius={45} strokeWidth={6} value={displayStats.total_cases}>
+              <ProgressCircle variant='blue' radius={45} strokeWidth={6} value={displayStats.total_cases}>
                 <div className='flex flex-col items-center'>
                   <span className='mt-1 font-medium text-foreground tabular-nums'>
                     {valueFormatter(displayStats.total_cases)}
@@ -292,6 +288,7 @@ export default function WorkflowPage() {
                 <ProgressCircle
                   radius={45}
                   strokeWidth={6}
+                  variant='blue'
                   value={calculatePercentage(displayStats.tested_cases, displayStats.total_cases)}
                 >
                   <div className='flex flex-col items-center'>
@@ -312,6 +309,7 @@ export default function WorkflowPage() {
                 <ProgressCircle
                   radius={45}
                   strokeWidth={6}
+                  variant='yellow'
                   value={calculatePercentage(displayStats.untested_cases, displayStats.total_cases)}
                 >
                   <div className='flex flex-col items-center'>
@@ -386,7 +384,7 @@ export default function WorkflowPage() {
         <div className='flex flex-col gap-8 md:hidden'>
           <div className='flex flex-col items-center gap-4'>
             <h2 className='text-sm font-medium text-foreground'>1. Completed Cases</h2>
-            <ProgressCircle radius={45} strokeWidth={6} value={displayStats.total_cases}>
+            <ProgressCircle variant='blue' radius={45} strokeWidth={6} value={displayStats.total_cases}>
               <div className='flex flex-col items-center'>
                 <span className='mt-1 font-medium text-foreground tabular-nums'>
                   {valueFormatter(displayStats.total_cases)}
@@ -405,6 +403,7 @@ export default function WorkflowPage() {
                 <ProgressCircle
                   radius={40}
                   strokeWidth={5}
+                  variant='blue'
                   value={calculatePercentage(displayStats.tested_cases, displayStats.total_cases)}
                 >
                   <div className='flex flex-col items-center'>
@@ -422,6 +421,7 @@ export default function WorkflowPage() {
                 <ProgressCircle
                   radius={40}
                   strokeWidth={5}
+                  variant='yellow'
                   value={calculatePercentage(displayStats.untested_cases, displayStats.total_cases)}
                 >
                   <div className='flex flex-col items-center'>
@@ -492,7 +492,7 @@ export default function WorkflowPage() {
         <div className='mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           <div className='relative rounded-3xl border border-border bg-card px-4 py-3 shadow-sm'>
             <span
-              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-primary'
+              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-blue-500 dark:bg-blue-400'
               aria-hidden
             />
 
@@ -512,7 +512,7 @@ export default function WorkflowPage() {
 
           <div className='relative rounded-3xl border border-border bg-card px-4 py-3 shadow-sm'>
             <span
-              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-primary'
+              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-blue-500 dark:bg-blue-400'
               aria-hidden
             />
 
@@ -536,7 +536,7 @@ export default function WorkflowPage() {
 
           <div className='relative rounded-3xl border border-border bg-card px-4 py-3 shadow-sm'>
             <span
-              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-primary'
+              className='absolute inset-x-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-md bg-blue-500 dark:bg-blue-400'
               aria-hidden
             />
 

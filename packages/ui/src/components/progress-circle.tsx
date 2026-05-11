@@ -15,6 +15,14 @@ const progressCircleVariants = tv({
         background: 'stroke-muted',
         circle: 'stroke-muted-foreground/70',
       },
+      blue: {
+        background: 'stroke-blue-200 dark:stroke-blue-500/30',
+        circle: 'stroke-blue-500',
+      },
+      yellow: {
+        background: 'stroke-yellow-200 dark:stroke-yellow-500/30',
+        circle: 'stroke-yellow-500',
+      },
       warning: {
         background: 'stroke-amber-200 dark:stroke-amber-500/30',
         circle: 'stroke-amber-500',
