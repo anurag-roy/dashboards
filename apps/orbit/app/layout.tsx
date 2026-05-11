@@ -7,6 +7,7 @@ import { MobileSidebarHeader, Sidebar } from '@/components/ui/navigation/sidebar
 import { ThemeProvider } from '@workspace/ui/components/theme-provider';
 import { SidebarInset, SidebarProvider } from '@workspace/ui/components/sidebar';
 import { cn } from '@workspace/ui/lib/utils';
+import { Toaster } from '@workspace/ui/components/sonner';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
@@ -66,6 +67,7 @@ export default function RootLayout({
                 <div className='mx-auto w-full max-w-7xl'>{children}</div>
               </SidebarInset>
             </SidebarProvider>
+            <Toaster />
           </TooltipProvider>
         </ThemeProvider>
       </body>

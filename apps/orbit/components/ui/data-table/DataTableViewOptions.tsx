@@ -389,7 +389,7 @@ function ViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
             }
           />
           <PopoverContent align='end' sideOffset={7} className='z-50 w-64 p-1.5'>
-            <Label className='px-3 py-1.5 text-xs text-muted-foreground'>Display properties</Label>
+            <Label className='px-3 pt-1.5 text-xs text-muted-foreground'>Display properties</Label>
             <ListContext.Provider value={contextValue}>
               <div className='flex flex-col gap-0.5'>
                 {items.map((item, index) => {

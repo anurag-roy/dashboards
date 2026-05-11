@@ -1,6 +1,7 @@
 'use client';
 
-import { ModalAddUser } from '@/components/ui/settings/modal-add-user';
+import * as React from 'react';
+import { type InviteUser, ModalAddUser } from '@/components/ui/settings/modal-add-user';
 import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { invitedUsers, roles, users } from '@/lib/data/data';
 import { Button } from '@workspace/ui/components/button';
@@ -14,7 +15,53 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@workspace/ui/components/tooltip';
 import { MoreHorizontal, Plus } from 'lucide-react';
 
+const initialsFromEmail = (email: string) => {
+  const [name = email] = email.split('@');
+  const parts = name.split(/[._-]/).filter(Boolean);
+
+  return (parts.length > 1 ? `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}` : name.slice(0, 2)).toUpperCase();
+};
+
 export default function UsersPage() {
+  const [members, setMembers] = React.useState(users);
+  const [pendingInvitations, setPendingInvitations] = React.useState(invitedUsers);
+  const [memberRoles, setMemberRoles] = React.useState(() =>
+    Object.fromEntries(users.map((user) => [user.name, user.role]))
+  );
+  const [invitationRoles, setInvitationRoles] = React.useState(() =>
+    Object.fromEntries(invitedUsers.map((user) => [user.initials, user.role]))
+  );
+
+  const handleInvite = (invite: InviteUser) => {
+    const invitation = {
+      initials: `${initialsFromEmail(invite.email)}-${Date.now()}`,
+      email: invite.email,
+      role: invite.role,
+      expires: 14,
+    };
+
+    setPendingInvitations((current) => [invitation, ...current]);
+    setInvitationRoles((current) => ({ ...current, [invitation.initials]: invite.role }));
+  };
+
+  const removeMember = (name: string) => {
+    setMembers((current) => current.filter((user) => user.name !== name));
+    setMemberRoles((current) => {
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
+  };
+
+  const revokeInvitation = (initials: string) => {
+    setPendingInvitations((current) => current.filter((user) => user.initials !== initials));
+    setInvitationRoles((current) => {
+      const next = { ...current };
+      delete next[initials];
+      return next;
+    });
+  };
+
   return (
     <>
       <section aria-labelledby='existing-users'>
@@ -27,15 +74,15 @@ export default function UsersPage() {
               Workspace administrators can add, manage, and remove users.
             </p>
           </div>
-          <ModalAddUser>
-            <Button className='mt-4 w-full gap-2 sm:mt-0 sm:w-fit'>
+          <ModalAddUser onInvite={handleInvite}>
+            <Button type='button' className='mt-4 w-full gap-2 sm:mt-0 sm:w-fit'>
               <Plus className='-ml-1 size-4 shrink-0' aria-hidden='true' />
               Add user
             </Button>
           </ModalAddUser>
         </div>
         <ul role='list' className='mt-6 divide-y divide-border'>
-          {users.map((user) => (
+          {members.map((user) => (
             <li key={user.name} className='flex items-center justify-between gap-x-6 py-2.5'>
               <div className='flex items-center gap-x-4 truncate'>
                 <DashboardAvatar seed={user.name} className='hidden size-9 sm:inline-flex' />
@@ -50,13 +97,18 @@ export default function UsersPage() {
                     <TooltipTrigger
                       render={
                         <div className='inline-flex w-full min-w-0 sm:w-auto'>
-                          <Select defaultValue={user.role} disabled={user.role === 'admin'} items={roles}>
+                          <Select value={memberRoles[user.name] ?? user.role} disabled items={roles}>
                             <SelectTrigger className='w-36'>
                               <SelectValue placeholder='Select' />
                             </SelectTrigger>
                             <SelectContent align='end'>
                               {roles.map((role) => (
-                                <SelectItem key={role.value} value={role.value} disabled={role.value === 'admin'}>
+                                <SelectItem
+                                  key={role.value}
+                                  value={role.value}
+                                  label={role.label}
+                                  disabled={role.value === 'admin'}
+                                >
                                   {role.label}
                                 </SelectItem>
                               ))}
@@ -70,13 +122,28 @@ export default function UsersPage() {
                     </TooltipContent>
                   </Tooltip>
                 ) : (
-                  <Select defaultValue={user.role} disabled={user.role === 'admin'} items={roles}>
+                  <Select
+                    value={memberRoles[user.name] ?? user.role}
+                    onValueChange={(value) => {
+                      if (!value) {
+                        return;
+                      }
+
+                      setMemberRoles((current) => ({ ...current, [user.name]: value }));
+                    }}
+                    items={roles}
+                  >
                     <SelectTrigger className='w-36'>
                       <SelectValue placeholder='Select' />
                     </SelectTrigger>
                     <SelectContent align='end'>
                       {roles.map((role) => (
-                        <SelectItem key={role.value} value={role.value} disabled={role.value === 'admin'}>
+                        <SelectItem
+                          key={role.value}
+                          value={role.value}
+                          label={role.label}
+                          disabled={role.value === 'admin'}
+                        >
                           {role.label}
                         </SelectItem>
                       ))}
@@ -99,8 +166,11 @@ export default function UsersPage() {
                     }
                   />
                   <DropdownMenuContent align='end' className='w-36'>
-                    <DropdownMenuItem>View details</DropdownMenuItem>
-                    <DropdownMenuItem variant='destructive' disabled={user.role === 'admin'}>
+                    <DropdownMenuItem
+                      variant='destructive'
+                      disabled={user.role === 'admin'}
+                      onClick={() => removeMember(user.name)}
+                    >
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -115,7 +185,7 @@ export default function UsersPage() {
           Pending invitations
         </h2>
         <ul role='list' className='mt-6 divide-y divide-border'>
-          {invitedUsers.map((user) => (
+          {pendingInvitations.map((user) => (
             <li key={user.initials} className='flex items-center justify-between gap-x-6 py-2.5'>
               <div className='flex items-center gap-x-4'>
                 <DashboardAvatar seed={user.email} className='hidden size-9 sm:inline-flex' />
@@ -125,13 +195,28 @@ export default function UsersPage() {
                 </div>
               </div>
               <div className='flex items-center gap-2'>
-                <Select defaultValue={user.role} items={roles}>
+                <Select
+                  value={invitationRoles[user.initials] ?? user.role}
+                  onValueChange={(value) => {
+                    if (!value) {
+                      return;
+                    }
+
+                    setInvitationRoles((current) => ({ ...current, [user.initials]: value }));
+                  }}
+                  items={roles}
+                >
                   <SelectTrigger className='w-36'>
                     <SelectValue placeholder='Select' />
                   </SelectTrigger>
                   <SelectContent align='end'>
                     {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value} disabled={role.value === 'admin'}>
+                      <SelectItem
+                        key={role.value}
+                        value={role.value}
+                        label={role.label}
+                        disabled={role.value === 'admin'}
+                      >
                         {role.label}
                       </SelectItem>
                     ))}
@@ -153,7 +238,7 @@ export default function UsersPage() {
                     }
                   />
                   <DropdownMenuContent align='end' className='w-36'>
-                    <DropdownMenuItem variant='destructive' disabled={user.role === 'admin'}>
+                    <DropdownMenuItem variant='destructive' onClick={() => revokeInvitation(user.initials)}>
                       Revoke invitation
                     </DropdownMenuItem>
                   </DropdownMenuContent>

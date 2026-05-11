@@ -13,6 +13,10 @@ function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
   return <PopoverPrimitive.Trigger data-slot='popover-trigger' {...props} />;
 }
 
+function PopoverAnchor({ ...props }: Omit<PopoverPrimitive.Trigger.Props, 'nativeButton' | 'render'>) {
+  return <PopoverPrimitive.Trigger data-slot='popover-anchor' nativeButton={false} render={<div />} {...props} />;
+}
+
 function PopoverContent({
   className,
   align = 'center',
@@ -64,4 +68,4 @@ function PopoverDescription({ className, ...props }: PopoverPrimitive.Descriptio
   );
 }
 
-export { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger };
+export { Popover, PopoverAnchor, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger };

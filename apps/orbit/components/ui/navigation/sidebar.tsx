@@ -2,10 +2,33 @@
 
 import { siteConfig } from '@/app/siteConfig';
 import { Button } from '@workspace/ui/components/button';
-import { Computer, ExternalLink, Home, Link2, ListChecks, Menu, Moon, Settings, Sun } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  CircleDollarSign,
+  Computer,
+  ExternalLink,
+  Gauge,
+  Home,
+  ListChecks,
+  Menu,
+  Moon,
+  Rows3,
+  Settings,
+  Sun,
+  UserPlus,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu';
 import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
@@ -20,10 +43,12 @@ import {
   SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
+import { Separator } from '@workspace/ui/components/separator';
 import { useTheme } from 'next-themes';
 
 import { AppLogo } from '@/components/app-logo';
 import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
+import { cn } from '@/lib/utils';
 import { UserProfileDesktop } from './user-profile';
 
 const navigation = [
@@ -40,24 +65,44 @@ const shortcuts = [
   {
     name: 'Add new user',
     href: '/settings/users',
-    icon: Link2,
+    icon: UserPlus,
   },
   {
     name: 'Workspace usage',
     href: '/settings/billing#billing-overview',
-    icon: Link2,
+    icon: Gauge,
   },
   {
     name: 'Cost spend control',
     href: '/settings/billing#cost-spend-control',
-    icon: Link2,
+    icon: CircleDollarSign,
   },
   {
     name: 'Overview – Rows written',
     href: '/overview#usage-overview',
-    icon: Link2,
+    icon: Rows3,
   },
 ] as const;
+
+type Workspace = {
+  name: string;
+  tier: string;
+};
+
+const workspaces: Workspace[] = [
+  {
+    name: 'Acme Analytics',
+    tier: 'Pro workspace',
+  },
+  {
+    name: 'Growth Lab',
+    tier: 'Team workspace',
+  },
+  {
+    name: 'Sandbox Ops',
+    tier: 'Developer workspace',
+  },
+];
 
 const mobileAccountItems = [
   { name: 'Changelog', icon: ExternalLink },
@@ -144,6 +189,68 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
   );
 }
 
+function WorkspaceSwitcher({
+  activeWorkspace,
+  onWorkspaceChange,
+}: {
+  activeWorkspace: Workspace;
+  onWorkspaceChange: (workspace: Workspace) => void;
+}) {
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size='lg'
+                className='data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground'
+              />
+            }
+          >
+            <DashboardAvatar seed={activeWorkspace.name} square className='[&_svg]:size-8' />
+            <div className='grid min-w-0 flex-1 text-left text-sm leading-tight'>
+              <span className='truncate font-medium'>{activeWorkspace.name}</span>
+              <span className='truncate text-xs text-muted-foreground'>{activeWorkspace.tier}</span>
+            </div>
+            <ChevronsUpDown className='ml-auto text-muted-foreground' aria-hidden='true' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='start' side={isMobile ? 'bottom' : 'right'} sideOffset={6} className='min-w-64'>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+              {workspaces.map((workspace) => {
+                const isActive = workspace.name === activeWorkspace.name;
+
+                return (
+                  <DropdownMenuItem
+                    key={workspace.name}
+                    onClick={() => {
+                      onWorkspaceChange(workspace);
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
+                    }}
+                    className='gap-3'
+                  >
+                    <DashboardAvatar seed={workspace.name} square className='size-7' />
+                    <div className='min-w-0 flex-1'>
+                      <p className='truncate text-sm font-medium text-foreground'>{workspace.name}</p>
+                      <p className='truncate text-xs text-muted-foreground'>{workspace.tier}</p>
+                    </div>
+                    <Check className={cn('ml-auto', isActive ? 'opacity-100' : 'opacity-0')} aria-hidden='true' />
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
 function SidebarNavContent() {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
@@ -203,7 +310,7 @@ function SidebarNavContent() {
 
 function BrandHeader({ compact = false }: { compact?: boolean }) {
   return (
-    <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
+    <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
       <AppLogo iconClassName={compact ? 'size-7' : 'size-8'} />
       <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
         <p className='truncate text-lg font-bold text-foreground'>Orbit</p>
@@ -213,15 +320,23 @@ function BrandHeader({ compact = false }: { compact?: boolean }) {
 }
 
 export function Sidebar() {
+  const [activeWorkspace, setActiveWorkspace] = React.useState(workspaces[0]);
+
   return (
     <SidebarPrimitive collapsible='icon'>
-      <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
+      <SidebarHeader className='border-b border-sidebar-border/70 pb-2'>
         <div className='hidden md:block'>
           <BrandHeader />
         </div>
         <div className='px-1 md:hidden'>
           <BrandHeader />
         </div>
+        {activeWorkspace && (
+          <div className='px-1 group-data-[collapsible=icon]:hidden'>
+            <Separator className='my-1 bg-sidebar-border/70' />
+            <WorkspaceSwitcher activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
+          </div>
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarNavContent />

@@ -27,6 +27,17 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   const pageSize = 20;
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>, toggleSelected: () => void) => {
+    const target = event.target;
+
+    if (target instanceof HTMLElement && target.closest('[data-row-action]')) {
+      return;
+    }
+
+    toggleSelected();
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -77,7 +88,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() ? 'selected' : undefined}
-                    onClick={() => row.toggleSelected(!row.getIsSelected())}
+                    onClick={(event) => handleRowClick(event, () => row.toggleSelected(!row.getIsSelected()))}
                     className='group cursor-pointer select-none'
                   >
                     {row.getVisibleCells().map((cell, index) => (

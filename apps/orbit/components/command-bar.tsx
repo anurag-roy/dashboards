@@ -1,7 +1,8 @@
 'use client';
 
-import * as Popover from '@radix-ui/react-popover';
 import * as React from 'react';
+
+import { Popover, PopoverAnchor, PopoverContent } from '@workspace/ui/components/popover';
 
 import { cn, focusRing } from '@/lib/utils';
 
@@ -24,27 +25,25 @@ const CommandBar = ({
   children,
 }: CommandBarProps) => {
   return (
-    <Popover.Root open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
-      <Popover.Anchor className={cn('fixed inset-x-0 bottom-8 mx-auto flex w-fit items-center')} />
-      <Popover.Portal>
-        <Popover.Content
-          side='top'
-          sideOffset={0}
-          onOpenAutoFocus={(e) => {
-            if (disableAutoFocus) {
-              e.preventDefault();
-            }
-          }}
-          className={cn(
-            'z-50',
-            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
-            'data-[state=open]:animate-in data-[state=open]:fade-in-0'
-          )}
-        >
-          {children}
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+    <Popover open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
+      <PopoverAnchor
+        aria-hidden='true'
+        tabIndex={-1}
+        className={cn('fixed inset-x-0 bottom-8 mx-auto flex w-fit items-center')}
+      />
+      <PopoverContent
+        side='top'
+        sideOffset={0}
+        initialFocus={disableAutoFocus ? false : undefined}
+        className={cn(
+          'z-50 w-auto border-0 bg-transparent p-0 text-foreground shadow-none ring-0 before:hidden dark:ring-0',
+          'data-closed:animate-out data-closed:fade-out-0',
+          'data-open:animate-in data-open:fade-in-0'
+        )}
+      >
+        {children}
+      </PopoverContent>
+    </Popover>
   );
 };
 CommandBar.displayName = 'CommandBar';

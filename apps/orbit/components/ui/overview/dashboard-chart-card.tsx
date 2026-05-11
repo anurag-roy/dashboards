@@ -6,11 +6,11 @@ import type { OverviewData } from '@/lib/data/schema';
 import { formatters, percentageFormatter } from '@/lib/utils';
 import type { PeriodValue } from '@/lib/types/overview';
 import { cn } from '@/lib/utils';
-import { eachDayOfInterval, formatDate, interval, isWithinInterval, parse } from 'date-fns';
+import { eachDayOfInterval, formatDate, interval, isValid, isWithinInterval, parse, parseISO } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 
-import { getPeriod } from '@/lib/overview-period';
+import { getCompleteDateRange, getPeriod } from '@/lib/overview-period';
 
 export type ChartCardProps = {
   title: keyof OverviewData;
@@ -24,6 +24,13 @@ const formattingMap = {
   currency: formatters.currency,
   unit: formatters.unit,
 };
+
+const overviewRows = overviews
+  .map((overview) => ({
+    ...overview,
+    parsedDate: parseISO(overview.date),
+  }))
+  .filter((overview) => isValid(overview.parsedDate));
 
 type TooltipDatum = {
   title?: string;
@@ -50,31 +57,31 @@ const getTooltipDatum = (value: unknown): TooltipDatum => {
 export function ChartCard({ title, type, selectedDates, selectedPeriod, isThumbnail }: ChartCardProps) {
   const formatter = formattingMap[type]!;
   const hasComparison = selectedPeriod !== 'no-comparison';
-  const selectedDatesInterval =
-    selectedDates?.from && selectedDates?.to ? interval(selectedDates.from, selectedDates.to) : null;
-  const allDatesInInterval =
-    selectedDates?.from && selectedDates?.to ? eachDayOfInterval(interval(selectedDates.from, selectedDates.to)) : null;
+  const selectedDateRange = getCompleteDateRange(selectedDates);
+  const selectedDatesInterval = selectedDateRange ? interval(selectedDateRange.from, selectedDateRange.to) : null;
+  const allDatesInInterval = selectedDatesInterval ? eachDayOfInterval(selectedDatesInterval) : null;
   const prevDates = getPeriod(selectedDates, selectedPeriod);
 
-  const prevDatesInterval = prevDates?.from && prevDates?.to ? interval(prevDates.from, prevDates.to) : null;
+  const prevDateRange = getCompleteDateRange(prevDates);
+  const prevDatesInterval = prevDateRange ? interval(prevDateRange.from, prevDateRange.to) : null;
 
-  const data = overviews
+  const data = overviewRows
     .filter((overview) => {
       if (selectedDatesInterval) {
-        return isWithinInterval(new Date(overview.date), selectedDatesInterval);
+        return isWithinInterval(overview.parsedDate, selectedDatesInterval);
       }
       return true;
     })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime());
 
-  const prevData = overviews
+  const prevData = overviewRows
     .filter((overview) => {
       if (prevDatesInterval) {
-        return isWithinInterval(new Date(overview.date), prevDatesInterval);
+        return isWithinInterval(overview.parsedDate, prevDatesInterval);
       }
       return false;
     })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime());
 
   const chartData = allDatesInInterval
     ?.map((date, index) => {
@@ -88,8 +95,8 @@ export function ChartCard({ title, type, selectedDates, selectedPeriod, isThumbn
         date,
         formattedDate: formatDate(date, 'dd/MM/yyyy'),
         value: rowValue,
-        previousDate: prevOverview?.date,
-        previousFormattedDate: prevOverview ? formatDate(prevOverview.date, 'dd/MM/yyyy') : null,
+        previousDate: prevOverview?.parsedDate,
+        previousFormattedDate: prevOverview ? formatDate(prevOverview.parsedDate, 'dd/MM/yyyy') : null,
         previousValue: selectedPeriod !== 'no-comparison' ? previousValue : null,
         evolution:
           selectedPeriod !== 'no-comparison' && rowValue && previousValue

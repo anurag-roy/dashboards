@@ -86,7 +86,11 @@ export function MobileUsageList<TData>({ table }: MobileUsageListProps<TData>) {
   return (
     <div className='space-y-3 md:hidden'>
       {visible.length > 0 ? (
-        visible.map((row) => <UsageCard key={row.id} row={row as unknown as { original: Usage; id: string }} />)
+        visible.map((row) => {
+          const usageRow = row as unknown as { original: Usage; id: string };
+
+          return <UsageCard key={row.id} row={usageRow} />;
+        })
       ) : (
         <p className='py-8 text-center text-sm text-muted-foreground'>No results.</p>
       )}

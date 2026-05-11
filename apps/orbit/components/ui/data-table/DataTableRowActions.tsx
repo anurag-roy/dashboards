@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { Button } from '@workspace/ui/components/button';
 import {
   DropdownMenu,
@@ -14,15 +15,22 @@ interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
 }
 
-export function DataTableRowActions<TData>(_props: DataTableRowActionsProps<TData>) {
+export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TData>) {
+  const stopRowSelection = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <Button
+            data-row-action
             variant='ghost'
             className='group aspect-square p-1.5 hover:border hover:border-border hover:bg-muted data-open:border-border data-open:bg-muted'
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            aria-label={`Open row ${row.index + 1} actions`}
+            onClick={stopRowSelection}
+            onPointerDown={stopRowSelection}
           >
             <MoreHorizontal
               className='size-4 shrink-0 text-muted-foreground group-hover:text-foreground'
@@ -31,9 +39,17 @@ export function DataTableRowActions<TData>(_props: DataTableRowActionsProps<TDat
           </Button>
         }
       />
-      <DropdownMenuContent align='end' className='min-w-40'>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem variant='destructive'>Delete</DropdownMenuItem>
+      <DropdownMenuContent
+        data-row-action
+        align='end'
+        className='min-w-40'
+        onClick={stopRowSelection}
+        onPointerDown={stopRowSelection}
+      >
+        <DropdownMenuItem onClick={stopRowSelection}>Edit</DropdownMenuItem>
+        <DropdownMenuItem variant='destructive' onClick={stopRowSelection}>
+          Delete
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

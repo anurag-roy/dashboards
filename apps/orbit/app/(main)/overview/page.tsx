@@ -8,7 +8,7 @@ import { overviews } from '@/lib/data/overview-data';
 import type { OverviewData } from '@/lib/data/schema';
 import { cn } from '@/lib/utils';
 import type { KpiEntry, KpiEntryExtended, PeriodValue } from '@/lib/types/overview';
-import { subDays, toDate } from 'date-fns';
+import { isValid, parseISO, subDays } from 'date-fns';
 import * as React from 'react';
 import type { DateRange } from 'react-day-picker';
 
@@ -41,8 +41,12 @@ const kpi3: KpiEntryExtended[] = [
   { title: 'Caching', percentage: 11.1, value: '$31.9', color: 'bg-chart-2' },
 ];
 
-const overviewsDates = overviews.map((item) => toDate(item.date as string | Date).getTime());
-const maxDate = toDate(Math.max(...overviewsDates));
+const fallbackMaxDate = new Date(2024, 0, 1);
+const overviewDates = overviews.map((item) => parseISO(item.date)).filter((date) => isValid(date));
+const maxDate = overviewDates.reduce(
+  (latestDate, date) => (date.getTime() > latestDate.getTime() ? date : latestDate),
+  overviewDates[0] ?? fallbackMaxDate
+);
 
 export default function OverviewPage() {
   const [selectedDates, setSelectedDates] = React.useState<DateRange | undefined>({
