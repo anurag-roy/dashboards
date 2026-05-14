@@ -1,6 +1,6 @@
 # Dashboards Monorepo
 
-This repository contains four Next.js dashboard apps built on a shared `@workspace/ui` design system and orchestrated with Turborepo.
+This repository contains four Next.js dashboard apps plus a portfolio launchpad, all built on a shared `@workspace/ui` design system and orchestrated with Turborepo.
 
 Read this file first when working across apps. Then read the app README for the specific product you are changing.
 
@@ -8,6 +8,7 @@ Read this file first when working across apps. Then read the app README for the 
 
 | App | Workspace | Port | Default Route | Product Surface |
 | --- | --- | ---: | --- | --- |
+| Dashboards | `apps/dashboards` | `3000` | `/` | Portfolio launchpad for the four demo dashboards |
 | Orbit | `apps/orbit` | `3001` | `/overview` | Usage analytics, billing cycle metrics, usage details, workspace settings |
 | Audit | `apps/audit` | `3002` | `/reports` | Expense reports, transaction review, audit policy settings, onboarding |
 | Pulse | `apps/pulse` | `3003` | `/support` | Support metrics, cohort retention, workflow simulation, agent performance |
@@ -15,6 +16,7 @@ Read this file first when working across apps. Then read the app README for the 
 
 ## Workspace Layout
 
+- `apps/dashboards` - container page for `dashboards.anuragroy.dev` with links to the four dashboard demos.
 - `apps/orbit` - sidebar-based usage analytics dashboard.
 - `apps/audit` - sidebar-based audit dashboard plus onboarding and login routes outside the shell.
 - `apps/pulse` - top-navigation operations dashboard with optional data-generation scripts.
@@ -55,7 +57,7 @@ bun run build --filter=audit
 bun run typecheck --filter=pulse
 ```
 
-Do not start all four apps together unless that is the actual task. For routine verification, run static gates and a single affected app first.
+Do not start every app together unless that is the actual task. For routine verification, run static gates and a single affected app first.
 
 ## App Commands
 
@@ -94,6 +96,7 @@ Run those from `apps/pulse` after changing a Pulse generator.
 
 ## Shell Patterns
 
+- Dashboards is a standalone portfolio launchpad with no dashboard shell.
 - Orbit, Audit, and Nova use a pinned left sidebar on desktop and a minimal mobile sidebar header.
 - Pulse uses a sticky top bar with route tabs on desktop and a right-side mobile sheet.
 - Dashboard content is constrained to a centered `max-w-7xl` column on the right side of each shell.
@@ -112,6 +115,7 @@ When wiring real backends later, preserve the page contracts and table/filter st
 
 ## Documentation Map
 
+- `apps/dashboards/README.md` - Hub links, visual launch grid, local logo copies, deployment-domain metadata.
 - `apps/orbit/README.md` - Orbit routes, usage chart state, details table, settings, sidebar shortcuts.
 - `apps/audit/README.md` - Audit reports, transaction drawer behavior, audit policy settings, onboarding.
 - `apps/pulse/README.md` - Pulse top navigation, ticket sheet, retention heatmap, workflow simulator, generators.
