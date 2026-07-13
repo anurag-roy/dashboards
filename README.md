@@ -16,35 +16,33 @@ Read this file first when working across apps. Then read the app README for the 
 
 ## Screenshots
 
-### Dashboards
-
-| Desktop | Mobile |
-| --- | --- |
-| <img src="./docs/screenshots/dashboards-desktop.png" alt="Dashboards portfolio launchpad on desktop" width="900" /> | <img src="./docs/screenshots/dashboards-mobile.png" alt="Dashboards portfolio launchpad on mobile" width="260" /> |
-
 ### Orbit
 
-| Desktop | Mobile |
-| --- | --- |
-| <img src="./docs/screenshots/orbit-desktop.png" alt="Orbit usage analytics dashboard on desktop" width="900" /> | <img src="./docs/screenshots/orbit-mobile.png" alt="Orbit usage analytics dashboard on mobile" width="260" /> |
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/orbit-light-desktop.png" alt="Orbit overview in light mode on desktop" width="620" /> | <img src="./docs/screenshots/orbit-dark-desktop.png" alt="Orbit details in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/orbit-light-mobile.png" alt="Orbit overview in light mode on mobile" width="260" /> | <img src="./docs/screenshots/orbit-dark-mobile.png" alt="Orbit details in dark mode on mobile" width="260" /> |
 
 ### Audit
 
-| Desktop | Mobile |
-| --- | --- |
-| <img src="./docs/screenshots/audit-desktop.png" alt="Audit expense reports dashboard on desktop" width="900" /> | <img src="./docs/screenshots/audit-mobile.png" alt="Audit expense reports dashboard on mobile" width="260" /> |
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/audit-light-desktop.png" alt="Audit reports in light mode on desktop" width="620" /> | <img src="./docs/screenshots/audit-dark-desktop.png" alt="Audit transactions in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/audit-light-mobile.png" alt="Audit reports in light mode on mobile" width="260" /> | <img src="./docs/screenshots/audit-dark-mobile.png" alt="Audit transactions in dark mode on mobile" width="260" /> |
 
 ### Pulse
 
-| Desktop | Mobile |
-| --- | --- |
-| <img src="./docs/screenshots/pulse-desktop.png" alt="Pulse support operations dashboard on desktop" width="900" /> | <img src="./docs/screenshots/pulse-mobile.png" alt="Pulse support operations dashboard on mobile" width="260" /> |
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/pulse-light-desktop.png" alt="Pulse support dashboard in light mode on desktop" width="620" /> | <img src="./docs/screenshots/pulse-dark-desktop.png" alt="Pulse retention dashboard in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/pulse-light-mobile.png" alt="Pulse support dashboard in light mode on mobile" width="260" /> | <img src="./docs/screenshots/pulse-dark-mobile.png" alt="Pulse retention dashboard in dark mode on mobile" width="260" /> |
 
 ### Nova
 
-| Desktop | Mobile |
-| --- | --- |
-| <img src="./docs/screenshots/nova-desktop.png" alt="Nova LLM operations dashboard on desktop" width="900" /> | <img src="./docs/screenshots/nova-mobile.png" alt="Nova LLM operations dashboard on mobile" width="260" /> |
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/nova-light-desktop.png" alt="Nova overview in light mode on desktop" width="620" /> | <img src="./docs/screenshots/nova-dark-desktop.png" alt="Nova traces in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/nova-light-mobile.png" alt="Nova overview in light mode on mobile" width="260" /> | <img src="./docs/screenshots/nova-dark-mobile.png" alt="Nova traces in dark mode on mobile" width="260" /> |
 
 ## Workspace Layout
 
