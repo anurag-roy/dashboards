@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@works
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
@@ -17,6 +18,7 @@ import { MoreHorizontal, Copy, Eye } from 'lucide-react';
 import { CopyButton } from '@workspace/ui/components/copy-button';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
 import { ProviderLogo } from '@/components/ProviderLogo';
+import { RouteOutcomeBadge } from './RouteOutcomeBadge';
 
 export const columns: ColumnDef<Trace>[] = [
   {
@@ -83,6 +85,21 @@ export const columns: ColumnDef<Trace>[] = [
       </TooltipProvider>
     ),
     enableSorting: false,
+    meta: { className: 'hidden 2xl:table-cell' },
+  },
+  {
+    accessorKey: 'routeOutcome',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Route' />,
+    cell: ({ row }) => (
+      <div className='flex flex-col items-start gap-1'>
+        <RouteOutcomeBadge outcome={row.original.routeOutcome} />
+        <span className='text-xs text-muted-foreground tabular-nums'>
+          {row.original.attempts.length === 0
+            ? `${row.original.gatewayLatencyMs}ms edge`
+            : `${row.original.attempts.length} ${row.original.attempts.length === 1 ? 'attempt' : 'attempts'}`}
+        </span>
+      </div>
+    ),
   },
   {
     id: 'tokens',
@@ -156,29 +173,31 @@ export const columns: ColumnDef<Trace>[] = [
                 className='size-8 data-[state=open]:bg-muted'
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreHorizontal className='size-4' />
+                <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
             }
           />
           <DropdownMenuContent align='end' className='w-[160px]'>
-            <DropdownMenuItem
-              onClick={() => {
-                const meta = table.options.meta as { onRowClick?: (trace: Trace) => void } | undefined;
-                meta?.onRowClick?.(trace);
-              }}
-            >
-              <Eye className='size-4' />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                navigator.clipboard.writeText(trace.traceId);
-              }}
-            >
-              <Copy className='size-4' />
-              Copy Trace ID
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  const meta = table.options.meta as { onRowClick?: (trace: Trace) => void } | undefined;
+                  meta?.onRowClick?.(trace);
+                }}
+              >
+                <Eye />
+                View details
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(trace.traceId);
+                }}
+              >
+                <Copy />
+                Copy trace ID
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -23,7 +23,6 @@ import {
 
 import { AppLogo } from '@/components/app-logo';
 import { siteConfig } from '@/app/siteConfig';
-import { DashboardAvatar } from '@workspace/ui/components/dashboard-avatar';
 import { UserProfileDesktop } from './user-profile';
 
 const workspace = {
@@ -191,21 +190,8 @@ export function Sidebar() {
       <SidebarContent>
         <SidebarNavContent />
       </SidebarContent>
-      <SidebarFooter>
-        <div className='md:block'>
-          <div className='hidden md:block'>
-            <UserProfileDesktop />
-          </div>
-          <div className='px-3 py-2 md:hidden'>
-            <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
-              <DashboardAvatar seed='Anurag Roy' className='size-8' />
-              <div className='min-w-0'>
-                <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
-                <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <SidebarFooter className='hidden md:flex'>
+        <UserProfileDesktop />
       </SidebarFooter>
       <SidebarRail />
     </SidebarPrimitive>

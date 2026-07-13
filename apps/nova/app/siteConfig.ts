@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'Nova',
   url: 'https://nova.com',
-  description: 'LLM operations dashboard for monitoring AI model performance, costs, and traces.',
+  description: 'AI gateway observability for monitoring routes, providers, model performance, costs, and traces.',
   baseLinks: {
     home: '/',
     overview: '/overview',

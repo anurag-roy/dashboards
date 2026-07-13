@@ -6,7 +6,7 @@ Use this README as the first context file before editing Nova.
 
 ## Purpose
 
-- AI operations dashboard for monitoring LLM usage, cost, latency, traces, and model performance.
+- AI gateway observability dashboard for monitoring routes, providers, usage, cost, latency, and traces.
 - Main workflows: overview analytics, trace inspection, model comparison, workspace settings, billing, and users.
 - Stack: `Next.js 16`, `React 19`, `Tailwind v4`, `@workspace/ui`, `recharts`, `@tanstack/react-table`.
 - Product metadata and route links live in `app/siteConfig.ts`.
@@ -100,10 +100,12 @@ Behavior:
 - Default selected models: `gpt-5.5-pro`, `claude-opus-4-7`, `gemini-3.1-pro`.
 - `ModelMultiSelect` groups models by provider, supports search, provider-level selection, `maxSelected`, and `minSelected`.
 - Maximum compare count is 5; minimum selected count is 1.
-- Per-model summary cards include request share, requests, latency, cost, tokens, and sparklines.
+- Per-model summary cards include route success, P95 latency, TTFT, gateway overhead, fallback rate, cache rate, and traffic sparklines.
+- Routing signals identify the most reliable, responsive, and cost-efficient selected models.
+- Provider route health compares attempt share, success, rate limiting, TTFT, latency, and operational status.
 - Latency distribution is a multi-model bar chart.
 - Daily cost is a stacked area chart.
-- Performance comparison is a table with provider, requests, tokens, cost, latency, input/output pricing, and request share.
+- Gateway performance comparison pairs request volume and spend with route-level success, TTFT, latency, cache, fallback, and cost metrics.
 
 ### `/settings/general`
 

@@ -6,6 +6,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@workspace/ui/compone
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
@@ -18,6 +19,7 @@ import { modelMap } from '@/lib/data/models';
 import { formatters, relativeTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { ProviderLogo } from '@/components/ProviderLogo';
+import { RouteOutcomeBadge } from './RouteOutcomeBadge';
 
 const BATCH_SIZE = 15;
 
@@ -61,62 +63,78 @@ export function MobileTraceList({ table, onRowClick }: MobileTraceListProps) {
           const trace = row.original;
           const model = modelMap[trace.model];
           return (
-            <Card key={trace.traceId} className='rounded-2xl shadow-sm transition-colors hover:bg-muted/50'>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0'>
+            <Card
+              key={trace.traceId}
+              role='button'
+              tabIndex={0}
+              className='cursor-pointer rounded-2xl shadow-sm transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none'
+              onClick={() => onRowClick(trace)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  onRowClick(trace);
+                }
+              }}
+            >
+              <CardHeader className='flex flex-row items-center justify-between'>
                 <div className='flex items-center gap-2'>
                   <ProviderLogo providerId={model?.providerId ?? 'openai'} size={14} />
                   <span className='text-sm font-medium text-foreground'>{model?.name}</span>
                 </div>
-                <div className='flex items-center gap-2'>
-                  <Badge
-                    variant={trace.status === 'success' ? 'default' : 'destructive'}
-                    className='rounded-full capitalize'
-                  >
-                    {trace.status}
-                  </Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='size-8 data-[state=open]:bg-muted'
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreHorizontal className='size-4' />
-                          <span className='sr-only'>Open menu</span>
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent align='end' className='w-[160px]'>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='size-8 data-[state=open]:bg-muted'
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <MoreHorizontal />
+                        <span className='sr-only'>Open menu</span>
+                      </Button>
+                    }
+                  />
+                  <DropdownMenuContent align='end' className='w-[160px]' onClick={(event) => event.stopPropagation()}>
+                    <DropdownMenuGroup>
                       <DropdownMenuItem onClick={() => onRowClick(trace)}>
-                        <Eye className='size-4' />
-                        View Details
+                        <Eye />
+                        View details
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
                           navigator.clipboard.writeText(trace.traceId);
                         }}
                       >
-                        <Copy className='size-4' />
-                        Copy Trace ID
+                        <Copy />
+                        Copy trace ID
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </CardHeader>
-              <CardContent>
-                <p className='text-sm text-muted-foreground'>{trace.userPrompt}</p>
+              <CardContent className='flex flex-col gap-3'>
+                <div className='flex items-center gap-2'>
+                  <RouteOutcomeBadge outcome={trace.routeOutcome} />
+                  <Badge
+                    variant={trace.status === 'success' ? 'default' : 'destructive'}
+                    className='rounded-full capitalize'
+                  >
+                    {trace.status}
+                  </Badge>
+                  <span className='ml-auto text-xs text-muted-foreground'>{trace.region}</span>
+                </div>
+                <p className='line-clamp-2 text-sm text-muted-foreground'>{trace.userPrompt}</p>
               </CardContent>
               <CardFooter>
-                <div className='flex w-full items-center justify-between text-xs text-muted-foreground'>
-                  <div className='flex flex-col gap-1'>
-                    <span className='font-mono'>{trace.traceId}</span>
-                    <span suppressHydrationWarning className='text-muted-foreground'>
-                      {relativeTime(trace.timestamp)}
+                <div className='grid w-full grid-cols-[minmax(0,1fr)_auto] items-end gap-3 text-xs text-muted-foreground'>
+                  <div className='flex min-w-0 flex-col gap-1'>
+                    <span className='truncate font-mono'>{trace.traceId}</span>
+                    <span suppressHydrationWarning className='truncate text-muted-foreground'>
+                      {trace.project} · {relativeTime(trace.timestamp)}
                     </span>
                   </div>
-                  <div className='flex flex-col items-end gap-1'>
+                  <div className='flex flex-col items-end gap-1 whitespace-nowrap'>
                     <span
                       className={cn(
                         'font-medium tabular-nums',
@@ -129,7 +147,10 @@ export function MobileTraceList({ table, onRowClick }: MobileTraceListProps) {
                     >
                       {trace.latencyMs.toLocaleString()}ms
                     </span>
-                    <span className='tabular-nums'>{formatters.currencyPrecise(trace.cost)}</span>
+                    <span className='tabular-nums'>
+                      {formatters.currencyPrecise(trace.cost)} · TTFT{' '}
+                      {trace.timeToFirstTokenMs === null ? 'n/a' : `${trace.timeToFirstTokenMs.toLocaleString()}ms`}
+                    </span>
                   </div>
                 </div>
               </CardFooter>
