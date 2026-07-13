@@ -14,6 +14,38 @@ Read this file first when working across apps. Then read the app README for the 
 | Pulse | `apps/pulse` | `3003` | `/support` | Support metrics, cohort retention, workflow simulation, agent performance |
 | Nova | `apps/nova` | `3004` | `/overview` | LLM usage, traces, model comparison, AI operations settings |
 
+## Screenshots
+
+### Dashboards
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="./docs/screenshots/dashboards-desktop.png" alt="Dashboards portfolio launchpad on desktop" width="900" /> | <img src="./docs/screenshots/dashboards-mobile.png" alt="Dashboards portfolio launchpad on mobile" width="260" /> |
+
+### Orbit
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="./docs/screenshots/orbit-desktop.png" alt="Orbit usage analytics dashboard on desktop" width="900" /> | <img src="./docs/screenshots/orbit-mobile.png" alt="Orbit usage analytics dashboard on mobile" width="260" /> |
+
+### Audit
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="./docs/screenshots/audit-desktop.png" alt="Audit expense reports dashboard on desktop" width="900" /> | <img src="./docs/screenshots/audit-mobile.png" alt="Audit expense reports dashboard on mobile" width="260" /> |
+
+### Pulse
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="./docs/screenshots/pulse-desktop.png" alt="Pulse support operations dashboard on desktop" width="900" /> | <img src="./docs/screenshots/pulse-mobile.png" alt="Pulse support operations dashboard on mobile" width="260" /> |
+
+### Nova
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="./docs/screenshots/nova-desktop.png" alt="Nova LLM operations dashboard on desktop" width="900" /> | <img src="./docs/screenshots/nova-mobile.png" alt="Nova LLM operations dashboard on mobile" width="260" /> |
+
 ## Workspace Layout
 
 - `apps/dashboards` - container page for `dashboards.anuragroy.dev` with links to the four dashboard demos.
