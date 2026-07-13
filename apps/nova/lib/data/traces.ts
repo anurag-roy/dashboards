@@ -193,7 +193,9 @@ function generateTraces(count: number): Trace[] {
             );
 
     const cost =
-      Math.round((promptTokens * model.costPer1kInput + completionTokens * model.costPer1kOutput) * 100) / 100;
+      Math.round(
+        ((promptTokens / 1_000) * model.costPer1kInput + (completionTokens / 1_000) * model.costPer1kOutput) * 100_000
+      ) / 100_000;
 
     const temperature = [0, 0.3, 0.5, 0.7, 1.0][Math.floor(seededRandom(seed + 6) * 5)]!;
     const maxTokens = [512, 1024, 2048, 4096][Math.floor(seededRandom(seed + 7) * 4)]!;

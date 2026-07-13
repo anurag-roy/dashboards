@@ -16,11 +16,12 @@ import { Button } from '@workspace/ui/components/button';
 import { Separator } from '@workspace/ui/components/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
-import { RotateCcw } from 'lucide-react';
+import { Activity, RotateCcw, ShieldCheck, Timer, TriangleAlert, Zap } from 'lucide-react';
 
 import { modelMap, type ModelDefinition } from '@/lib/data/models';
 import { getModelTotals, usageByModel } from '@/lib/data/usage-by-model';
 import { getLatencyBuckets } from '@/lib/data/latency-buckets';
+import { getModelGatewayHealth, getProviderGatewayHealth } from '@/lib/data/model-health';
 import { formatters } from '@/lib/utils';
 import { ProviderLogo } from '@/components/ProviderLogo';
 import { ModelMultiSelect } from '@/components/ModelMultiSelect';
@@ -50,6 +51,16 @@ function getSelectedModels(modelIds: string[]) {
   return modelIds.map((id) => modelMap[id]).filter((model): model is ModelDefinition => Boolean(model));
 }
 
+function formatDuration(value: number) {
+  return value >= 1000 ? `${(value / 1000).toFixed(1)}s` : `${value}ms`;
+}
+
+const providerStatusConfig = {
+  operational: { label: 'Operational', icon: ShieldCheck, className: 'bg-primary/10 text-primary' },
+  monitor: { label: 'Monitor', icon: Activity, className: 'bg-muted text-muted-foreground' },
+  degraded: { label: 'Degraded', icon: TriangleAlert, className: 'bg-destructive/10 text-destructive' },
+} as const;
+
 export default function ModelsPage() {
   const [period, setPeriod] = React.useState('30');
   const [selectedModelIds, setSelectedModelIds] = React.useState(defaultModelIds);
@@ -57,6 +68,8 @@ export default function ModelsPage() {
 
   const selectedModels = React.useMemo(() => getSelectedModels(selectedModelIds), [selectedModelIds]);
   const selectedDateSet = React.useMemo(() => new Set(allUsageDates.slice(-days)), [days]);
+  const gatewayHealthById = React.useMemo(() => getModelGatewayHealth(days), [days]);
+  const providerHealth = React.useMemo(() => getProviderGatewayHealth(days), [days]);
 
   const totalsById = React.useMemo(() => {
     const totals = getModelTotals(days);
@@ -84,9 +97,10 @@ export default function ModelsPage() {
         totalCost: totals?.totalCost ?? 0,
         avgLatency: totals?.avgLatency ?? 0,
         requestShare,
+        gatewayHealth: gatewayHealthById.get(model.id),
       };
     });
-  }, [selectedModels, totalRequestsAllModels, totalsById]);
+  }, [gatewayHealthById, selectedModels, totalRequestsAllModels, totalsById]);
 
   const chartConfig = React.useMemo(() => {
     return Object.fromEntries(
@@ -135,6 +149,21 @@ export default function ModelsPage() {
     );
   }, [selectedDateSet, selectedModelTotals]);
 
+  const routingSignals = React.useMemo(() => {
+    const modelsWithHealth = selectedModelTotals.filter((model) => model.gatewayHealth);
+    return {
+      reliable: [...modelsWithHealth].sort(
+        (a, b) => (b.gatewayHealth?.successRate ?? 0) - (a.gatewayHealth?.successRate ?? 0)
+      )[0],
+      responsive: modelsWithHealth
+        .filter((model) => (model.gatewayHealth?.p50TtftMs ?? 0) > 0)
+        .sort((a, b) => (a.gatewayHealth?.p50TtftMs ?? 0) - (b.gatewayHealth?.p50TtftMs ?? 0))[0],
+      efficient: [...modelsWithHealth].sort(
+        (a, b) => (a.gatewayHealth?.costPer1kRequests ?? 0) - (b.gatewayHealth?.costPer1kRequests ?? 0)
+      )[0],
+    };
+  }, [selectedModelTotals]);
+
   const handleResetModels = React.useCallback(() => {
     setSelectedModelIds(defaultModelIds);
   }, []);
@@ -143,9 +172,9 @@ export default function ModelsPage() {
     <div>
       <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
         <div>
-          <h1 className='text-2xl font-semibold text-foreground'>Models</h1>
+          <h1 className='text-2xl font-semibold text-foreground'>Model & Provider Health</h1>
           <p className='mt-1 text-sm text-muted-foreground'>
-            Compare model performance, costs, and usage patterns across your AI stack
+            Compare route reliability, response performance, and cost across your gateway
           </p>
         </div>
         <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
@@ -198,33 +227,41 @@ export default function ModelsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className='grid grid-cols-2 gap-3'>
+                <div className='grid grid-cols-2 gap-x-4 gap-y-3'>
                   <div>
-                    <p className='text-xs text-muted-foreground'>Request share</p>
+                    <p className='text-xs text-muted-foreground'>Route success</p>
                     <p className='text-sm font-semibold text-foreground tabular-nums'>
-                      {model.requestShare.toFixed(1)}%
+                      {model.gatewayHealth?.successRate.toFixed(1) ?? '0.0'}%
                     </p>
                   </div>
                   <div>
-                    <p className='text-xs text-muted-foreground'>Requests</p>
+                    <p className='text-xs text-muted-foreground'>P95 latency</p>
                     <p className='text-sm font-semibold text-foreground tabular-nums'>
-                      {formatters.compact(model.totalRequests)}
+                      {formatDuration(model.gatewayHealth?.p95LatencyMs ?? 0)}
                     </p>
                   </div>
                   <div>
-                    <p className='text-xs text-muted-foreground'>Avg Latency</p>
-                    <p className='text-sm font-semibold text-foreground tabular-nums'>{model.avgLatency}ms</p>
-                  </div>
-                  <div>
-                    <p className='text-xs text-muted-foreground'>Cost</p>
+                    <p className='text-xs text-muted-foreground'>P50 TTFT</p>
                     <p className='text-sm font-semibold text-foreground tabular-nums'>
-                      {formatters.currency(model.totalCost)}
+                      {formatDuration(model.gatewayHealth?.p50TtftMs ?? 0)}
                     </p>
                   </div>
                   <div>
-                    <p className='text-xs text-muted-foreground'>Tokens</p>
+                    <p className='text-xs text-muted-foreground'>Gateway overhead</p>
                     <p className='text-sm font-semibold text-foreground tabular-nums'>
-                      {formatters.compact(model.totalTokens)}
+                      {formatDuration(model.gatewayHealth?.gatewayOverheadMs ?? 0)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-xs text-muted-foreground'>Fallback rate</p>
+                    <p className='text-sm font-semibold text-foreground tabular-nums'>
+                      {model.gatewayHealth?.fallbackRate.toFixed(1) ?? '0.0'}%
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-xs text-muted-foreground'>Cache served</p>
+                    <p className='text-sm font-semibold text-foreground tabular-nums'>
+                      {model.gatewayHealth?.cacheRate.toFixed(1) ?? '0.0'}%
                     </p>
                   </div>
                 </div>
@@ -251,11 +288,173 @@ export default function ModelsPage() {
                     />
                   </AreaChart>
                 </ChartContainer>
+                <div className='mt-3 flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground'>
+                  <span>{formatters.compact(model.totalRequests)} requests</span>
+                  <span className='tabular-nums'>
+                    {formatters.currency(model.gatewayHealth?.costPer1kRequests ?? 0)} / 1K req
+                  </span>
+                </div>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      <section className='mt-8' aria-labelledby='routing-signals-title'>
+        <div className='mb-3'>
+          <h2 id='routing-signals-title' className='text-sm font-medium text-foreground'>
+            Routing signals
+          </h2>
+          <p className='mt-1 text-sm text-muted-foreground'>Best current candidates across the selected model pool</p>
+        </div>
+        <div className='grid gap-3 sm:grid-cols-3'>
+          <div className='rounded-2xl border border-border bg-muted/20 p-4'>
+            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+              <ShieldCheck className='size-3.5' aria-hidden='true' />
+              Most reliable
+            </div>
+            <p className='mt-3 truncate text-sm font-medium text-foreground'>
+              {routingSignals.reliable?.name ?? 'No data'}
+            </p>
+            <p className='mt-1 text-xs text-muted-foreground tabular-nums'>
+              {routingSignals.reliable?.gatewayHealth?.successRate.toFixed(1) ?? '0.0'}% route success
+            </p>
+          </div>
+          <div className='rounded-2xl border border-border bg-muted/20 p-4'>
+            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+              <Timer className='size-3.5' aria-hidden='true' />
+              Fastest response
+            </div>
+            <p className='mt-3 truncate text-sm font-medium text-foreground'>
+              {routingSignals.responsive?.name ?? 'No data'}
+            </p>
+            <p className='mt-1 text-xs text-muted-foreground tabular-nums'>
+              {formatDuration(routingSignals.responsive?.gatewayHealth?.p50TtftMs ?? 0)} median TTFT
+            </p>
+          </div>
+          <div className='rounded-2xl border border-border bg-muted/20 p-4'>
+            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+              <Zap className='size-3.5' aria-hidden='true' />
+              Lowest route cost
+            </div>
+            <p className='mt-3 truncate text-sm font-medium text-foreground'>
+              {routingSignals.efficient?.name ?? 'No data'}
+            </p>
+            <p className='mt-1 text-xs text-muted-foreground tabular-nums'>
+              {formatters.currency(routingSignals.efficient?.gatewayHealth?.costPer1kRequests ?? 0)} / 1K requests
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Card className='mt-8 rounded-3xl shadow-sm'>
+        <CardHeader>
+          <div className='flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between'>
+            <div>
+              <CardTitle className='text-base font-medium'>Provider Route Health</CardTitle>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                Live attempt reliability across primary and fallback routes
+              </p>
+            </div>
+            <Badge variant='outline' className='mt-2 rounded-full sm:mt-0'>
+              {providerHealth.length} providers active
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className='hidden overflow-x-auto md:block'>
+            <Table>
+              <TableHeader>
+                <TableRow className='hover:bg-transparent'>
+                  <TableHead className='min-w-44 text-muted-foreground'>Provider</TableHead>
+                  <TableHead className='text-muted-foreground'>Status</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Route share</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Success</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Rate limited</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>P50 TTFT</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>P95 latency</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {providerHealth.map((provider) => {
+                  const status = providerStatusConfig[provider.status];
+                  const StatusIcon = status.icon;
+                  return (
+                    <TableRow key={provider.providerId}>
+                      <TableCell>
+                        <div className='flex items-center gap-2 font-medium text-foreground'>
+                          <ProviderLogo providerId={provider.providerId} size={15} />
+                          {provider.provider}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant='secondary' className={`rounded-full ${status.className}`}>
+                          <StatusIcon data-icon='inline-start' />
+                          {status.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className='text-right text-muted-foreground tabular-nums'>
+                        {provider.attemptShare.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className='text-right font-medium text-foreground tabular-nums'>
+                        {provider.successRate.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className='text-right text-muted-foreground tabular-nums'>
+                        {provider.rateLimitRate.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className='text-right text-muted-foreground tabular-nums'>
+                        {formatDuration(provider.p50TtftMs)}
+                      </TableCell>
+                      <TableCell className='text-right text-muted-foreground tabular-nums'>
+                        {formatDuration(provider.p95LatencyMs)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className='divide-y divide-border md:hidden'>
+            {providerHealth.map((provider) => {
+              const status = providerStatusConfig[provider.status];
+              const StatusIcon = status.icon;
+              return (
+                <div key={provider.providerId} className='py-4 first:pt-0 last:pb-0'>
+                  <div className='flex items-center justify-between gap-3'>
+                    <div className='flex min-w-0 items-center gap-2 font-medium text-foreground'>
+                      <ProviderLogo providerId={provider.providerId} size={15} />
+                      <span className='truncate'>{provider.provider}</span>
+                    </div>
+                    <Badge variant='secondary' className={`rounded-full ${status.className}`}>
+                      <StatusIcon data-icon='inline-start' />
+                      {status.label}
+                    </Badge>
+                  </div>
+                  <div className='mt-4 grid grid-cols-4 gap-2'>
+                    <div>
+                      <p className='text-xs text-muted-foreground'>Success</p>
+                      <p className='mt-1 text-sm font-medium tabular-nums'>{provider.successRate.toFixed(1)}%</p>
+                    </div>
+                    <div>
+                      <p className='text-xs text-muted-foreground'>Rate limit</p>
+                      <p className='mt-1 text-sm font-medium tabular-nums'>{provider.rateLimitRate.toFixed(1)}%</p>
+                    </div>
+                    <div>
+                      <p className='text-xs text-muted-foreground'>P50 TTFT</p>
+                      <p className='mt-1 text-sm font-medium tabular-nums'>{formatDuration(provider.p50TtftMs)}</p>
+                    </div>
+                    <div>
+                      <p className='text-xs text-muted-foreground'>P95</p>
+                      <p className='mt-1 text-sm font-medium tabular-nums'>{formatDuration(provider.p95LatencyMs)}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className='mt-8 rounded-3xl shadow-sm'>
         <CardHeader>
@@ -331,7 +530,10 @@ export default function ModelsPage() {
 
       <Card className='mt-8 rounded-3xl shadow-sm'>
         <CardHeader>
-          <CardTitle className='text-base font-medium'>Performance Comparison</CardTitle>
+          <CardTitle className='text-base font-medium'>Gateway Performance Comparison</CardTitle>
+          <p className='text-sm text-muted-foreground'>
+            Usage totals paired with route-level performance for the selected models
+          </p>
         </CardHeader>
         <CardContent>
           <div className='overflow-x-auto'>
@@ -341,12 +543,13 @@ export default function ModelsPage() {
                   <TableHead className='min-w-52 text-muted-foreground'>Model</TableHead>
                   <TableHead className='text-muted-foreground'>Provider</TableHead>
                   <TableHead className='text-right text-muted-foreground'>Requests</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Tokens</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Cost</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Avg Latency</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Input / 1K</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Output / 1K</TableHead>
-                  <TableHead className='text-right text-muted-foreground'>Share</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Spend</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Success</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>P50 TTFT</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>P95 latency</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Cache</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Fallback</TableHead>
+                  <TableHead className='text-right text-muted-foreground'>Cost / 1K req</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -363,22 +566,25 @@ export default function ModelsPage() {
                       {formatters.compact(model.totalRequests)}
                     </TableCell>
                     <TableCell className='text-right text-muted-foreground tabular-nums'>
-                      {formatters.compact(model.totalTokens)}
-                    </TableCell>
-                    <TableCell className='text-right text-muted-foreground tabular-nums'>
                       {formatters.currency(model.totalCost)}
                     </TableCell>
-                    <TableCell className='text-right text-muted-foreground tabular-nums'>
-                      {model.avgLatency}ms
+                    <TableCell className='text-right font-medium text-foreground tabular-nums'>
+                      {model.gatewayHealth?.successRate.toFixed(1) ?? '0.0'}%
                     </TableCell>
                     <TableCell className='text-right text-muted-foreground tabular-nums'>
-                      {formatters.currencyPrecise(model.costPer1kInput)}
+                      {formatDuration(model.gatewayHealth?.p50TtftMs ?? 0)}
                     </TableCell>
                     <TableCell className='text-right text-muted-foreground tabular-nums'>
-                      {formatters.currencyPrecise(model.costPer1kOutput)}
+                      {formatDuration(model.gatewayHealth?.p95LatencyMs ?? 0)}
                     </TableCell>
                     <TableCell className='text-right text-muted-foreground tabular-nums'>
-                      {model.requestShare.toFixed(1)}%
+                      {model.gatewayHealth?.cacheRate.toFixed(1) ?? '0.0'}%
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {model.gatewayHealth?.fallbackRate.toFixed(1) ?? '0.0'}%
+                    </TableCell>
+                    <TableCell className='text-right text-muted-foreground tabular-nums'>
+                      {formatters.currency(model.gatewayHealth?.costPer1kRequests ?? 0)}
                     </TableCell>
                   </TableRow>
                 ))}
