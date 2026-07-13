@@ -14,6 +14,36 @@ Read this file first when working across apps. Then read the app README for the 
 | Pulse | `apps/pulse` | `3003` | `/support` | Support metrics, cohort retention, workflow simulation, agent performance |
 | Nova | `apps/nova` | `3004` | `/overview` | LLM usage, traces, model comparison, AI operations settings |
 
+## Screenshots
+
+### Orbit
+
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/orbit-light-desktop.png" alt="Orbit overview in light mode on desktop" width="620" /> | <img src="./docs/screenshots/orbit-dark-desktop.png" alt="Orbit details in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/orbit-light-mobile.png" alt="Orbit overview in light mode on mobile" width="260" /> | <img src="./docs/screenshots/orbit-dark-mobile.png" alt="Orbit details in dark mode on mobile" width="260" /> |
+
+### Audit
+
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/audit-light-desktop.png" alt="Audit reports in light mode on desktop" width="620" /> | <img src="./docs/screenshots/audit-dark-desktop.png" alt="Audit transactions in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/audit-light-mobile.png" alt="Audit reports in light mode on mobile" width="260" /> | <img src="./docs/screenshots/audit-dark-mobile.png" alt="Audit transactions in dark mode on mobile" width="260" /> |
+
+### Pulse
+
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/pulse-light-desktop.png" alt="Pulse support dashboard in light mode on desktop" width="620" /> | <img src="./docs/screenshots/pulse-dark-desktop.png" alt="Pulse retention dashboard in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/pulse-light-mobile.png" alt="Pulse support dashboard in light mode on mobile" width="260" /> | <img src="./docs/screenshots/pulse-dark-mobile.png" alt="Pulse retention dashboard in dark mode on mobile" width="260" /> |
+
+### Nova
+
+| View | Light mode | Dark mode |
+| --- | --- | --- |
+| Desktop | <img src="./docs/screenshots/nova-light-desktop.png" alt="Nova overview in light mode on desktop" width="620" /> | <img src="./docs/screenshots/nova-dark-desktop.png" alt="Nova traces in dark mode on desktop" width="620" /> |
+| Mobile | <img src="./docs/screenshots/nova-light-mobile.png" alt="Nova overview in light mode on mobile" width="260" /> | <img src="./docs/screenshots/nova-dark-mobile.png" alt="Nova traces in dark mode on mobile" width="260" /> |
+
 ## Workspace Layout
 
 - `apps/dashboards` - container page for `dashboards.anuragroy.dev` with links to the four dashboard demos.
