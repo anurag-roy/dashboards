@@ -16,6 +16,28 @@ export type Trace = {
   systemPrompt: string;
   userPrompt: string;
   completion: string;
+  project: string;
+  environment: 'production' | 'preview';
+  region: string;
+  routePolicy: 'balanced' | 'cost-optimized' | 'lowest-latency';
+  routeOutcome: 'primary' | 'fallback' | 'cache';
+  cacheStatus: 'hit' | 'miss' | 'bypass';
+  gatewayLatencyMs: number;
+  providerLatencyMs: number;
+  timeToFirstTokenMs: number | null;
+  finishReason: 'stop' | 'length' | 'error' | 'timeout';
+  attempts: ProviderAttempt[];
+};
+
+export type ProviderAttempt = {
+  provider: string;
+  providerId: string;
+  model: string;
+  region: string;
+  status: 'success' | 'rate-limited' | 'error' | 'timeout';
+  durationMs: number;
+  timeToFirstTokenMs: number | null;
+  errorCode?: string;
 };
 
 const systemPrompts = [
@@ -61,6 +83,10 @@ const completions = [
   'Service comparison analysis:\n- Auth Service: P99 latency 45ms, 99.99% uptime\n- Payment Service: P99 120ms...',
   'FR: Notre solution innovante transforme la façon dont les entreprises gèrent leurs données...',
 ];
+
+const projects = ['support-copilot', 'checkout-assistant', 'docs-search', 'internal-tools'];
+const regions = ['iad1', 'sfo1', 'fra1', 'sin1'];
+const routePolicies: Trace['routePolicy'][] = ['balanced', 'lowest-latency', 'cost-optimized'];
 
 function seededRandom(seed: number): number {
   const x = Math.sin(seed) * 10_000;
@@ -133,11 +159,38 @@ function generateTraces(count: number): Trace[] {
     const status: Trace['status'] = statusRoll < 0.008 ? 'timeout' : statusRoll < 0.025 ? 'error' : 'success';
 
     const promptTokens = 200 + Math.floor(seededRandom(seed + 3) * 2_800);
-    const completionTokens = status === 'error' ? 0 : 100 + Math.floor(seededRandom(seed + 4) * 2_000);
+    const completionTokens = status === 'success' ? 100 + Math.floor(seededRandom(seed + 4) * 2_000) : 0;
 
     const baseLatency = baseLatencyByModel[model.id] ?? 250;
-    const latencyMs =
-      status === 'timeout' ? 30_000 : Math.floor(baseLatency + seededRandom(seed + 5) * baseLatency * 2.5);
+    const cacheRoll = seededRandom(seed + 13);
+    const fallbackRoll = seededRandom(seed + 14);
+    const routeOutcome: Trace['routeOutcome'] =
+      status === 'success' && cacheRoll < 0.12
+        ? 'cache'
+        : status === 'success' && fallbackRoll < 0.09
+          ? 'fallback'
+          : 'primary';
+    const gatewayLatencyMs =
+      routeOutcome === 'cache'
+        ? 24 + Math.floor(seededRandom(seed + 15) * 28)
+        : 18 + Math.floor(seededRandom(seed + 15) * 42);
+    const providerLatencyMs =
+      routeOutcome === 'cache'
+        ? 0
+        : status === 'timeout'
+          ? 30_000 - gatewayLatencyMs
+          : Math.floor(baseLatency + seededRandom(seed + 5) * baseLatency * 2.5);
+    const fallbackPenaltyMs = routeOutcome === 'fallback' ? 180 + Math.floor(seededRandom(seed + 16) * 460) : 0;
+    const latencyMs = gatewayLatencyMs + providerLatencyMs + fallbackPenaltyMs;
+    const timeToFirstTokenMs =
+      status !== 'success'
+        ? null
+        : routeOutcome === 'cache'
+          ? gatewayLatencyMs
+          : Math.min(
+              providerLatencyMs,
+              Math.floor(baseLatency * 0.55 + seededRandom(seed + 17) * Math.max(60, baseLatency * 0.8))
+            );
 
     const cost =
       Math.round((promptTokens * model.costPer1kInput + completionTokens * model.costPer1kOutput) * 100) / 100;
@@ -151,7 +204,40 @@ function generateTraces(count: number): Trace[] {
     const completion =
       status === 'error'
         ? 'Error: Request failed with status 500'
-        : completions[Math.floor(seededRandom(seed + 11) * completions.length)]!;
+        : status === 'timeout'
+          ? 'Error: Upstream provider timed out before returning a completion'
+          : completions[Math.floor(seededRandom(seed + 11) * completions.length)]!;
+
+    const region = regions[Math.floor(seededRandom(seed + 18) * regions.length)]!;
+    const attempts: ProviderAttempt[] = [];
+
+    if (routeOutcome !== 'cache') {
+      if (routeOutcome === 'fallback') {
+        const fallbackSource =
+          models[(models.indexOf(model) + 1 + Math.floor(seededRandom(seed + 19) * 3)) % models.length]!;
+        attempts.push({
+          provider: fallbackSource.provider,
+          providerId: fallbackSource.providerId,
+          model: fallbackSource.id,
+          region,
+          status: seededRandom(seed + 20) < 0.72 ? 'rate-limited' : 'error',
+          durationMs: fallbackPenaltyMs,
+          timeToFirstTokenMs: null,
+          errorCode: seededRandom(seed + 20) < 0.72 ? '429_RATE_LIMITED' : '503_UPSTREAM_UNAVAILABLE',
+        });
+      }
+
+      attempts.push({
+        provider: model.provider,
+        providerId: model.providerId,
+        model: model.id,
+        region,
+        status: status === 'success' ? 'success' : status,
+        durationMs: providerLatencyMs,
+        timeToFirstTokenMs: status === 'success' ? timeToFirstTokenMs : null,
+        errorCode: status === 'timeout' ? 'GATEWAY_TIMEOUT' : status === 'error' ? '500_PROVIDER_ERROR' : undefined,
+      });
+    }
 
     data.push({
       traceId: generateTraceId(seed + 12),
@@ -168,6 +254,24 @@ function generateTraces(count: number): Trace[] {
       systemPrompt,
       userPrompt,
       completion,
+      project: projects[Math.floor(seededRandom(seed + 21) * projects.length)]!,
+      environment: seededRandom(seed + 22) < 0.88 ? 'production' : 'preview',
+      region,
+      routePolicy: routePolicies[Math.floor(seededRandom(seed + 23) * routePolicies.length)]!,
+      routeOutcome,
+      cacheStatus: routeOutcome === 'cache' ? 'hit' : seededRandom(seed + 24) < 0.82 ? 'miss' : 'bypass',
+      gatewayLatencyMs,
+      providerLatencyMs,
+      timeToFirstTokenMs,
+      finishReason:
+        status === 'timeout'
+          ? 'timeout'
+          : status === 'error'
+            ? 'error'
+            : seededRandom(seed + 25) < 0.06
+              ? 'length'
+              : 'stop',
+      attempts,
     });
   }
 

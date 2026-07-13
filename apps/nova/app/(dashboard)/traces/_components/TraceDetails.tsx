@@ -12,15 +12,18 @@ import {
 } from '@workspace/ui/components/drawer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@workspace/ui/components/dialog';
 import { Separator } from '@workspace/ui/components/separator';
-import { X } from 'lucide-react';
+import { Database, X } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { CopyButton } from '@workspace/ui/components/copy-button';
+import { InsightBadge } from '@workspace/ui/components/insight-badge';
 
 import type { Trace } from '@/lib/data/traces';
 import { modelMap } from '@/lib/data/models';
 import { formatters } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/lib/use-media-query';
+import { ProviderLogo } from '@/components/ProviderLogo';
+import { RouteOutcomeBadge } from './RouteOutcomeBadge';
 
 type TraceDetailsProps = {
   trace: Trace | null;
@@ -37,24 +40,105 @@ function MetaItem({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function AttemptStatus({ status }: { status: Trace['attempts'][number]['status'] }) {
+  const variant = status === 'success' ? 'success' : status === 'rate-limited' ? 'warning' : 'error';
+
+  return (
+    <InsightBadge variant={variant} className='capitalize'>
+      {status.replace('-', ' ')}
+    </InsightBadge>
+  );
+}
+
+function RoutingPath({ trace }: { trace: Trace }) {
+  return (
+    <section>
+      <div className='flex flex-wrap items-center justify-between gap-2'>
+        <div className='flex items-center gap-2'>
+          <p className='text-sm font-medium text-foreground'>Routing path</p>
+          <RouteOutcomeBadge outcome={trace.routeOutcome} />
+        </div>
+        <p className='text-xs text-muted-foreground'>{trace.routePolicy.replace('-', ' ')} policy</p>
+      </div>
+
+      {trace.routeOutcome === 'cache' ? (
+        <div className='mt-3 flex items-start gap-3 rounded-2xl border border-border bg-muted/30 p-4'>
+          <div className='flex size-8 shrink-0 items-center justify-center rounded-full bg-muted'>
+            <Database className='size-4 text-muted-foreground' aria-hidden='true' />
+          </div>
+          <div className='min-w-0 flex-1'>
+            <p className='text-sm font-medium text-foreground'>Served from semantic cache</p>
+            <p className='mt-1 text-xs leading-5 text-muted-foreground'>
+              Nova returned a matching response at the edge without calling an upstream provider.
+            </p>
+          </div>
+          <span className='shrink-0 text-sm font-medium text-foreground tabular-nums'>{trace.gatewayLatencyMs}ms</span>
+        </div>
+      ) : (
+        <div className='mt-3 overflow-hidden rounded-2xl border border-border'>
+          {trace.attempts.map((attempt, index) => {
+            const attemptModel = modelMap[attempt.model];
+            return (
+              <div
+                key={`${attempt.providerId}-${attempt.model}-${index}`}
+                className='flex items-start gap-3 border-b border-border p-4 last:border-b-0'
+              >
+                <div className='flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground tabular-nums'>
+                  {index + 1}
+                </div>
+                <ProviderLogo providerId={attempt.providerId} size={18} className='mt-1' />
+                <div className='min-w-0 flex-1'>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <p className='text-sm font-medium text-foreground'>{attemptModel?.name ?? attempt.model}</p>
+                    <span className='text-xs text-muted-foreground'>via {attempt.provider}</span>
+                  </div>
+                  <p className='mt-1 text-xs text-muted-foreground'>
+                    {attempt.region}
+                    {attempt.timeToFirstTokenMs !== null
+                      ? ` · ${attempt.timeToFirstTokenMs.toLocaleString()}ms TTFT`
+                      : attempt.errorCode
+                        ? ` · ${attempt.errorCode}`
+                        : ''}
+                  </p>
+                </div>
+                <div className='flex shrink-0 flex-col items-end gap-1'>
+                  <AttemptStatus status={attempt.status} />
+                  <span className='text-xs text-muted-foreground tabular-nums'>
+                    {attempt.durationMs.toLocaleString()}ms
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function TraceContent({ trace }: { trace: Trace }) {
-  const model = modelMap[trace.model];
   const totalTokens = trace.promptTokens + trace.completionTokens;
   const promptPct = totalTokens > 0 ? Math.round((trace.promptTokens / totalTokens) * 100) : 0;
 
   return (
     <div className='overflow-y-auto px-4 pb-6 md:px-0 md:pb-0'>
-      {/* Metadata Grid */}
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>
-        <MetaItem label='Model' value={model?.name ?? trace.model} />
-        <MetaItem label='Latency' value={`${trace.latencyMs.toLocaleString()}ms`} />
-        <MetaItem label='Total Tokens' value={formatters.number(totalTokens)} />
+        <MetaItem label='Project' value={trace.project} />
+        <MetaItem label='Environment' value={trace.environment} />
+        <MetaItem label='Edge region' value={trace.region} />
+        <MetaItem label='Cache' value={trace.cacheStatus} />
+        <MetaItem label='End-to-end' value={`${trace.latencyMs.toLocaleString()}ms`} />
+        <MetaItem
+          label='Time to first token'
+          value={trace.timeToFirstTokenMs === null ? 'Not available' : `${trace.timeToFirstTokenMs.toLocaleString()}ms`}
+        />
+        <MetaItem label='Gateway overhead' value={`${trace.gatewayLatencyMs.toLocaleString()}ms`} />
         <MetaItem label='Cost' value={formatters.currencyPrecise(trace.cost)} />
-        <MetaItem label='Temperature' value={trace.temperature} />
-        <MetaItem label='Max Tokens' value={formatters.number(trace.maxTokens)} />
-        <MetaItem label='Top-p' value={trace.topP} />
-        <MetaItem label='Timestamp' value={formatters.dateTime(trace.timestamp)} />
       </div>
+
+      <Separator className='my-5' />
+
+      <RoutingPath trace={trace} />
 
       <Separator className='my-5' />
 
@@ -92,7 +176,12 @@ function TraceContent({ trace }: { trace: Trace }) {
 
       {/* Token Breakdown Bar */}
       <div>
-        <p className='text-sm font-medium text-foreground'>Token Breakdown</p>
+        <div className='flex items-center justify-between gap-3'>
+          <p className='text-sm font-medium text-foreground'>Token breakdown</p>
+          <p className='text-xs text-muted-foreground'>
+            {formatters.number(totalTokens)} total · {trace.finishReason} finish
+          </p>
+        </div>
         <div className='mt-3 flex h-2.5 w-full overflow-hidden rounded-full bg-muted'>
           <div className={cn('rounded-l-full bg-[var(--chart-1)]')} style={{ width: `${promptPct}%` }} />
           <div className={cn('rounded-r-full bg-[var(--chart-2)]')} style={{ width: `${100 - promptPct}%` }} />
@@ -107,6 +196,11 @@ function TraceContent({ trace }: { trace: Trace }) {
             Completion: {formatters.number(trace.completionTokens)} ({100 - promptPct}%)
           </span>
         </div>
+        <div className='mt-4 grid grid-cols-3 gap-4'>
+          <MetaItem label='Temperature' value={trace.temperature} />
+          <MetaItem label='Max tokens' value={formatters.number(trace.maxTokens)} />
+          <MetaItem label='Top-p' value={trace.topP} />
+        </div>
       </div>
     </div>
   );
@@ -120,9 +214,9 @@ export function TraceDetails({ trace, open, onOpenChange }: TraceDetailsProps) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className='max-h-[85vh] max-w-2xl overflow-y-auto sm:max-w-2xl'>
+        <DialogContent className='max-h-[85vh] max-w-3xl overflow-y-auto sm:max-w-3xl'>
           <DialogHeader>
-            <div className='flex items-center gap-3'>
+            <div className='flex flex-wrap items-center gap-3 pr-8'>
               <div className='flex items-center gap-1.5'>
                 <DialogTitle className='font-mono text-sm'>{trace.traceId}</DialogTitle>
                 <CopyButton value={trace.traceId} className='size-6' />
@@ -133,6 +227,7 @@ export function TraceDetails({ trace, open, onOpenChange }: TraceDetailsProps) {
               >
                 {trace.status}
               </Badge>
+              <span className='text-xs text-muted-foreground'>{modelMap[trace.model]?.name ?? trace.model}</span>
             </div>
             <DialogDescription className='sr-only'>Trace details for {trace.traceId}</DialogDescription>
           </DialogHeader>
@@ -146,7 +241,7 @@ export function TraceDetails({ trace, open, onOpenChange }: TraceDetailsProps) {
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className='mx-auto max-h-[85vh] max-w-2xl'>
         <DrawerHeader className='text-left'>
-          <div className='flex items-center gap-3'>
+          <div className='flex flex-wrap items-center gap-3 pr-10'>
             <div className='flex items-center gap-1.5'>
               <DrawerTitle className='font-mono text-sm'>{trace.traceId}</DrawerTitle>
               <CopyButton value={trace.traceId} className='size-6' />
@@ -154,10 +249,11 @@ export function TraceDetails({ trace, open, onOpenChange }: TraceDetailsProps) {
             <Badge variant={trace.status === 'success' ? 'default' : 'destructive'} className='rounded-full capitalize'>
               {trace.status}
             </Badge>
+            <span className='text-xs text-muted-foreground'>{modelMap[trace.model]?.name ?? trace.model}</span>
           </div>
           <DrawerClose asChild>
             <Button variant='ghost' size='icon' className='absolute top-4 right-4 size-8'>
-              <X className='size-4' />
+              <X />
               <span className='sr-only'>Close</span>
             </Button>
           </DrawerClose>

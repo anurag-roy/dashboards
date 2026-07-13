@@ -2,7 +2,14 @@
 
 import * as React from 'react';
 import { Separator } from '@workspace/ui/components/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
 import { Input } from '@workspace/ui/components/input';
 import { Button } from '@workspace/ui/components/button';
 import { RotateCcw } from 'lucide-react';
@@ -30,12 +37,20 @@ const dateRangeItems = [
   { value: '720', label: 'Last 30d' },
 ];
 
+const routeItems = [
+  { value: 'all', label: 'All routes' },
+  { value: 'primary', label: 'Primary' },
+  { value: 'fallback', label: 'Fallback' },
+  { value: 'cache', label: 'Cache served' },
+];
+
 export default function TracesPage() {
   const [selectedTrace, setSelectedTrace] = React.useState<Trace | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [dateRange, setDateRange] = React.useState('720');
   const [selectedModels, setSelectedModels] = React.useState<string[]>([]);
   const [statusFilter, setStatusFilter] = React.useState('all');
+  const [routeFilter, setRouteFilter] = React.useState('all');
   const [minLatency, setMinLatency] = React.useState('');
 
   const filteredTraces = React.useMemo(() => {
@@ -56,6 +71,10 @@ export default function TracesPage() {
       result = result.filter((t) => t.status === statusFilter);
     }
 
+    if (routeFilter !== 'all') {
+      result = result.filter((t) => t.routeOutcome === routeFilter);
+    }
+
     // Min latency
     const minMs = Number(minLatency);
     if (minMs > 0) {
@@ -63,7 +82,7 @@ export default function TracesPage() {
     }
 
     return result;
-  }, [dateRange, selectedModels, statusFilter, minLatency]);
+  }, [dateRange, selectedModels, statusFilter, routeFilter, minLatency]);
 
   const handleRowClick = React.useCallback((trace: Trace) => {
     setSelectedTrace(trace);
@@ -74,6 +93,7 @@ export default function TracesPage() {
     setDateRange('720');
     setSelectedModels([]);
     setStatusFilter('all');
+    setRouteFilter('all');
     setMinLatency('');
   };
 
@@ -82,7 +102,7 @@ export default function TracesPage() {
       <div>
         <h1 className='text-2xl font-semibold text-foreground'>Traces</h1>
         <p className='mt-1 text-sm text-muted-foreground'>
-          Inspect individual LLM requests, prompts, completions, and performance metrics
+          Inspect gateway routing decisions, provider attempts, prompts, and request performance
         </p>
       </div>
       <Separator className='my-6' />
@@ -100,11 +120,13 @@ export default function TracesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {dateRangeItems.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      {dateRangeItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value} label={item.label}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -123,11 +145,31 @@ export default function TracesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {statusItems.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      {statusItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value} label={item.label}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className='w-full'>
+                <label className='mb-1.5 block text-xs font-medium text-muted-foreground'>Route outcome</label>
+                <Select value={routeFilter} onValueChange={(v) => v && setRouteFilter(v)} items={routeItems}>
+                  <SelectTrigger className='w-full'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {routeItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value} label={item.label}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -161,11 +203,13 @@ export default function TracesPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {dateRangeItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {dateRangeItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value} label={item.label}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -184,11 +228,31 @@ export default function TracesPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {statusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {statusItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value} label={item.label}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className='w-auto'>
+          <label className='mb-1.5 block text-xs font-medium text-muted-foreground'>Route outcome</label>
+          <Select value={routeFilter} onValueChange={(v) => v && setRouteFilter(v)} items={routeItems}>
+            <SelectTrigger className='w-[140px]'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {routeItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value} label={item.label}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
