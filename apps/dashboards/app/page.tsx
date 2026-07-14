@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { ArrowDownIcon, ArrowUpRightIcon } from 'lucide-react';
 
 import { siteConfig } from '@/app/siteConfig';
+import { ThemeSwitcher } from '@/app/theme-switcher';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { cn } from '@workspace/ui/lib/utils';
@@ -20,6 +21,7 @@ type Dashboard = {
   logoLight: string;
   logoDark: string;
   screenshot: string;
+  screenshotDark: string;
   screenshotAlt: string;
 };
 
@@ -39,6 +41,7 @@ const dashboards: Dashboard[] = [
     logoLight: '/logos/orbit-light.svg',
     logoDark: '/logos/orbit-dark.svg',
     screenshot: '/screenshots/orbit-overview.png',
+    screenshotDark: '/screenshots/orbit-overview-dark.png',
     screenshotAlt: 'Orbit overview showing workspace usage, billing, and activity metrics',
   },
   {
@@ -56,6 +59,7 @@ const dashboards: Dashboard[] = [
     logoLight: '/logos/audit-light.svg',
     logoDark: '/logos/audit-dark.svg',
     screenshot: '/screenshots/audit-reports.png',
+    screenshotDark: '/screenshots/audit-reports-dark.png',
     screenshotAlt: 'Audit reports dashboard showing expense filters and transaction charts',
   },
   {
@@ -73,6 +77,7 @@ const dashboards: Dashboard[] = [
     logoLight: '/logos/pulse-light.svg',
     logoDark: '/logos/pulse-dark.svg',
     screenshot: '/screenshots/pulse-support.png',
+    screenshotDark: '/screenshots/pulse-support-dark.png',
     screenshotAlt: 'Pulse support dashboard showing ticket, SLA, and call volume metrics',
   },
   {
@@ -90,6 +95,7 @@ const dashboards: Dashboard[] = [
     logoLight: '/logos/nova-light.svg',
     logoDark: '/logos/nova-dark.svg',
     screenshot: '/screenshots/nova-overview.png',
+    screenshotDark: '/screenshots/nova-overview-dark.png',
     screenshotAlt: 'Nova gateway health dashboard showing AI traffic and routing outcomes',
   },
 ];
@@ -110,10 +116,19 @@ export default function Home() {
           </span>
         </a>
 
-        <Button nativeButton={false} variant='outline' size='sm' render={<a href='#collection' />}>
-          Browse collection
-          <ArrowDownIcon data-icon='inline-end' />
-        </Button>
+        <div className='flex shrink-0 items-center gap-2'>
+          <ThemeSwitcher />
+          <Button
+            nativeButton={false}
+            variant='outline'
+            size='sm'
+            className='size-8 px-0 sm:w-auto sm:px-3'
+            render={<a href='#collection' />}
+          >
+            <span className='sr-only sm:not-sr-only'>Browse collection</span>
+            <ArrowDownIcon data-icon='inline-end' />
+          </Button>
+        </div>
       </header>
 
       <section className='border-y border-border/70 bg-muted/20'>
@@ -165,7 +180,15 @@ export default function Home() {
                   alt=''
                   fill
                   sizes='(min-width: 1024px) 20vw, (min-width: 640px) 42vw, 90vw'
-                  className='hub-index-image object-cover object-left-top'
+                  className='hub-index-image object-cover object-left-top dark:hidden'
+                  loading='eager'
+                />
+                <Image
+                  src={dashboard.screenshotDark}
+                  alt=''
+                  fill
+                  sizes='(min-width: 1024px) 20vw, (min-width: 640px) 42vw, 90vw'
+                  className='hub-index-image hidden object-cover object-left-top dark:block'
                   loading='eager'
                 />
               </div>
@@ -266,7 +289,11 @@ function DashboardChapter({ dashboard, imageFirst }: { dashboard: Dashboard; ima
             ))}
           </div>
 
-          <Button nativeButton={false} className='w-fit' render={<a href={dashboard.href} />}>
+          <Button
+            nativeButton={false}
+            className='w-fit'
+            render={<a href={dashboard.href} target='_blank' rel='noreferrer' />}
+          >
             Open {dashboard.name}
             <ArrowUpRightIcon data-icon='inline-end' />
           </Button>
@@ -274,6 +301,8 @@ function DashboardChapter({ dashboard, imageFirst }: { dashboard: Dashboard; ima
 
         <a
           href={dashboard.href}
+          target='_blank'
+          rel='noreferrer'
           className={cn(
             'hub-project-shot group block overflow-hidden rounded-3xl border border-border bg-card shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30',
             imageFirst && 'lg:order-1'
@@ -286,7 +315,15 @@ function DashboardChapter({ dashboard, imageFirst }: { dashboard: Dashboard; ima
               alt={dashboard.screenshotAlt}
               fill
               sizes='(min-width: 1024px) 65vw, 100vw'
-              className='hub-project-image object-cover object-top'
+              className='hub-project-image object-cover object-top dark:hidden'
+              loading='eager'
+            />
+            <Image
+              src={dashboard.screenshotDark}
+              alt={dashboard.screenshotAlt}
+              fill
+              sizes='(min-width: 1024px) 65vw, 100vw'
+              className='hub-project-image hidden object-cover object-top dark:block'
               loading='eager'
             />
             <figcaption className='absolute right-3 bottom-3 flex items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm'>
