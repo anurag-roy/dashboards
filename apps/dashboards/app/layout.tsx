@@ -21,6 +21,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: ['dashboard demos', 'SaaS operations', 'expense review', 'customer support', 'AI observability'],
+  authors: [{ name: 'Anurag Roy', url: 'https://anuragroy.dev' }],
+  creator: 'Anurag Roy',
+  alternates: { canonical: siteConfig.url },
+  robots: { index: true, follow: true },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -28,6 +33,13 @@ export const metadata: Metadata = {
     title: 'Dashboards | Four Product Demos',
     description: siteConfig.description,
     siteName: siteConfig.name,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Dashboards product demos' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dashboards | Four Product Demos',
+    description: siteConfig.description,
+    images: ['/opengraph-image'],
   },
   icons: {
     icon: [{ url: '/logos/dashboards.svg', type: 'image/svg+xml' }],
