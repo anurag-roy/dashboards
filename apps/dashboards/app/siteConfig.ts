@@ -1,11 +1,10 @@
 export const siteConfig = {
-  name: 'Anurag Roy Dashboards',
+  name: 'Dashboards',
   url: 'https://dashboards.anuragroy.dev',
   description:
-    'A client-facing gallery of polished dashboard demos by Anurag Roy, focused on business software, internal tools, and operational web apps.',
+    'Explore four focused dashboard products for SaaS operations, expense review, customer support, and AI observability.',
   baseLinks: {
     home: '/',
-    portfolio: 'https://anuragroy.dev',
     orbit: 'https://orbit.anuragroy.dev',
     audit: 'https://audit.anuragroy.dev',
     pulse: 'https://pulse.anuragroy.dev',

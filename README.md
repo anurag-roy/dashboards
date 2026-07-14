@@ -1,5 +1,7 @@
 # Dashboards Monorepo
 
+![Dashboards collection landing page](./docs/screenshots/dashboards.png)
+
 This repository contains four Next.js dashboard apps plus a portfolio launchpad, all built on a shared `@workspace/ui` design system and orchestrated with Turborepo.
 
 Read this file first when working across apps. Then read the app README for the specific product you are changing.
