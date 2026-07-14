@@ -17,17 +17,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Business Software Demos | Anurag Roy',
+    default: 'Dashboards | Four Product Demos',
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  authors: [{ name: 'Anurag Roy', url: 'https://anuragroy.dev' }],
-  creator: 'Anurag Roy',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
-    title: 'Business Software Demos | Anurag Roy',
+    title: 'Dashboards | Four Product Demos',
     description: siteConfig.description,
     siteName: siteConfig.name,
   },
