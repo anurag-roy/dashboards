@@ -22,9 +22,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: [],
+  keywords: ['expense audit', 'transaction review', 'expense reporting'],
   authors: [{ name: 'Anurag Roy', url: 'https://anuragroy.dev' }],
   creator: 'Anurag Roy',
+  alternates: { canonical: siteConfig.url },
+  robots: { index: true, follow: true },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -32,6 +34,13 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Audit expense review dashboard' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: ['/opengraph-image'],
   },
   icons: {
     icon: [
