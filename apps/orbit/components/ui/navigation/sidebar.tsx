@@ -91,7 +91,7 @@ type Workspace = {
 
 const workspaces: Workspace[] = [
   {
-    name: 'Acme Analytics',
+    name: 'Moon DB',
     tier: 'Pro workspace',
   },
   {
@@ -224,7 +224,7 @@ function WorkspaceSwitcher({
               />
             }
           >
-            <DashboardAvatar seed={activeWorkspace.name} square className='[&_svg]:size-8' />
+            <DashboardAvatar seed={activeWorkspace.name} />
             <div className='grid min-w-0 flex-1 text-left text-sm leading-tight'>
               <span className='truncate font-medium'>{activeWorkspace.name}</span>
               <span className='truncate text-xs text-muted-foreground'>{activeWorkspace.tier}</span>
@@ -248,7 +248,7 @@ function WorkspaceSwitcher({
                     }}
                     className='gap-3'
                   >
-                    <DashboardAvatar seed={workspace.name} square className='size-7' />
+                    <DashboardAvatar seed={workspace.name} className='size-7' />
                     <div className='min-w-0 flex-1'>
                       <p className='truncate text-sm font-medium text-foreground'>{workspace.name}</p>
                       <p className='truncate text-xs text-muted-foreground'>{workspace.tier}</p>

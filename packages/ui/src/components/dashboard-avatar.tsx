@@ -1,74 +1,47 @@
 'use client';
 
-import Avatar from 'boring-avatars';
+import { palettes } from '@oreo-design/avatar';
+import { Avatar } from '@oreo-design/avatar/react';
+import { useId, type CSSProperties } from 'react';
 
 import { cn } from '@workspace/ui/lib/utils';
+import { useTheme } from 'next-themes';
 
-const workspaceAvatarPalettes = [
-  ['#00bbf9', '#00f5d4', '#9b5de5', '#f15bb5', '#fee440'],
-  ['#06d6a0', '#1b9aaa', '#ef476f', '#ffc43d', '#f4a261'],
-  ['#2ec4b6', '#e71d36', '#ff9f1c', '#011627', '#4cc9f0'],
-  ['#3a86ff', '#8338ec', '#ff006e', '#fb5607', '#ffbe0b'],
-  ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#8338ec'],
-  ['#f72585', '#b5179e', '#7209b7', '#560bad', '#4cc9f0'],
-  ['#ff4d6d', '#ff85a1', '#f72585', '#b5179e', '#7209b7'],
-  ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'],
-  ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'],
-  ['#ff7b00', '#ff006e', '#8338ec', '#3a86ff', '#06d6a0'],
-  ['#ff9f1c', '#ffbf69', '#cbf3f0', '#2ec4b6', '#4361ee'],
-  ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff'],
-] as const;
-
-const userAvatarPalettes = [
-  ['#f7f3ed', '#ead8cf', '#d3b9bd', '#a9afc1', '#7985a3'],
-  ['#faf3e3', '#eadcbd', '#c9d0b7', '#9ab2ab', '#688b88'],
-  ['#f9eeee', '#ebd3da', '#d0bed8', '#abb8d5', '#7d99bd'],
-  ['#f8f1e8', '#e5d0bf', '#d7b2ad', '#ba9fb8', '#8a8bac'],
-  ['#f5f0e9', '#dfdacb', '#bdccc5', '#94b1ba', '#6c8995'],
-  ['#fff2e2', '#f1d8bc', '#dfbeba', '#bbaccb', '#8b9abe'],
-  ['#f8f5ee', '#e3dccf', '#ccc3d7', '#adbbd2', '#889fae'],
-  ['#f9f0e8', '#e9d2c7', '#cab8a9', '#9fb4ab', '#728f89'],
-] as const;
+const avatarStyle = { width: '100%', height: '100%' } satisfies CSSProperties;
 
 const hashSeed = (seed: string) => {
-  let hash = 0;
+  let hash = 2166136261;
   for (let index = 0; index < seed.length; index += 1) {
-    hash = (hash << 5) - hash + seed.charCodeAt(index);
-    hash |= 0;
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
   }
-  return Math.abs(hash);
+  return hash >>> 0;
 };
 
-const getPaletteForSeed = (seed: string, square: boolean) => {
-  const palettes = square ? workspaceAvatarPalettes : userAvatarPalettes;
+const getPaletteForSeed = (seed: string) => {
   const paletteIndex = hashSeed(seed) % palettes.length;
-  return [...palettes[paletteIndex]!];
+  return palettes[paletteIndex]!.id;
 };
 
 type DashboardAvatarProps = {
   seed: string;
   className?: string;
-  variant?: 'pixel' | 'bauhaus' | 'ring' | 'beam' | 'sunset' | 'marble' | 'geometric' | 'abstract';
-  square?: boolean;
 };
 
-export function DashboardAvatar({ seed, className, variant = 'marble', square = false }: DashboardAvatarProps) {
+export function DashboardAvatar({ seed, className }: DashboardAvatarProps) {
+  const instanceId = useId();
+  const theme = useTheme();
+  const resolvedTheme = (theme.resolvedTheme || 'light') as 'light' | 'dark';
+
   return (
-    <div
-      className={cn(
-        'inline-flex size-8 shrink-0 overflow-hidden rounded-full border border-border bg-muted/40',
-        square && 'rounded-xl',
-        className
-      )}
-      aria-hidden='true'
-    >
+    <div className={cn('inline-flex size-8 shrink-0 rounded-full overflow-clip', className)} aria-hidden='true'>
       <Avatar
-        name={seed}
-        size='100%'
-        className='size-full'
-        variant={variant}
-        colors={getPaletteForSeed(seed, square)}
-        square={square}
+        className='size-full [&>svg]:!size-full'
+        style={avatarStyle}
+        shape='flare'
+        palette={getPaletteForSeed(seed)}
+        variantId={instanceId}
+        appearance={resolvedTheme}
       />
     </div>
   );
