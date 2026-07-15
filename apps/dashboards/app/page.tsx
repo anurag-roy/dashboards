@@ -126,7 +126,7 @@ export default function Home() {
             render={<a href='#collection' />}
           >
             <span className='sr-only sm:not-sr-only'>Browse collection</span>
-            <ArrowDownIcon data-icon='inline-end' />
+            <ArrowDownIcon />
           </Button>
         </div>
       </header>
