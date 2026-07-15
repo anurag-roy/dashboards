@@ -9,6 +9,7 @@ import { useIsMobile } from '@workspace/ui/hooks/use-mobile';
 import { cn } from '@workspace/ui/lib/utils';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
+import { Kbd, KbdGroup } from '@workspace/ui/components/kbd';
 import { Separator } from '@workspace/ui/components/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@workspace/ui/components/sheet';
 import { Skeleton } from '@workspace/ui/components/skeleton';
@@ -41,6 +42,16 @@ function useSidebar() {
   }
 
   return context;
+}
+
+function useIsMacPlatform() {
+  const [isMac, setIsMac] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/.test(window.navigator.userAgent));
+  }, []);
+
+  return isMac;
 }
 
 function SidebarProvider({
@@ -213,7 +224,7 @@ function Sidebar({
         data-slot='sidebar-container'
         data-side={side}
         className={cn(
-          'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex',
+          'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-100 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex',
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
@@ -279,6 +290,52 @@ function SidebarRail({ className, ...props }: React.ComponentProps<typeof Button
       {isCollapsed ? <PanelLeftOpenIcon /> : <PanelLeftCloseIcon />}
       <span className='sr-only'>{label}</span>
     </Button>
+  );
+}
+
+function SidebarFooterTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>) {
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+  const isMac = useIsMacPlatform();
+  const label = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            {...props}
+            data-sidebar='footer-trigger'
+            data-slot='sidebar-footer-trigger'
+            type='button'
+            variant='ghost'
+            size='default'
+            aria-label={label}
+            aria-keyshortcuts='Meta+B Control+B'
+            className={cn(
+              'hidden md:inline-flex',
+              isCollapsed ? 'w-8 self-center px-0' : 'w-full justify-start',
+              className
+            )}
+            onClick={(event) => {
+              onClick?.(event);
+              toggleSidebar();
+            }}
+          />
+        }
+      >
+        {isCollapsed ? <PanelLeftOpenIcon /> : <PanelLeftCloseIcon data-icon='inline-start' />}
+        {isCollapsed ? null : <span>{label}</span>}
+      </TooltipTrigger>
+      <TooltipContent side='right' align='center' sideOffset={8}>
+        {label}
+        <KbdGroup>
+          <Kbd>{isMac ? '⌘' : 'Ctrl'}</Kbd>
+          {isMac ? null : <span>+</span>}
+          <Kbd>B</Kbd>
+        </KbdGroup>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -374,7 +431,7 @@ function SidebarGroupLabel({
     props: mergeProps<'div'>(
       {
         className: cn(
-          'flex h-8 shrink-0 items-center rounded-xl px-3 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+          "relative flex h-8 shrink-0 items-center rounded-xl px-3 text-xs font-medium whitespace-nowrap text-sidebar-foreground/70 ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:text-transparent after:pointer-events-none after:absolute after:top-1/2 after:left-1/2 after:hidden after:size-1 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-sidebar-foreground/50 after:content-[''] group-data-[collapsible=icon]:after:block focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
           className
         ),
       },
@@ -446,7 +503,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button group/menu-button flex w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-sidebar-accent data-open:hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate',
+  'peer/menu-button group/menu-button flex w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:w-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-sidebar-accent data-open:hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate',
   {
     variants: {
       variant: {
@@ -489,7 +546,7 @@ function SidebarMenuButton({
       },
       props
     ),
-    render: !tooltip ? render : <TooltipTrigger render={render} />,
+    render,
     state: {
       slot: 'sidebar-menu-button',
       sidebar: 'menu-button',
@@ -498,7 +555,7 @@ function SidebarMenuButton({
     },
   });
 
-  if (!tooltip) {
+  if (!tooltip || state !== 'collapsed' || isMobile) {
     return comp;
   }
 
@@ -510,8 +567,8 @@ function SidebarMenuButton({
 
   return (
     <Tooltip>
-      {comp}
-      <TooltipContent side='right' align='center' hidden={state !== 'collapsed' || isMobile} {...tooltip} />
+      <TooltipTrigger render={comp} />
+      <TooltipContent side='right' align='center' {...tooltip} />
     </Tooltip>
   );
 }
@@ -654,6 +711,7 @@ export {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarFooterTrigger,
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,

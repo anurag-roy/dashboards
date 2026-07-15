@@ -10,6 +10,7 @@ import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
   SidebarFooter,
+  SidebarFooterTrigger,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -17,9 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
+import { Separator } from '@workspace/ui/components/separator';
 
 import { AppLogo } from '@/components/app-logo';
 import { siteConfig } from '@/app/siteConfig';
@@ -188,7 +189,7 @@ export function Sidebar() {
       <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
         <div className='hidden md:block'>
           <div className='flex items-center gap-3 rounded-2xl px-3 py-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
-            <AppLogo iconClassName='size-8' />
+            <AppLogo iconClassName='size-8 group-data-[collapsible=icon]:p-0.5' />
             <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
               <p className='truncate text-lg font-bold text-foreground'>{workspace.name}</p>
             </div>
@@ -207,9 +208,12 @@ export function Sidebar() {
         <SidebarNavContent />
       </SidebarContent>
       <SidebarFooter className='hidden md:flex'>
-        <UserProfileDesktop />
+        <SidebarFooterTrigger />
+        <Separator className='bg-sidebar-border/70' />
+        <div className='flex h-[58px] items-center group-data-[collapsible=icon]:justify-center'>
+          <UserProfileDesktop />
+        </div>
       </SidebarFooter>
-      <SidebarRail />
     </SidebarPrimitive>
   );
 }

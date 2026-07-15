@@ -33,6 +33,7 @@ import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
   SidebarFooter,
+  SidebarFooterTrigger,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -40,7 +41,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
 import { Separator } from '@workspace/ui/components/separator';
@@ -325,7 +325,7 @@ function SidebarNavContent() {
 function BrandHeader({ compact = false }: { compact?: boolean }) {
   return (
     <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
-      <AppLogo iconClassName={compact ? 'size-7' : 'size-8'} />
+      <AppLogo iconClassName={cn(compact ? 'size-7' : 'size-8', 'group-data-[collapsible=icon]:p-0.5')} />
       <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
         <p className='truncate text-lg font-bold text-foreground'>Orbit</p>
       </div>
@@ -346,7 +346,7 @@ export function Sidebar() {
           <BrandHeader />
         </div>
         {activeWorkspace && (
-          <div className='px-1 group-data-[collapsible=icon]:hidden'>
+          <div className='px-1 group-data-[collapsible=icon]:px-0'>
             <Separator className='my-1 bg-sidebar-border/70' />
             <WorkspaceSwitcher activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
           </div>
@@ -356,22 +356,21 @@ export function Sidebar() {
         <SidebarNavContent />
       </SidebarContent>
       <SidebarFooter>
-        <div className='md:block'>
-          <div className='hidden md:block'>
-            <UserProfileDesktop />
-          </div>
-          <div className='px-3 py-2 md:hidden'>
-            <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
-              <DashboardAvatar seed='Anurag Roy' className='size-8' />
-              <div className='min-w-0'>
-                <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
-                <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
-              </div>
+        <SidebarFooterTrigger />
+        <Separator className='hidden bg-sidebar-border/70 md:block' />
+        <div className='hidden h-[58px] items-center group-data-[collapsible=icon]:justify-center md:flex'>
+          <UserProfileDesktop />
+        </div>
+        <div className='px-3 py-2 md:hidden'>
+          <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
+            <DashboardAvatar seed='Anurag Roy' className='size-8' />
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
+              <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
             </div>
           </div>
         </div>
       </SidebarFooter>
-      <SidebarRail />
     </SidebarPrimitive>
   );
 }
