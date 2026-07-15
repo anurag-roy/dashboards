@@ -1,0 +1,85 @@
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+
+import '@workspace/ui/globals.css';
+import { siteConfig } from '@/app/siteConfig';
+import { MobileSidebarHeader, Sidebar } from '@/components/ui/navigation/sidebar';
+import { ThemeProvider } from '@workspace/ui/components/theme-provider';
+import { SidebarInset, SidebarProvider } from '@workspace/ui/components/sidebar';
+import { cn } from '@workspace/ui/lib/utils';
+import { Toaster } from '@workspace/ui/components/sonner';
+import { TooltipProvider } from '@workspace/ui/components/tooltip';
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const fontMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: ['usage analytics', 'workspace billing', 'usage reporting'],
+  authors: [{ name: 'Anurag Roy', url: 'https://anuragroy.dev' }],
+  creator: 'Anurag Roy',
+  alternates: { canonical: siteConfig.url },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Orbit usage analytics dashboard' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: ['/opengraph-image'],
+  },
+  icons: {
+    icon: [
+      { url: '/logos/orbit-light.svg', media: '(prefers-color-scheme: light)', type: 'image/svg+xml' },
+      { url: '/logos/orbit-dark.svg', media: '(prefers-color-scheme: dark)', type: 'image/svg+xml' },
+    ],
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang='en' suppressHydrationWarning>
+      <body
+        className={cn(
+          'theme-orbit overflow-y-scroll scroll-auto antialiased selection:bg-primary/20 selection:text-primary',
+          fontMono.variable,
+          'font-sans',
+          geist.variable
+        )}
+        suppressHydrationWarning
+      >
+        <ThemeProvider>
+          <TooltipProvider delay={0}>
+            <SidebarProvider>
+              <Sidebar />
+              <SidebarInset>
+                <MobileSidebarHeader />
+                <div className='mx-auto w-full max-w-7xl'>{children}</div>
+              </SidebarInset>
+            </SidebarProvider>
+            <Toaster />
+          </TooltipProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

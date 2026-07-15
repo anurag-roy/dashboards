@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" shape-rendering="geometricPrecision">
+  <rect width="48" height="48" rx="12" fill="#101828"/>
+  <rect x="9" y="9" width="13" height="13" rx="4" fill="#1447e6"/>
+  <rect x="26" y="9" width="13" height="13" rx="4" fill="#c6005c"/>
+  <rect x="9" y="26" width="13" height="13" rx="4" fill="#007a55"/>
+  <rect x="26" y="26" width="13" height="13" rx="4" fill="#432dd7"/>
+  <rect width="46" height="46" x="1" y="1" rx="11" stroke="url(#dashboards-border)" stroke-width="2"/>
+  <defs>
+    <linearGradient id="dashboards-border" x1="24" x2="24" y1="0" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>
