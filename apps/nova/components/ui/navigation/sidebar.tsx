@@ -36,7 +36,7 @@ const navigation = [
   { name: 'Settings', href: siteConfig.baseLinks.settings.general, icon: Settings2 },
 ] as const;
 
-const mobileAccountItems = [
+const mobileResourceItems = [
   { name: 'Changelog', icon: ExternalLink },
   { name: 'Documentation', icon: ExternalLink },
   { name: 'Join Slack community', icon: ExternalLink },
@@ -60,62 +60,78 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
   }
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Account</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'light'}
-              onClick={() => {
-                setTheme('light');
-              }}
-            >
-              <Sun className='size-4 shrink-0' aria-hidden='true' />
-              <span>Light theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'dark'}
-              onClick={() => {
-                setTheme('dark');
-              }}
-            >
-              <Moon className='size-4 shrink-0' aria-hidden='true' />
-              <span>Dark theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'system'}
-              onClick={() => {
-                setTheme('system');
-              }}
-            >
-              <Computer className='size-4 shrink-0' aria-hidden='true' />
-              <span>System theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          {mobileAccountItems.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton type='button' onClick={onItemClick}>
-                <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
-                <span>{item.name}</span>
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Appearance</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'light'}
+                onClick={() => {
+                  setTheme('light');
+                }}
+              >
+                <Sun className='size-4 shrink-0' aria-hidden='true' />
+                <span>Light theme</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ))}
-          <SidebarMenuItem>
-            <SidebarMenuButton type='button' onClick={onItemClick}>
-              <span>Sign out</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'dark'}
+                onClick={() => {
+                  setTheme('dark');
+                }}
+              >
+                <Moon className='size-4 shrink-0' aria-hidden='true' />
+                <span>Dark theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'system'}
+                onClick={() => {
+                  setTheme('system');
+                }}
+              >
+                <Computer className='size-4 shrink-0' aria-hidden='true' />
+                <span>System theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Resources</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {mobileResourceItems.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton type='button' onClick={onItemClick}>
+                  <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
+                  <span>{item.name}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton type='button' onClick={onItemClick}>
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </>
   );
 }
 

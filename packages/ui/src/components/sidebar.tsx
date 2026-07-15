@@ -13,7 +13,7 @@ import { Separator } from '@workspace/ui/components/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@workspace/ui/components/sheet';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@workspace/ui/components/tooltip';
-import { PanelLeftIcon } from 'lucide-react';
+import { PanelLeftCloseIcon, PanelLeftIcon, PanelLeftOpenIcon } from 'lucide-react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -135,6 +135,7 @@ function SidebarProvider({
 
 function Sidebar({
   side = 'left',
+  mobileSide = 'right',
   variant = 'sidebar',
   collapsible = 'offcanvas',
   className,
@@ -143,6 +144,7 @@ function Sidebar({
   ...props
 }: React.ComponentProps<'div'> & {
   side?: 'left' | 'right';
+  mobileSide?: 'left' | 'right';
   variant?: 'sidebar' | 'floating' | 'inset';
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }) {
@@ -174,7 +176,7 @@ function Sidebar({
               '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
             } as React.CSSProperties
           }
-          side={side}
+          side={mobileSide}
         >
           <SheetHeader className='sr-only'>
             <SheetTitle>Sidebar</SheetTitle>
@@ -254,28 +256,29 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
   );
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
-  const { toggleSidebar } = useSidebar();
+function SidebarRail({ className, ...props }: React.ComponentProps<typeof Button>) {
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+  const label = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
 
   return (
-    <button
+    <Button
       data-sidebar='rail'
       data-slot='sidebar-rail'
-      aria-label='Toggle Sidebar'
-      tabIndex={-1}
+      aria-label={label}
       onClick={toggleSidebar}
-      title='Toggle Sidebar'
+      title={label}
+      variant='outline'
+      size='icon-xs'
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
-        'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
-        '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-        'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar',
-        '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
-        '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+        'absolute top-4 z-20 hidden bg-sidebar shadow-sm group-data-[side=left]:-right-3 group-data-[side=right]:-left-3 md:inline-flex group-data-[side=right]:[&_svg]:rotate-180',
         className
       )}
       {...props}
-    />
+    >
+      {isCollapsed ? <PanelLeftOpenIcon /> : <PanelLeftCloseIcon />}
+      <span className='sr-only'>{label}</span>
+    </Button>
   );
 }
 

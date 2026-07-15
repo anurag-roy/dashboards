@@ -4,7 +4,7 @@ import Avatar from 'boring-avatars';
 
 import { cn } from '@workspace/ui/lib/utils';
 
-const avatarPalettes = [
+const workspaceAvatarPalettes = [
   ['#00bbf9', '#00f5d4', '#9b5de5', '#f15bb5', '#fee440'],
   ['#06d6a0', '#1b9aaa', '#ef476f', '#ffc43d', '#f4a261'],
   ['#2ec4b6', '#e71d36', '#ff9f1c', '#011627', '#4cc9f0'],
@@ -19,6 +19,17 @@ const avatarPalettes = [
   ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff'],
 ] as const;
 
+const userAvatarPalettes = [
+  ['#f7f3ed', '#ead8cf', '#d3b9bd', '#a9afc1', '#7985a3'],
+  ['#faf3e3', '#eadcbd', '#c9d0b7', '#9ab2ab', '#688b88'],
+  ['#f9eeee', '#ebd3da', '#d0bed8', '#abb8d5', '#7d99bd'],
+  ['#f8f1e8', '#e5d0bf', '#d7b2ad', '#ba9fb8', '#8a8bac'],
+  ['#f5f0e9', '#dfdacb', '#bdccc5', '#94b1ba', '#6c8995'],
+  ['#fff2e2', '#f1d8bc', '#dfbeba', '#bbaccb', '#8b9abe'],
+  ['#f8f5ee', '#e3dccf', '#ccc3d7', '#adbbd2', '#889fae'],
+  ['#f9f0e8', '#e9d2c7', '#cab8a9', '#9fb4ab', '#728f89'],
+] as const;
+
 const hashSeed = (seed: string) => {
   let hash = 0;
   for (let index = 0; index < seed.length; index += 1) {
@@ -28,9 +39,10 @@ const hashSeed = (seed: string) => {
   return Math.abs(hash);
 };
 
-const getPaletteForSeed = (seed: string) => {
-  const paletteIndex = hashSeed(seed) % avatarPalettes.length;
-  return [...avatarPalettes[paletteIndex]!];
+const getPaletteForSeed = (seed: string, square: boolean) => {
+  const palettes = square ? workspaceAvatarPalettes : userAvatarPalettes;
+  const paletteIndex = hashSeed(seed) % palettes.length;
+  return [...palettes[paletteIndex]!];
 };
 
 type DashboardAvatarProps = {
@@ -55,7 +67,7 @@ export function DashboardAvatar({ seed, className, variant = 'marble', square = 
         size='100%'
         className='size-full'
         variant={variant}
-        colors={getPaletteForSeed(seed)}
+        colors={getPaletteForSeed(seed, square)}
         square={square}
       />
     </div>

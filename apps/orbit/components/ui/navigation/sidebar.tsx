@@ -104,7 +104,7 @@ const workspaces: Workspace[] = [
   },
 ];
 
-const mobileAccountItems = [
+const mobileResourceItems = [
   { name: 'Changelog', icon: ExternalLink },
   { name: 'Documentation', icon: ExternalLink },
   { name: 'Join Slack community', icon: ExternalLink },
@@ -130,7 +130,7 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupLabel>Appearance</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -169,7 +169,14 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
                 <span>System theme</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {mobileAccountItems.map((item) => (
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Resources</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {mobileResourceItems.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton type='button' onClick={onItemClick}>
                   <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
@@ -177,6 +184,13 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton type='button' onClick={onItemClick}>
                 <span>Sign out</span>
