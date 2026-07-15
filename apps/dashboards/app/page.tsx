@@ -122,7 +122,7 @@ export default function Home() {
             nativeButton={false}
             variant='outline'
             size='sm'
-            className='size-8 px-0 has-data-[icon=inline-end]:pr-0 sm:w-auto sm:px-3 sm:has-data-[icon=inline-end]:pr-2'
+            className='size-8 px-0 sm:w-auto sm:px-3'
             render={<a href='#collection' />}
           >
             <span className='sr-only sm:not-sr-only'>Browse collection</span>

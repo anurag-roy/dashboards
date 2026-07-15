@@ -70,7 +70,7 @@ function MobileSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
 
           {mounted && (
             <div className='flex flex-col gap-1 p-4'>
-              <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Theme</p>
+              <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Appearance</p>
               {(
                 [
                   { value: 'light', label: 'Light', icon: Sun },
@@ -98,7 +98,7 @@ function MobileSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
           <Separator className='mx-4' />
 
           <div className='flex flex-col gap-1 p-4'>
-            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Account</p>
+            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Resources</p>
             {[{ label: 'Changelog' }, { label: 'Documentation' }, { label: 'Join Slack community' }].map((item) => (
               <a
                 key={item.label}
@@ -110,6 +110,12 @@ function MobileSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
                 <ExternalLink className='size-3.5 shrink-0' aria-hidden='true' />
               </a>
             ))}
+          </div>
+
+          <Separator className='mx-4' />
+
+          <div className='flex flex-col gap-1 p-4'>
+            <p className='mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>Account</p>
             <Link
               href={siteConfig.baseLinks.login}
               onClick={() => onOpenChange(false)}

@@ -10,6 +10,7 @@ import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
   SidebarFooter,
+  SidebarFooterTrigger,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -17,9 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
+import { Separator } from '@workspace/ui/components/separator';
 
 import { AppLogo } from '@/components/app-logo';
 import { siteConfig } from '@/app/siteConfig';
@@ -40,7 +41,7 @@ const setupNavigation = [
   { name: 'Onboarding', href: siteConfig.baseLinks.onboarding.products, icon: Compass },
 ] as const;
 
-const mobileAccountItems = [
+const mobileResourceItems = [
   { name: 'Changelog', icon: ExternalLink },
   { name: 'Documentation', icon: ExternalLink },
   { name: 'Join Slack community', icon: ExternalLink },
@@ -64,62 +65,78 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
   }
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Account</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'light'}
-              onClick={() => {
-                setTheme('light');
-              }}
-            >
-              <Sun className='size-4 shrink-0' aria-hidden='true' />
-              <span>Light theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'dark'}
-              onClick={() => {
-                setTheme('dark');
-              }}
-            >
-              <Moon className='size-4 shrink-0' aria-hidden='true' />
-              <span>Dark theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type='button'
-              isActive={mounted && theme === 'system'}
-              onClick={() => {
-                setTheme('system');
-              }}
-            >
-              <Computer className='size-4 shrink-0' aria-hidden='true' />
-              <span>System theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          {mobileAccountItems.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton type='button' onClick={onItemClick}>
-                <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
-                <span>{item.name}</span>
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Appearance</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'light'}
+                onClick={() => {
+                  setTheme('light');
+                }}
+              >
+                <Sun className='size-4 shrink-0' aria-hidden='true' />
+                <span>Light theme</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ))}
-          <SidebarMenuItem>
-            <SidebarMenuButton type='button' onClick={onItemClick}>
-              <span>Sign out</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'dark'}
+                onClick={() => {
+                  setTheme('dark');
+                }}
+              >
+                <Moon className='size-4 shrink-0' aria-hidden='true' />
+                <span>Dark theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type='button'
+                isActive={mounted && theme === 'system'}
+                onClick={() => {
+                  setTheme('system');
+                }}
+              >
+                <Computer className='size-4 shrink-0' aria-hidden='true' />
+                <span>System theme</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Resources</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {mobileResourceItems.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton type='button' onClick={onItemClick}>
+                  <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
+                  <span>{item.name}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton type='button' onClick={onItemClick}>
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </>
   );
 }
 
@@ -199,7 +216,7 @@ export function Sidebar() {
       <SidebarHeader className='border-b border-sidebar-border/70 pb-3'>
         <div className='hidden md:block'>
           <div className='flex items-center gap-3 rounded-2xl px-3 py-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
-            <AppLogo iconClassName='size-8' />
+            <AppLogo iconClassName='size-8 group-data-[collapsible=icon]:p-0.5' />
             <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
               <p className='truncate text-lg font-bold text-foreground'>{workspace.name}</p>
             </div>
@@ -218,22 +235,21 @@ export function Sidebar() {
         <SidebarNavContent />
       </SidebarContent>
       <SidebarFooter>
-        <div className='md:block'>
-          <div className='hidden md:block'>
-            <UserProfileDesktop />
-          </div>
-          <div className='px-3 py-2 md:hidden'>
-            <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
-              <DashboardAvatar seed='Anurag Roy' className='size-8' />
-              <div className='min-w-0'>
-                <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
-                <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
-              </div>
+        <SidebarFooterTrigger />
+        <Separator className='hidden bg-sidebar-border/70 md:block' />
+        <div className='hidden h-[58px] items-center group-data-[collapsible=icon]:justify-center md:flex'>
+          <UserProfileDesktop />
+        </div>
+        <div className='px-3 py-2 md:hidden'>
+          <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
+            <DashboardAvatar seed='Anurag Roy' className='size-8' />
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
+              <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
             </div>
           </div>
         </div>
       </SidebarFooter>
-      <SidebarRail />
     </SidebarPrimitive>
   );
 }

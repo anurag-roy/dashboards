@@ -33,6 +33,7 @@ import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
   SidebarFooter,
+  SidebarFooterTrigger,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -40,7 +41,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
 import { Separator } from '@workspace/ui/components/separator';
@@ -91,7 +91,7 @@ type Workspace = {
 
 const workspaces: Workspace[] = [
   {
-    name: 'Acme Analytics',
+    name: 'Moon DB',
     tier: 'Pro workspace',
   },
   {
@@ -104,7 +104,7 @@ const workspaces: Workspace[] = [
   },
 ];
 
-const mobileAccountItems = [
+const mobileResourceItems = [
   { name: 'Changelog', icon: ExternalLink },
   { name: 'Documentation', icon: ExternalLink },
   { name: 'Join Slack community', icon: ExternalLink },
@@ -130,7 +130,7 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupLabel>Appearance</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -169,7 +169,14 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
                 <span>System theme</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {mobileAccountItems.map((item) => (
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Resources</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {mobileResourceItems.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton type='button' onClick={onItemClick}>
                   <item.icon className='size-4 shrink-0 text-muted-foreground' aria-hidden='true' />
@@ -177,6 +184,13 @@ function MobileSidebarUtilityGroups({ isMobile, onItemClick }: MobileSidebarUtil
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Account</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton type='button' onClick={onItemClick}>
                 <span>Sign out</span>
@@ -210,7 +224,7 @@ function WorkspaceSwitcher({
               />
             }
           >
-            <DashboardAvatar seed={activeWorkspace.name} square className='[&_svg]:size-8' />
+            <DashboardAvatar seed={activeWorkspace.name} />
             <div className='grid min-w-0 flex-1 text-left text-sm leading-tight'>
               <span className='truncate font-medium'>{activeWorkspace.name}</span>
               <span className='truncate text-xs text-muted-foreground'>{activeWorkspace.tier}</span>
@@ -234,7 +248,7 @@ function WorkspaceSwitcher({
                     }}
                     className='gap-3'
                   >
-                    <DashboardAvatar seed={workspace.name} square className='size-7' />
+                    <DashboardAvatar seed={workspace.name} className='size-7' />
                     <div className='min-w-0 flex-1'>
                       <p className='truncate text-sm font-medium text-foreground'>{workspace.name}</p>
                       <p className='truncate text-xs text-muted-foreground'>{workspace.tier}</p>
@@ -311,7 +325,7 @@ function SidebarNavContent() {
 function BrandHeader({ compact = false }: { compact?: boolean }) {
   return (
     <div className='flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
-      <AppLogo iconClassName={compact ? 'size-7' : 'size-8'} />
+      <AppLogo iconClassName={cn(compact ? 'size-7' : 'size-8', 'group-data-[collapsible=icon]:p-0.5')} />
       <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
         <p className='truncate text-lg font-bold text-foreground'>Orbit</p>
       </div>
@@ -332,7 +346,7 @@ export function Sidebar() {
           <BrandHeader />
         </div>
         {activeWorkspace && (
-          <div className='px-1 group-data-[collapsible=icon]:hidden'>
+          <div className='px-1 group-data-[collapsible=icon]:px-0'>
             <Separator className='my-1 bg-sidebar-border/70' />
             <WorkspaceSwitcher activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
           </div>
@@ -342,22 +356,21 @@ export function Sidebar() {
         <SidebarNavContent />
       </SidebarContent>
       <SidebarFooter>
-        <div className='md:block'>
-          <div className='hidden md:block'>
-            <UserProfileDesktop />
-          </div>
-          <div className='px-3 py-2 md:hidden'>
-            <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
-              <DashboardAvatar seed='Anurag Roy' className='size-8' />
-              <div className='min-w-0'>
-                <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
-                <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
-              </div>
+        <SidebarFooterTrigger />
+        <Separator className='hidden bg-sidebar-border/70 md:block' />
+        <div className='hidden h-[58px] items-center group-data-[collapsible=icon]:justify-center md:flex'>
+          <UserProfileDesktop />
+        </div>
+        <div className='px-3 py-2 md:hidden'>
+          <div className='flex items-center gap-3 rounded-2xl px-2 py-1'>
+            <DashboardAvatar seed='Anurag Roy' className='size-8' />
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-medium text-foreground'>Anurag Roy</p>
+              <p className='truncate text-xs text-muted-foreground'>hello@anuragroy.dev</p>
             </div>
           </div>
         </div>
       </SidebarFooter>
-      <SidebarRail />
     </SidebarPrimitive>
   );
 }
